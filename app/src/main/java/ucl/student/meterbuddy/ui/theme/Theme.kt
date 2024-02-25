@@ -1,4 +1,4 @@
-package com.example.p4.ui.theme
+package ucl.student.meterbuddy.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun P4Theme(
+fun MeterBuddyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

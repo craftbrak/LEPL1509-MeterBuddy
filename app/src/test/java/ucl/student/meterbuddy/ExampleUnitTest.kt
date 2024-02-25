@@ -1,4 +1,4 @@
-package com.example.p4
+package ucl.student.meterbuddy
 
 import org.junit.Test
 

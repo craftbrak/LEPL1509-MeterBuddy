@@ -1,4 +1,4 @@
-package com.example.p4.ui.theme
+package ucl.student.meterbuddy.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
