@@ -1,11 +1,9 @@
 package ucl.student.meterbuddy.tables.entities.relations
 
-import androidx.compose.ui.semantics.Role
-import androidx.room.Entity
 
-enum class Role {
-    // TODO
-}
+import androidx.room.Entity
+import ucl.student.meterbuddy.tables.entities.Role
+
 
 @Entity(primaryKeys = ["housingID", "userID"])
 data class HousingUserCrossRef (
