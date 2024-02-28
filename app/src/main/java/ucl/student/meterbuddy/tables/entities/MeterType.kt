@@ -3,8 +3,10 @@ package ucl.student.meterbuddy.tables.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class Type {
-    // TODO
+enum class Type (val type: String) {
+    ELECTRICITY("Electricity"),
+    GAS("Gas"),
+    WATER("Water")
 }
 
 @Entity

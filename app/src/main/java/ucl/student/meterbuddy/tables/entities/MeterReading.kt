@@ -2,12 +2,8 @@ package ucl.student.meterbuddy.tables.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
-enum class Date {
-    Day,
-    Month,
-    Year
-}
 
 @Entity
 data class MeterReading (
