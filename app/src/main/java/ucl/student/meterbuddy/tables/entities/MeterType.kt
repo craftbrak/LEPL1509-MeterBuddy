@@ -11,6 +11,6 @@ enum class Type (val type: String) {
 
 @Entity
 data class MeterType (
-    @PrimaryKey(autoGenerate = false) val meterTypeID: Int,
+    @PrimaryKey(autoGenerate = true) val meterTypeID: Int,
     val type: Type
 )
