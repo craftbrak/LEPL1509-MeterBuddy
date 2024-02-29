@@ -18,7 +18,7 @@ enum class Icon {
 
 @Entity
 data class Meter (
-    @PrimaryKey(autoGenerate = false) val meterID: Int,
+    @PrimaryKey(autoGenerate = true) val meterID: Int,
     val meterName: String,
     val meterUnit: Unit,
     val meterIcon: Icon,

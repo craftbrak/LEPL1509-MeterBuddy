@@ -11,7 +11,7 @@ enum class TypeHousing {
 
 @Entity
 data class Housing (
-    @PrimaryKey(autoGenerate = false) val housingID: Int,
+    @PrimaryKey(autoGenerate = true) val housingID: Int,
     val housingName: String,
     val housingType: TypeHousing,
     val housingSurface: Int,
