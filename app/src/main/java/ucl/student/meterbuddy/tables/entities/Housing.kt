@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Housing (
-    @PrimaryKey(autoGenerate = false) val housingID: Int,
+    @PrimaryKey(autoGenerate = true) val housingID: Int,
     val housingName: String,
     val housingType: HousingType,
     val housingSurface: Int,

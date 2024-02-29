@@ -7,7 +7,7 @@ import java.util.Date
 
 @Entity
 data class MeterReading (
-    @PrimaryKey(autoGenerate = false) val readingID: Int,
+    @PrimaryKey(autoGenerate = true) val readingID: Int,
     val meterID: Int,
     val value: Double,
     val date: Date,
