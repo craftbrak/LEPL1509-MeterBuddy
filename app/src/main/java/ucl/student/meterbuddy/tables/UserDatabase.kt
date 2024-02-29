@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import ucl.student.meterbuddy.tables.entities.Housing
 import ucl.student.meterbuddy.tables.entities.Meter
 import ucl.student.meterbuddy.tables.entities.MeterReading
@@ -20,9 +21,10 @@ import ucl.student.meterbuddy.tables.entities.relations.HousingUserCrossRef
         MeterType::class,
         HousingUserCrossRef::class
     ],
+
     version = 1
 )
-
+@TypeConverters(ucl.student.meterbuddy.tables.TypeConverters::class)
 abstract class UserDatabase : RoomDatabase() {
 
     abstract val userDao : UserDao
