@@ -30,10 +30,10 @@ interface UserDao {
     suspend fun insertUser(user: User)
 
     @Transaction
-    @Query("SELECT * FROM user WHERE userName = :userName")
-    suspend fun getHousingWithUserName(userName: String) : List<Housing>
+    @Query("SELECT H.* FROM Housing as H JOIN HousingUserCrossRef hu on hu.userID JOIN User U on U.userID WHERE U.userID = :userId ")
+    suspend fun getHousingWithUserName(userId: Int) : List<Housing>
 
     @Transaction
-    @Query("SELECT * FROM housing WHERE housingName = :housingName")
+    @Query("SELECT U.* FROM User as U JOIN HousingUserCrossRef hu on hu.userID JOIN housing h on h.housingID WHERE h.housingName = :housingName ")
     suspend fun getUsersWithHousingName(housingName: String) : List<User>
 }
