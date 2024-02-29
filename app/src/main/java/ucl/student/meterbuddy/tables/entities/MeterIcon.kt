@@ -3,10 +3,11 @@ package ucl.student.meterbuddy.tables.entities
 import android.graphics.drawable.Icon
 import ucl.student.meterbuddy.R
 
-enum class MeterIcon(val icon: Icon) {
-//    Electricity(Icon.createWithResource("drawable", R.drawable.baseline_electrical_services_24)),
-//    Gas(Icon.createWithResource("drawable", R.drawable.baseline_fireplace_24)),
-//    Water(Icon.createWithResource("drawable", R.drawable.baseline_water_24)),
-//    Heating(Icon.createWithResource("drawable", R.drawable.baseline_whatshot_24)),
-//    Other(Icon.createWithResource("drawable", R.drawable.baseline_other_24))
+enum class MeterIcon(val icon: Icon, val iconName: String) {
+    Electricity(Icon.createWithResource("drawable", R.drawable.baseline_home_24), "Electricity"),
+    Gas(Icon.createWithResource("drawable", R.drawable.baseline_home_24),  "Gas"),
+    Water(Icon.createWithResource("drawable", R.drawable.baseline_home_24), "Water"),
+    Heating(Icon.createWithResource("drawable", R.drawable.baseline_home_24), "Heating"),
+    Other(Icon.createWithResource("drawable", R.drawable.baseline_home_24), "Other")
+    //Todo: Make the drawable resources for the icons and add them to the project. Then replace the drawable resources with the actual icons.
 }
