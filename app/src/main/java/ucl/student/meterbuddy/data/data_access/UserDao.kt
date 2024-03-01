@@ -1,15 +1,15 @@
-package ucl.student.meterbuddy.tables
+package ucl.student.meterbuddy.data.data_access
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import ucl.student.meterbuddy.tables.entities.Housing
-import ucl.student.meterbuddy.tables.entities.Meter
-import ucl.student.meterbuddy.tables.entities.MeterReading
-import ucl.student.meterbuddy.tables.entities.MeterType
-import ucl.student.meterbuddy.tables.entities.User
+import ucl.student.meterbuddy.data.model.entity.Housing
+import ucl.student.meterbuddy.data.model.entity.Meter
+import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.entity.MeterType
+import ucl.student.meterbuddy.data.model.entity.User
 
 @Dao
 interface UserDao {

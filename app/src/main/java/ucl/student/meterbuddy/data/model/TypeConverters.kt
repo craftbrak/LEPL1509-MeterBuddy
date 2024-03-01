@@ -1,12 +1,13 @@
-package ucl.student.meterbuddy.tables
+package ucl.student.meterbuddy.data.model
 
 import androidx.room.TypeConverter
-import ucl.student.meterbuddy.tables.entities.Currency
-import ucl.student.meterbuddy.tables.entities.HousingType
-import ucl.student.meterbuddy.tables.entities.MeterIcon
-import ucl.student.meterbuddy.tables.entities.Role
+import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.model.enums.Currency
+import ucl.student.meterbuddy.data.model.enums.HousingType
+import ucl.student.meterbuddy.data.model.enums.MeterIcon
+import ucl.student.meterbuddy.data.model.enums.Role
 import java.util.Date
-import ucl.student.meterbuddy.tables.entities.Unit
+import ucl.student.meterbuddy.data.model.enums.Unit
 
 class TypeConverters {
     // Converters for the HousingType enum
@@ -146,5 +147,32 @@ class TypeConverters {
             }
         }
     }
+    @TypeConverter
+    fun fromMeterType(meterType: MeterType): String{
+        return meterType.type
+    }
 
+    @TypeConverter
+    fun toMeterType(meterType: String): MeterType {
+        return when(meterType){
+            "Electricity" ->{
+                MeterType.ELECTRICITY
+            }
+            "Gas" ->{
+                MeterType.GAS
+            }
+            "Water" ->{
+                MeterType.WATER
+            }
+            "Car" ->{
+                MeterType.CAR
+            }
+            "Hot Water" ->{
+                MeterType.HOT_WATER
+            }
+            else -> {
+                throw IllegalArgumentException("Could not recognise MeterType")
+            }
+        }
+    }
 }
