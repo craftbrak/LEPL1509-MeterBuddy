@@ -1,15 +1,15 @@
 package ucl.student.meterbuddy.data.model.enums
 
 enum class Unit(val unit: String, val symbol: String){
-    KWH("Kilowatt Hour", "kWh"),
-    M3("Cubic Meter", "m³"),
-    L("Liter", "L"),
-    G("Gallon", "G"),
-    GJ("Gigajoule", "Gj"),
-    MWh("Megawatt", "MW"),
-    H("Hour", "h"),
-    CM("Centimeter", "cm"),
-    Kg("Kilogram", "Kg"),
-    ST("Staire", "St"),
-    MB("Megabyte", "Mb"),
+    KILO_WATT_HOUR("Kilowatt Hour", "kWh"),
+    CUBIC_METER("Cubic Meter", "m³"),
+    LITER("Liter", "L"),
+    GALLON("Gallon", "G"),
+    GIGA_JOULE("Gigajoule", "Gj"),
+    MEGA_WATT_HOUR("Megawatt", "MW"),
+    HOUR("Hour", "h"),
+    CENTIMETER("Centimeter", "cm"),
+    KILOGRAM("Kilogram", "Kg"),
+    STAIR("Staire", "St"),
+    MEGABYTE("Megabyte", "Mb"),
 }

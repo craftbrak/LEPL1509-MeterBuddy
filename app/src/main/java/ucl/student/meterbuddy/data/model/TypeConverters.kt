@@ -59,37 +59,37 @@ class TypeConverters {
     fun toUnit(unit: String): Unit {
         return when (unit) {
             "kWh" -> {
-                Unit.KWH
+                Unit.KILO_WATT_HOUR
             }
             "m3" -> {
-                Unit.M3
+                Unit.CUBIC_METER
             }
             "L" -> {
-                Unit.L
+                Unit.LITER
             }
             "G" -> {
-                Unit.G
+                Unit.GALLON
             }
             "Gj" -> {
-                Unit.GJ
+                Unit.GIGA_JOULE
             }
             "MW" -> {
-                Unit.MWh
+                Unit.MEGA_WATT_HOUR
             }
             "h" -> {
-                Unit.H
+                Unit.HOUR
             }
             "cm" -> {
-                Unit.CM
+                Unit.CENTIMETER
             }
             "Kg" -> {
-                Unit.Kg
+                Unit.KILOGRAM
             }
             "St" -> {
-                Unit.ST
+                Unit.STAIR
             }
             "Mb" -> {
-                Unit.MB
+                Unit.MEGABYTE
             }
             else -> {
                 throw IllegalArgumentException("Could not recognize unit")
