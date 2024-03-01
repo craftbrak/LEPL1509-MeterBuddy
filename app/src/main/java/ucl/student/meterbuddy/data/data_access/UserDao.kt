@@ -8,7 +8,6 @@ import androidx.room.Transaction
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
-import ucl.student.meterbuddy.data.model.entity.MeterType
 import ucl.student.meterbuddy.data.model.entity.User
 
 @Dao
@@ -19,9 +18,6 @@ interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHousing(housing: Housing)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMeterType(meterType: MeterType)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMeterReading(meterReading: MeterReading)
