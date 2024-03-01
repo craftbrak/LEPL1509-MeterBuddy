@@ -27,7 +27,7 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT H.* FROM Housing as H JOIN HousingUserCrossRef hu on hu.userID JOIN User U on U.userID WHERE U.userID = :userId ")
-    suspend fun getHousingWithUserName(userId: Int) : List<Housing>
+    suspend fun getHousingWithUserID(userId: Int) : List<Housing>
 
     @Transaction
     @Query("SELECT U.* FROM User as U JOIN HousingUserCrossRef hu on hu.userID JOIN housing h on h.housingID WHERE h.housingName = :housingName ")
