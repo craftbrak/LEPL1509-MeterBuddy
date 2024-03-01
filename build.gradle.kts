@@ -10,6 +10,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.9.21"))
+        classpath(kotlin("gradle-plugin", version = "1.9.22"))
     }
 }
