@@ -1,8 +1,8 @@
-package ucl.student.meterbuddy.tables.entities.relations
+package ucl.student.meterbuddy.data.model.relations
 
 
 import androidx.room.Entity
-import ucl.student.meterbuddy.tables.entities.Role
+import ucl.student.meterbuddy.data.model.enums.Role
 
 
 @Entity(primaryKeys = ["housingID", "userID"])

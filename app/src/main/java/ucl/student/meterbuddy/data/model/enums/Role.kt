@@ -1,4 +1,4 @@
-package ucl.student.meterbuddy.tables.entities
+package ucl.student.meterbuddy.data.model.enums
 
 
 enum class Role(val role: String, val canAddMebers: Boolean, val write: Boolean, val read: Boolean){

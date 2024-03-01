@@ -1,4 +1,4 @@
-package ucl.student.meterbuddy.tables.entities
+package ucl.student.meterbuddy.data.model.enums
 
 import android.graphics.drawable.Icon
 import ucl.student.meterbuddy.R
