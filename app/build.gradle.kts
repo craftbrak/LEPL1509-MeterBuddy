@@ -19,6 +19,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+
     }
 
     buildTypes {
@@ -41,7 +45,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
