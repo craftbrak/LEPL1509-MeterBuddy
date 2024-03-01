@@ -9,7 +9,6 @@ import ucl.student.meterbuddy.data.data_access.UserDao
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
-import ucl.student.meterbuddy.data.model.entity.MeterType
 import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.model.relations.HousingUserCrossRef
 
@@ -19,7 +18,6 @@ import ucl.student.meterbuddy.data.model.relations.HousingUserCrossRef
         Meter::class,
         MeterReading::class,
         User::class,
-        MeterType::class,
         HousingUserCrossRef::class
     ],
 
