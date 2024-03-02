@@ -32,4 +32,17 @@ interface UserDao {
     @Transaction
     @Query("SELECT U.* FROM User as U JOIN HousingUserCrossRef hu on hu.userID JOIN housing h on h.housingID WHERE h.housingName = :housingName ")
     suspend fun getUsersWithHousingName(housingName: String) : List<User>
+
+    @Transaction
+    @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ")
+    suspend fun getMeterReadingFormMeterID(meterId: Int): List<MeterReading>
+    @Transaction
+    @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ORDER BY date ASC ")
+    suspend fun getLastMeterReadingFormMeterID(meterId: Int): MeterReading
+
+    @Transaction
+    @Query("SELECT * FROM Meter WHERE housingID= :housingId ")
+    suspend fun getMetersFromHousing(housingId: Int): List<Meter>
+
+
 }
