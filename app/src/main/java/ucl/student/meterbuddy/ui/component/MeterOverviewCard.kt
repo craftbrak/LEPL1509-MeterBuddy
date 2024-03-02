@@ -1,6 +1,7 @@
 package ucl.student.meterbuddy.ui.component
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
@@ -49,7 +51,7 @@ fun MeterOverviewCard(
                 Row(
                     Modifier
                         .padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
-// TODO                    Icon(painter = meterIcon.icon, contentDescription = "Meter Icon")
+                    Icon(imageVector = ImageVector.vectorResource(meterIcon.icon), contentDescription = "Meter Icon")
                     Text(text = meterName)
                 }
                 Row(
@@ -73,7 +75,7 @@ fun MeterOverviewCard(
                     Modifier
                         .padding(20.dp)
                         .fillMaxWidth(.5F), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                    ElevatedSuggestionChip(onClick = { /*TODO*/ },label={
+                    ElevatedSuggestionChip(modifier= Modifier.clickable(enabled = false){}, onClick = { /*TODO*/ },label={
                         Text(text = tendenceValue.toString())
                     })
                 }
