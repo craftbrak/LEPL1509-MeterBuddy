@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
+import ucl.student.meterbuddy.ui.screen.AddReadingScreen
 import java.time.Instant
 import java.util.Date
 
@@ -99,7 +100,7 @@ fun MeterPage(title: String, meter: Meter ) {
                 containerColor = MaterialTheme.colorScheme.secondary,
                 shape = MaterialTheme.shapes.extraLarge
             ){
-                IconButton(onClick = { /*TODO*/ }, modifier = Modifier) {
+                IconButton(onClick = { navigator.push(AddReadingScreen(meter.meterID,meter.meterName)) }, modifier = Modifier) {
                     Icon(imageVector = Icons.Outlined.Lock, contentDescription = "Sort")
                 }
             }
