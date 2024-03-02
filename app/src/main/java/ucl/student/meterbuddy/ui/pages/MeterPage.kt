@@ -1,6 +1,7 @@
 package ucl.student.meterbuddy.ui.pages
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -29,16 +30,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeterPage(title: String) {
+fun MeterPage(title: String, meter: Meter ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
+    val navigator = LocalNavigator.currentOrThrow
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -50,7 +54,7 @@ fun MeterPage(title: String) {
                 ),
                 title = { Text(text = title, style = MaterialTheme.typography.headlineLarge) },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {navigator.pop()}) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Sort")
                     }
                 },
@@ -69,7 +73,7 @@ fun MeterPage(title: String) {
                 shape = MaterialTheme.shapes.extraLarge
             ){
                 IconButton(onClick = { /*TODO*/ }, modifier = Modifier) {
-                    Text(text = "Add reading")
+                    Icon(imageVector = Icons.Outlined.Lock, contentDescription = "Sort")
                 }
             }
         }
@@ -78,8 +82,8 @@ fun MeterPage(title: String) {
             .fillMaxSize()
             .padding(innerpading) ){
             MeterOverviewCard(
-                meterName = "Electricity",
-                meterIcon = Icons.Outlined.Lock,
+                meterName = meter.meterName,
+                meterIcon = meter.meterIcon,
                 lastReading = 123.0f,
                 readingUnit = "kWh",
                 tendanceIcon = "up",
