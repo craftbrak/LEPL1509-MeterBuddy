@@ -1,0 +1,229 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "ac9aa94eab757cf6e9ad11b989b31d53",
+    "entities": [
+      {
+        "tableName": "Housing",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`housingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `housingName` TEXT NOT NULL, `housingType` TEXT NOT NULL, `housingSurface` INTEGER NOT NULL, `housingNbPersons` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "housingID",
+            "columnName": "housingID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "housingName",
+            "columnName": "housingName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "housingType",
+            "columnName": "housingType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "housingSurface",
+            "columnName": "housingSurface",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "housingNbPersons",
+            "columnName": "housingNbPersons",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "housingID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Meter",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterName` TEXT NOT NULL, `meterUnit` TEXT NOT NULL, `meterIcon` TEXT NOT NULL, `meterType` TEXT NOT NULL, `housingID` INTEGER NOT NULL, `meterCost` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "meterID",
+            "columnName": "meterID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterName",
+            "columnName": "meterName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterUnit",
+            "columnName": "meterUnit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterIcon",
+            "columnName": "meterIcon",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterType",
+            "columnName": "meterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "housingID",
+            "columnName": "housingID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterCost",
+            "columnName": "meterCost",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "meterID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "MeterReading",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`readingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterID` INTEGER NOT NULL, `value` REAL NOT NULL, `date` INTEGER NOT NULL, `note` TEXT NOT NULL, `additiveMeter` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "readingID",
+            "columnName": "readingID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterID",
+            "columnName": "meterID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "additiveMeter",
+            "columnName": "additiveMeter",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "readingID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "User",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userName` TEXT NOT NULL, `userCurrency` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "userID",
+            "columnName": "userID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "userName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userCurrency",
+            "columnName": "userCurrency",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "userID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "HousingUserCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`housingID` INTEGER NOT NULL, `userID` INTEGER NOT NULL, `role` TEXT NOT NULL, PRIMARY KEY(`housingID`, `userID`))",
+        "fields": [
+          {
+            "fieldPath": "housingID",
+            "columnName": "housingID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userID",
+            "columnName": "userID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "housingID",
+            "userID"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac9aa94eab757cf6e9ad11b989b31d53')"
+    ]
+  }
+}

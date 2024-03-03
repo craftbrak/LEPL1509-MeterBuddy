@@ -29,8 +29,10 @@ data class MeterScreenModel(val meter: Meter): ScreenModel {
         MeterReading(11, meter.meterID, 11.0, Date.from(Instant.now())),
         MeterReading(12, meter.meterID, 12.0, Date.from(Instant.now()))
     )
+
     private val _state = mutableStateOf(MeterState(meter, readings))
     val state :State<MeterState> = _state
+
     fun addReading(meterId: Int, reading: Double, date: String) {
         val mutList = state.value.readings.toMutableList()
         mutList.add(MeterReading(state.value.readings.size+1, meterId, reading, Date.from(Instant.now())))
