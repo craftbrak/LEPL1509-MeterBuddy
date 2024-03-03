@@ -8,6 +8,7 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
+import java.util.Date
 
 class MainPageScreenModel(context: Context): ScreenModel {
 
@@ -27,7 +28,7 @@ class MainPageScreenModel(context: Context): ScreenModel {
     }
 
     suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {
-        return userDao.getMeterReadingFormMeterID(meter.meterID).last()
+        return userDao.getMeterReadingFromMeterID(meter.meterID).last()
     }
 
     suspend fun getLastReadingOfEachMeter(meter: Meter): MutableList<MeterReading> {
@@ -36,6 +37,68 @@ class MainPageScreenModel(context: Context): ScreenModel {
             lastReadings.add(getLastReadingOfMeter(meter))
         }
         return lastReadings
+    }
+
+    fun filterMetersByType(type: MeterType): MutableList<Meter> {
+        return listMeter.filter { meter ->
+            meter.meterType == type
+        }.toMutableList()
+    }
+
+    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
+        return listMeter.filter { meter ->
+            meter.meterUnit == unit
+        }.toMutableList()
+    }
+
+    fun getMeterDetails(meter: Meter): String {
+        return "Meter details: name = ${meter.meterName}, unit = ${meter.meterUnit}, icon = ${meter.meterIcon}, type = ${meter.meterType}, housingID = ${meter.housingID}, cost = ${meter.meterCost}, additive = ${meter.additiveMeter}"
+    }
+
+    fun getTotalConsumption(): Double {
+        return listMeter.sumOf { meter ->
+            meter.meterCost
+        }
+    }
+
+    fun removeMeter(meter: Meter) {
+        listMeter.remove(meter)
+    }
+
+    fun isMeterExists(name: String): Boolean {
+        return listMeter.any { meter ->
+            meter.meterName == name }
+    }
+
+    suspend fun getMeterReadingsForDateRange(startDate: Date, endDate: Date): List<MeterReading> {
+        return getAllMeterReadings().filter { meterReading ->
+            meterReading.date.after(startDate) and meterReading.date.before(endDate)
+        }
+    }
+
+    suspend fun getAllMeterReadings(): List<MeterReading> {
+        var allMeterReadingsList = mutableListOf<MeterReading>()
+        listMeter.forEach { meter ->
+            allMeterReadingsList += userDao.getMeterReadingFromMeterID(meter.meterID)
+        }
+        return allMeterReadingsList
+    }
+
+    fun sortMeterByName(): List<Meter> {
+        return listMeter.sortedBy { it.meterName }
+    }
+
+    fun getTotalMeterCount(): Int {
+        return listMeter.size
+    }
+
+    suspend fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
+        return meterReading.value > threshold
+    }
+
+    // How add a MeterReading
+    fun addMeterReading(meter: Meter, reading: MeterReading) {
+        // TODO
     }
 
     // Edit What ?
