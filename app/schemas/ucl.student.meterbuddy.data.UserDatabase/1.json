@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ac9aa94eab757cf6e9ad11b989b31d53",
+    "identityHash": "8f99b6c5e6251ed4b17b3bc837f069e4",
     "entities": [
       {
         "tableName": "Housing",
@@ -50,7 +50,7 @@
       },
       {
         "tableName": "Meter",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterName` TEXT NOT NULL, `meterUnit` TEXT NOT NULL, `meterIcon` TEXT NOT NULL, `meterType` TEXT NOT NULL, `housingID` INTEGER NOT NULL, `meterCost` REAL NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterName` TEXT NOT NULL, `meterUnit` TEXT NOT NULL, `meterIcon` TEXT NOT NULL, `meterType` TEXT NOT NULL, `housingID` INTEGER NOT NULL, `meterCost` REAL NOT NULL, `additiveMeter` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "meterID",
@@ -93,6 +93,12 @@
             "columnName": "meterCost",
             "affinity": "REAL",
             "notNull": true
+          },
+          {
+            "fieldPath": "additiveMeter",
+            "columnName": "additiveMeter",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -106,7 +112,7 @@
       },
       {
         "tableName": "MeterReading",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`readingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterID` INTEGER NOT NULL, `value` REAL NOT NULL, `date` INTEGER NOT NULL, `note` TEXT NOT NULL, `additiveMeter` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`readingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `meterID` INTEGER NOT NULL, `value` REAL NOT NULL, `date` INTEGER NOT NULL, `note` TEXT)",
         "fields": [
           {
             "fieldPath": "readingID",
@@ -136,13 +142,7 @@
             "fieldPath": "note",
             "columnName": "note",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "additiveMeter",
-            "columnName": "additiveMeter",
-            "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -223,7 +223,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac9aa94eab757cf6e9ad11b989b31d53')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8f99b6c5e6251ed4b17b3bc837f069e4')"
     ]
   }
 }

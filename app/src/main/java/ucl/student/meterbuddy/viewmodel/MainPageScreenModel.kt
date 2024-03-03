@@ -14,17 +14,19 @@ class MainPageScreenModel(context: Context): ScreenModel {
 
     private val userDao = UserDatabase.getInstance(context).userDao
 
-    private var listMeter = mutableListOf(
-        Meter(1, "Electricity", Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY, 1, 4.3, true),
-        Meter(2, "Gas", Unit.CUBIC_METER, MeterIcon.Gas, MeterType.GAS, 1, 7.3, false)
+    private var meters : MutableList<Meter> = mutableListOf(
+        Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true),
+        Meter(2, "Gas",Unit.LITER, MeterIcon.Gas, MeterType.GAS,1,23121.23,true),
+        Meter(3, "Water",Unit.CUBIC_METER, MeterIcon.Water, MeterType.WATER,1,23121.23,true),
+        Meter(4, "Heating",Unit.CENTIMETER, MeterIcon.Other, MeterType.HOT_WATER,1,23121.23,true),
     )
 
     fun addMeter(id: Int, name: String, unit: Unit, icon: MeterIcon, type: MeterType, housingID: Int, cost: Double, additive: Boolean) {
-        listMeter.add(Meter(id, name, unit, icon, type, housingID, cost, additive))
+        meters.add(Meter(id, name, unit, icon, type, housingID, cost, additive))
     }
 
     fun listAllMeters(): MutableList<Meter> {
-        return listMeter
+        return meters
     }
 
     suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {
@@ -33,20 +35,20 @@ class MainPageScreenModel(context: Context): ScreenModel {
 
     suspend fun getLastReadingOfEachMeter(meter: Meter): MutableList<MeterReading> {
         val lastReadings = mutableListOf<MeterReading>()
-        listMeter.forEach { meter ->
+        meters.forEach { meter ->
             lastReadings.add(getLastReadingOfMeter(meter))
         }
         return lastReadings
     }
 
     fun filterMetersByType(type: MeterType): MutableList<Meter> {
-        return listMeter.filter { meter ->
+        return meters.filter { meter ->
             meter.meterType == type
         }.toMutableList()
     }
 
     fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
-        return listMeter.filter { meter ->
+        return meters.filter { meter ->
             meter.meterUnit == unit
         }.toMutableList()
     }
@@ -56,17 +58,17 @@ class MainPageScreenModel(context: Context): ScreenModel {
     }
 
     fun getTotalConsumption(): Double {
-        return listMeter.sumOf { meter ->
+        return meters.sumOf { meter ->
             meter.meterCost
         }
     }
 
     fun removeMeter(meter: Meter) {
-        listMeter.remove(meter)
+        meters.remove(meter)
     }
 
     fun isMeterExists(name: String): Boolean {
-        return listMeter.any { meter ->
+        return meters.any { meter ->
             meter.meterName == name }
     }
 
@@ -78,18 +80,18 @@ class MainPageScreenModel(context: Context): ScreenModel {
 
     suspend fun getAllMeterReadings(): List<MeterReading> {
         var allMeterReadingsList = mutableListOf<MeterReading>()
-        listMeter.forEach { meter ->
+        meters.forEach { meter ->
             allMeterReadingsList += userDao.getMeterReadingFromMeterID(meter.meterID)
         }
         return allMeterReadingsList
     }
 
     fun sortMeterByName(): List<Meter> {
-        return listMeter.sortedBy { it.meterName }
+        return meters.sortedBy { it.meterName }
     }
 
     fun getTotalMeterCount(): Int {
-        return listMeter.size
+        return meters.size
     }
 
     suspend fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
