@@ -29,6 +29,7 @@ import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
+import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 val meters : List<Meter> = listOf(
     Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true),
@@ -39,7 +40,7 @@ val meters : List<Meter> = listOf(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPage() {
+fun MainPage(mainPageScreenModel: MainPageScreenModel) {
     val navigator = LocalNavigator.currentOrThrow
     Scaffold(
         modifier = Modifier.fillMaxSize(),
