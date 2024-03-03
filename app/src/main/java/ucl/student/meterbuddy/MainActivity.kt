@@ -25,14 +25,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MeterBuddyTheme {
-                // A surface container using the 'background' color from the theme
+                CompositionLocalProvider(LocalScreenContext provides this) {
+                    HomeScreen.Content()
+                }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CompositionLocalProvider(LocalScreenContext provides this) {
-                        HomeScreen.Content()
-                    }
                     Navigator (HomeScreen)
                 }
                 }

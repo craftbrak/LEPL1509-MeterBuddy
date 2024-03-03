@@ -14,7 +14,7 @@ class MainPageScreenModel(context: Context): ScreenModel {
 
     private val userDao = UserDatabase.getInstance(context).userDao
 
-    private var meters : MutableList<Meter> = mutableListOf(
+    var meters : MutableList<Meter> = mutableListOf(
         Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true),
         Meter(2, "Gas",Unit.LITER, MeterIcon.Gas, MeterType.GAS,1,23121.23,true),
         Meter(3, "Water",Unit.CUBIC_METER, MeterIcon.Water, MeterType.WATER,1,23121.23,true),
