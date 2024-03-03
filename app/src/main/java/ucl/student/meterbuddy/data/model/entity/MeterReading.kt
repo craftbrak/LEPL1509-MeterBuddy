@@ -11,6 +11,5 @@ data class MeterReading (
     val meterID: Int,
     val value: Double,
     val date: Date,
-    val note: String,
-    val additiveMeter: Boolean
+    val note: String? = null,
 )

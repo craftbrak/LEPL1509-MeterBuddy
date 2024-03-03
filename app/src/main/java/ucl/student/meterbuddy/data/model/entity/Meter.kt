@@ -14,5 +14,6 @@ data class Meter (
     val meterIcon: MeterIcon,
     val meterType: MeterType,
     val housingID: Int,
-    val meterCost: Double
+    val meterCost: Double,
+    val additiveMeter: Boolean
 )
