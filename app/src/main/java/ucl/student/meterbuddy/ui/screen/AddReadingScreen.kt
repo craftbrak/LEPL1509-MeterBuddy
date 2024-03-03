@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.screen
 
+import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,16 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import java.time.Instant
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 data class AddReadingScreen(val meterId: Int, val meterName: String, val lastDate: Long = Instant.now().epochSecond, val lastValue: Double?=null): Screen {
@@ -46,8 +57,15 @@ data class AddReadingScreen(val meterId: Int, val meterName: String, val lastDat
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
-        val date = rememberDatePickerState(lastDate)
         var inputValue: Double = lastValue ?: 0.0
+        var date by remember { mutableStateOf(Date.from(Instant.ofEpochSecond(lastDate))) }
+        var reading by remember { mutableStateOf(lastValue.toString()) }
+        var note by remember { mutableStateOf("") }
+        var selectedDate by remember { mutableStateOf("") }
+        val context = LocalContext.current
+        // Date formatting
+        val dateFormat = SimpleDateFormat("EEE, dd/MM/yyyy", Locale.getDefault())
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -94,10 +112,52 @@ data class AddReadingScreen(val meterId: Int, val meterName: String, val lastDat
 //            }
         ) {
             Column(Modifier.padding(it)) {
-                DatePicker(state = date,)
-                TextField(value = inputValue.toString(), onValueChange ={ inputValue=it.toDouble()})
+                OutlinedButton(onClick = { showDatePicker(context,dateFormat,"") {
+                    selectedDate = it
+                }
+                }) {
+                    val ddate= if (date.toString().isNotEmpty()) date else "Select Date"
+                    Text(text = ddate.toString())
+                }
+//                DatePicker(state = date,)
+                OutlinedTextField(
+                    value = reading,
+                    onValueChange = { reading = it },
+                    label = { Text("Reading") }
+                )
+//                TextField(value = inputValue.toString(), onValueChange ={ inputValue=it.toDouble()})
             }
         }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    fun showDatePicker(
+        context: android.content.Context,
+        dateFormat: SimpleDateFormat,
+        currentDate: String,
+        onDateSelected: (String) -> Unit
+    ) {
+//        val calendar = Calendar.getInstance()
+//
+//        // If we already have a date, parse it and set it on the calendar
+//        if (currentDate.isNotEmpty()) {
+//            calendar.time = dateFormat.parse(currentDate) ?: Date()
+//        }
+//
+//        val year = calendar.get(Calendar.YEAR)
+//        val month = calendar.get(Calendar.MONTH)
+//        val day = calendar.get(Calendar.DAY_OF_MONTH)
+//
+//        val datePickerDialog = DatePickerDialog(
+//            context, { _, year, monthOfYear, dayOfMonth ->
+//                // Update the calendar with the new date selected by the user
+//                calendar.set(year, monthOfYear, dayOfMonth)
+//                val dateString = dateFormat.format(calendar.time)
+//                onDateSelected(dateString)
+//            }, year, month, day
+//        )
+//
+//        datePickerDialog.show()
     }
 
 }

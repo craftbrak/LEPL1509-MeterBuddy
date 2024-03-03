@@ -31,10 +31,10 @@ import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 
 val meters : List<Meter> = listOf(
-    Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23),
-    Meter(2, "Gas",Unit.LITER, MeterIcon.Gas, MeterType.GAS,1,23121.23),
-    Meter(3, "Water",Unit.CUBIC_METER, MeterIcon.Water, MeterType.WATER,1,23121.23),
-    Meter(4, "Heating",Unit.CENTIMETER, MeterIcon.Other, MeterType.HOT_WATER,1,23121.23),
+    Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true),
+    Meter(2, "Gas",Unit.LITER, MeterIcon.Gas, MeterType.GAS,1,23121.23,true),
+    Meter(3, "Water",Unit.CUBIC_METER, MeterIcon.Water, MeterType.WATER,1,23121.23,true),
+    Meter(4, "Heating",Unit.CENTIMETER, MeterIcon.Other, MeterType.HOT_WATER,1,23121.23,true),
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
