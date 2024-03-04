@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Lock
@@ -48,6 +49,8 @@ import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
+import ucl.student.meterbuddy.ui.screen.AddReadingScreen
+import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 import java.time.Instant
 import java.util.Date
 
@@ -55,7 +58,7 @@ import java.util.Date
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeterPage(title: String, meter: Meter ) {
+fun MeterPage(meterScreenModel: MeterScreenModel ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.currentOrThrow
@@ -69,7 +72,7 @@ fun MeterPage(title: String, meter: Meter ) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
-                title = { Text(text = title, style = MaterialTheme.typography.headlineLarge) },
+                title = { Text(text = meterScreenModel.meter.meterName, style = MaterialTheme.typography.headlineLarge) },
                 navigationIcon = {
                     IconButton(onClick = {navigator.pop()}) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
@@ -99,7 +102,10 @@ fun MeterPage(title: String, meter: Meter ) {
                 containerColor = MaterialTheme.colorScheme.secondary,
                 shape = MaterialTheme.shapes.extraLarge
             ){
-                IconButton(onClick = { /*TODO*/ }, modifier = Modifier) {
+                IconButton(onClick = {
+//                    meterScreenModel.addReading(meterScreenModel.meter.meterID, 2213.0, Date.from(Instant.now()).toString())
+                    navigator.push(AddReadingScreen(meterScreenModel.meter.meterID,meterScreenModel.meter.meterName))
+                    }, modifier = Modifier) {
                     Icon(imageVector = Icons.Outlined.Lock, contentDescription = "Sort")
                 }
             }
@@ -114,14 +120,14 @@ fun MeterPage(title: String, meter: Meter ) {
             item{
                 Text(text = "Meter Readings", style = MaterialTheme.typography.headlineMedium)
             }
-            items(80) {
+            items(meterScreenModel.state.value.readings) {reading->
                 MeterReadingCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
                     onclick = { /*TODO*/ },
-                    value = 123.0,
-                    date = Date.from(Instant.now()),
+                    value = reading.value,
+                    date = reading.date,
                     note = "Test",
                     onEditClick = { /*TODO*/ }
                 )

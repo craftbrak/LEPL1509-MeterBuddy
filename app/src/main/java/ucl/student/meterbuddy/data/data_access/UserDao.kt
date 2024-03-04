@@ -35,10 +35,10 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ")
-    suspend fun getMeterReadingFormMeterID(meterId: Int): List<MeterReading>
+    suspend fun getMeterReadingFromMeterID(meterId: Int): List<MeterReading>
     @Transaction
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ORDER BY date ASC ")
-    suspend fun getLastMeterReadingFormMeterID(meterId: Int): MeterReading
+    suspend fun getLastMeterReadingFromMeterID(meterId: Int): MeterReading
 
     @Transaction
     @Query("SELECT * FROM Meter WHERE housingID= :housingId ")
