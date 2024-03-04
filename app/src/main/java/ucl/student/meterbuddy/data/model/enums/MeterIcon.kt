@@ -7,10 +7,10 @@ import androidx.compose.ui.res.vectorResource
 import ucl.student.meterbuddy.R
 
 enum class MeterIcon(val icon: Int, val iconName: String) {
-    Electricity(R.drawable.baseline_bungalow_24, "Electricity"),
-    Gas(R.drawable.baseline_home_24,  "Gas"),
-    Water(R.drawable.baseline_home_24, "Water"),
-    Heating(R.drawable.baseline_home_24, "Heating"),
+    Electricity(R.drawable.electricity_icon, "Electricity"),
+    Gas(R.drawable.gas_meter_icon,  "Gas"),
+    Water(R.drawable.water_icon, "Water"),
+    Heating(R.drawable.gas_meter_icon, "Heating"),
     Other( R.drawable.baseline_home_24, "Other")
     //Todo: Make the drawable resources for the icons and add them to the project. Then replace the drawable resources with the actual icons.
 }
