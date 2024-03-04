@@ -46,8 +46,8 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
         topBar = {
             CenterAlignedTopAppBar(colors = topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ), title = { Text("Meter Menu") })
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ), title = { Text("Meter Menu")})
         }) {
             innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxWidth().padding(innerPadding)) {
@@ -56,7 +56,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
                     onClick = {
                         navigator?.push(MeterDetailsScreen(meter))
                     },
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(10.dp),
                     meterName = meter.meterName,
                     meterIcon = meter.meterIcon,
                     lastReading = 1938f,
