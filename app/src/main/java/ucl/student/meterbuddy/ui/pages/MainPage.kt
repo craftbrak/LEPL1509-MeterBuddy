@@ -31,12 +31,11 @@ import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(mainPageScreenModel: MainPageScreenModel) {
 
-    val navigator = LocalNavigator.currentOrThrow
+    val navigator = LocalNavigator.current
 
     // TEST BEGIN : MainPageScreenModel
     val meters = mainPageScreenModel.listAllMeters()
@@ -55,7 +54,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
             items(meters) { meter ->
                 MeterOverviewCard(
                     onClick = {
-                        navigator.push(MeterDetailsScreen(meter))
+                        navigator?.push(MeterDetailsScreen(meter))
                     },
                     modifier = Modifier.padding(20.dp),
                     meterName = meter.meterName,
