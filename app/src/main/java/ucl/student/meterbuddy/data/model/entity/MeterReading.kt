@@ -2,6 +2,7 @@ package ucl.student.meterbuddy.data.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
 import java.util.Date
 
 
@@ -9,8 +10,7 @@ import java.util.Date
 data class MeterReading (
     @PrimaryKey(autoGenerate = true) val readingID: Int,
     val meterID: Int,
-    val value: Double,
-    val date: Date,
-    val note: String,
-    val additiveMeter: Boolean
+    var value: Float,
+    var date: LocalDateTime,
+    var note: String? = null,
 )

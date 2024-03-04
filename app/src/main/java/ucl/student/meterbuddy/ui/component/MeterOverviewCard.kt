@@ -1,13 +1,19 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.graphics.drawable.Icon
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
@@ -19,8 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,7 +37,7 @@ fun MeterOverviewCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     meterName: String,
-    meterIcon: ImageVector,
+    meterIcon: MeterIcon,
     lastReading: Float,
     readingUnit: String,
     tendanceIcon: String,
@@ -39,41 +47,30 @@ fun MeterOverviewCard(
 ) {
     ElevatedCard(modifier = modifier, onClick = onClick) {
         Column(modifier= Modifier
-            .fillMaxWidth(),verticalArrangement = Arrangement.SpaceAround) {
+            .fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp),verticalArrangement = Arrangement.SpaceAround) {
             Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround) {
-                Row(
-                    Modifier
-                        .padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
-                    Icon(imageVector = meterIcon, contentDescription = "Meter Icon")
-                    Text(text = meterName)
-                }
-                Row(
-                    Modifier
-                        .padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly){
-                    Text(text = lastReading.toString())
-                    Text(text = readingUnit)
-                }
+                verticalAlignment = Alignment.CenterVertically) {
+
+                Icon(imageVector = ImageVector.vectorResource(meterIcon.icon), contentDescription = "Meter Icon")
+                Spacer(Modifier.width(8.dp))
+                Text(text = meterName)
+                Spacer(Modifier.weight(1f))
+                Text(text = lastReading.toString())
+                Spacer(Modifier.width(8.dp))
+                Text(text = readingUnit)
             }
+            Spacer(Modifier.height(20.dp))
             Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(
-                    Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(.5F), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                    Text(text = monthlyCost.toString())
-                    Text(text = currencySymbol)
-                }
-                Row(
-                    Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(.5F), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                    ElevatedSuggestionChip(onClick = { /*TODO*/ },label={
-                        Text(text = tendenceValue.toString())
-                    })
-                }
+                verticalAlignment = Alignment.CenterVertically) {
+                Spacer(Modifier.width(10.dp))
+                Text(text = monthlyCost.toString())
+                Spacer(Modifier.width(8.dp))
+                Text(text = currencySymbol)
+                Spacer(Modifier.weight(1f))
+                ElevatedSuggestionChip(modifier= Modifier.clickable(enabled = false){}, onClick = { /*TODO*/ },label={
+                    Text(text = tendenceValue.toString())
+                })
+                Spacer(Modifier.width(10.dp))
             }
         }
     }
@@ -83,6 +80,6 @@ fun MeterOverviewCard(
 @Composable
 fun PreviewMeterOverviewCard() {
     MeterBuddyTheme {
-        MeterOverviewCard(Modifier.padding(9.dp), meterName = "Electricity", meterIcon = Icons.Outlined.ThumbUp, currencySymbol = "eur", lastReading = 182.159F, monthlyCost = 291F, readingUnit = "Kwh", tendanceIcon = "", tendenceValue = 29F)
+        MeterOverviewCard(Modifier.padding(9.dp), meterName = "Electricity", meterIcon = MeterIcon.Water , currencySymbol = "eur", lastReading = 182.159F, monthlyCost = 291F, readingUnit = "Kwh", tendanceIcon = "", tendenceValue = 29F)
     }
 }

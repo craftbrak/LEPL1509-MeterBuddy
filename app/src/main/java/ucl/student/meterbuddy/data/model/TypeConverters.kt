@@ -1,5 +1,7 @@
 package ucl.student.meterbuddy.data.model
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Currency
@@ -8,6 +10,10 @@ import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.Role
 import java.util.Date
 import ucl.student.meterbuddy.data.model.enums.Unit
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 class TypeConverters {
     // Converters for the HousingType enum
@@ -42,13 +48,15 @@ class TypeConverters {
             else -> throw IllegalArgumentException("Could not recognize currency")
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun dateFromTimeStamp(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun dateFromTimeStamp(value: Long?): LocalDateTime? {
+        return value?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneId.systemDefault()) }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun dateToTimestamp(date: LocalDateTime?): Long? {
+        return date?.toInstant(ZoneOffset.of(ZoneId.systemDefault().toString()))?.toEpochMilli()
     }
 
     @TypeConverter

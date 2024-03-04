@@ -72,6 +72,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.squareup.moshi:moshi:1.15.0")
+
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -82,4 +83,9 @@ dependencies {
 
     testImplementation("androidx.room:room-testing:$room_version")
 
+    val voyagerVersion = "1.0.0"
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
 }
