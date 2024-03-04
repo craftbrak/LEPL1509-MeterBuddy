@@ -115,11 +115,20 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)){
             item{
-                Card(modifier = Modifier.padding(16.dp)) {
-                    Box(
-                        modifier = Modifier.padding(70.dp)
-                    ) {
-                        Text(text = "Graphs are not implemented yet but will be here soon", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(16.dp))
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(modifier = Modifier.padding(16.dp)) {
+                        Box(
+                            modifier = Modifier.padding(70.dp)
+                        ) {
+                            Text(
+                                text = "Graphs are not implemented yet but will be here soon",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
