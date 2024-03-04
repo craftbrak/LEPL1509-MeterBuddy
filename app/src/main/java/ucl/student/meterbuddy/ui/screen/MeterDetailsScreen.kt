@@ -12,6 +12,7 @@ import ucl.student.meterbuddy.ui.pages.MeterPage
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 
 data class MeterDetailsScreen(val meter: Meter): Screen {
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {
