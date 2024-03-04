@@ -72,11 +72,11 @@ class MainPageScreenModel(context: Context): ScreenModel {
             meter.meterName == name }
     }
 
-    suspend fun getMeterReadingsForDateRange(startDate: Date, endDate: Date): List<MeterReading> {
-        return getAllMeterReadings().filter { meterReading ->
-            meterReading.date.after(startDate) and meterReading.date.before(endDate)
-        }
-    }
+//    suspend fun getMeterReadingsForDateRange(startDate: Date, endDate: Date): List<MeterReading> {
+//        return getAllMeterReadings().filter { meterReading ->
+//            meterReading.date.after(startDate) and meterReading.date.before(endDate)
+//        }
+//    }
 
     suspend fun getAllMeterReadings(): List<MeterReading> {
         var allMeterReadingsList = mutableListOf<MeterReading>()

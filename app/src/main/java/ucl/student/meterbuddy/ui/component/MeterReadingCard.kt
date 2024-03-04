@@ -1,5 +1,7 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,16 +22,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MeterReadingCard(modifier: Modifier,onclick : ()-> Unit, value: Double, date: Date, note: String , onEditClick: ()-> Unit ) {
+fun MeterReadingCard(modifier: Modifier,onclick : ()-> Unit, value: Float, date: LocalDateTime, note: String , onEditClick: ()-> Unit ) {
+    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
     //Should be a card and need to be aligned
     Row (modifier.clickable { onclick() }.clip(shape = RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
         Text(text = value.toString())
-        Text(text = date.toString())
+        Text(text = date.format(formatter))
         IconButton(onClick = onEditClick) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
+//            Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
         }
     }
 }

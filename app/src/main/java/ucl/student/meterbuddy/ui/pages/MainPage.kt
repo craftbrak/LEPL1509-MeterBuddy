@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,11 +39,14 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
                 ),
                 title = { Text("Meter Menu") },
                 actions = {
-                    Button(onClick = { navigator?.push(AddMeterFormScreen(meters)) }) {
-                        Text("Add Meter")
-                    }
+
                 }
             )
+        },
+        floatingActionButton ={
+            FloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen(meters)) }) {
+                Text("Add Meter")
+            }
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxWidth().padding(innerPadding)) {

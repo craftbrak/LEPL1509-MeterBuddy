@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -106,14 +107,19 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
             ){
                 IconButton(onClick = {
 //                    meterScreenModel.addReading(meterScreenModel.meter.meterID, 2213.0, Date.from(Instant.now()).toString())
-                    navigator.push(AddReadingScreen(meterScreenModel.meter.meterID,meterScreenModel.meter.meterName))
+                    navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName
+                    ) { value, date, note ->
+                        meterScreenModel.addReading(value,date,note)
+                    })
                     }, modifier = Modifier) {
-                    Icon(imageVector = Icons.Outlined.Lock, contentDescription = "Sort")
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "Sort")
                 }
             }
         }
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)){
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)){
             item{
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -140,11 +146,21 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    onclick = { /*TODO*/ },
+                    onclick =
+                    {
+//                     navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true
+//                    ) { value, date, note ->
+//                        meterScreenModel.updateReading(reading.readingID, value, date, note)
+//                    })
+                    },
                     value = reading.value,
                     date = reading.date,
                     note = "Test",
-                    onEditClick = { /*TODO*/ }
+                    onEditClick = {
+//                        navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true){ value, date, note ->
+//                        meterScreenModel.updateReading(reading.readingID, value, date, note)
+//                    })
+                    }
                 )
             }
         }
