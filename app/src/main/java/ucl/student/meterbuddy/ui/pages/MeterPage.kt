@@ -6,12 +6,14 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -72,7 +74,7 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
-                title = { Text(text = meterScreenModel.meter.meterName, style = MaterialTheme.typography.headlineLarge) },
+                title = { Text(text = meterScreenModel.meter.meterName) },
                 navigationIcon = {
                     IconButton(onClick = {navigator.pop()}) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
@@ -113,12 +115,16 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)){
             item{
-                Card(modifier = Modifier.fillMaxWidth().padding(8.dp).fillMaxHeight(.4f)) {
-                    Text(text = "Graphs are not implemented yet but will be here soon", style = MaterialTheme.typography.headlineLarge)
+                Card(modifier = Modifier.padding(16.dp)) {
+                    Box(
+                        modifier = Modifier.padding(70.dp)
+                    ) {
+                        Text(text = "Graphs are not implemented yet but will be here soon", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(16.dp))
+                    }
                 }
             }
             item{
-                Text(text = "Meter Readings", style = MaterialTheme.typography.headlineMedium)
+                Text(text = "Meter Readings", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(8.dp))
             }
             items(meterScreenModel.state.value.readings) {reading->
                 MeterReadingCard(
