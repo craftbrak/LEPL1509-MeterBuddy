@@ -1,10 +1,16 @@
 package ucl.student.meterbuddy.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowColumn
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,15 +18,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -30,13 +44,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
@@ -44,7 +62,7 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 
 data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
     @Composable
     override fun Content() {
 
@@ -55,18 +73,16 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
         var isAdditive by remember { mutableStateOf(true) }
         var nameFieldRequired by remember { mutableStateOf(false) }
         var costFieldRequired by remember { mutableStateOf(false) }
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
 
         val navigator = LocalNavigator.current
 
-        val meterTypes = listOf(
-            MeterType.ELECTRICITY,
-            MeterType.GAS,
-            MeterType.WATER,
-            MeterType.CAR,
-            MeterType.HOT_WATER,
-        )
+        val meterTypes =MeterType.entries
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            snackbarHost ={ SnackbarHost(hostState = snackbarHostState) } ,
             topBar = {
                 TopAppBar(
                     title = {
@@ -80,8 +96,12 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                     IconButton(onClick = {navigator?.pop()}) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back" )
                     }
-                },)
-            }
+                }, actions = {
+
+                    }
+                    )
+            },
+
         ) {
             Column(
                 modifier = Modifier
@@ -99,23 +119,21 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text("Meter Type")
-                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
+                FlowRow(Modifier.padding(10.dp),Arrangement.SpaceEvenly) {
                     meterTypes.forEach { type ->
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .clickable { selectedType = type }
                                 .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            RadioButton(
-                                selected = (type == selectedType),
-                                onClick = null // RadioButton handle selection automatically
-                            )
+                            IconToggleButton(modifier = Modifier.padding(3.dp),checked = selectedType == type , onCheckedChange ={selectedType =type}) {
+                                Icon(imageVector =ImageVector.vectorResource(id =type.icon.icon ) , contentDescription = type.icon.iconName)
+                            }
                             Text(
-                                text = type.type,
-                                modifier = Modifier.padding(start = 8.dp)
+                                    text = type.type,
+                            modifier = Modifier.padding(start = 8.dp)
                             )
-
                         }
                         Spacer(modifier = Modifier.height(5.dp))
                     }
@@ -124,8 +142,11 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text("Unit")
-                Column {
-                    Unit.values().forEach { unit ->
+                FlowColumn(
+                    Modifier
+                        .padding(4.dp)
+                        .height(100.dp),Arrangement.SpaceBetween) {
+                    selectedType.units.forEach { unit ->
                         Row(
                             modifier = Modifier
                                 .clickable { selectedUnit = unit }
@@ -137,7 +158,7 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                                 onClick = null // RadioButton handle selection automatically
                             )
                             Text(
-                                text = unit.unit,
+                                text = unit.symbol,
                                 modifier = Modifier.padding(start = 8.dp)
                             )
                         }
@@ -150,7 +171,7 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                 TextField(
                     value = meterCost,
                     onValueChange = { meterCost = it.takeIf { it.isNotEmpty() } ?: "0.0" },
-                    label = { Text("Meter Cost") },
+                    label = { Text("Cost Per Unit") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -160,7 +181,7 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Additive Meter", modifier = Modifier.weight(1f))
+                    Text("Consumption", modifier = Modifier.weight(1f))
                     Switch(
                         checked = isAdditive,
                         onCheckedChange = { isAdditive = it },
@@ -174,7 +195,7 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(
+                    FilledTonalButton(
                         onClick = {
                             if (meterName.isNotBlank() && meterCost.isNotBlank()) {
                                 val newMeter = Meter(
@@ -190,30 +211,29 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                                 navigator?.pop()
                                 meters.add(newMeter)
                             } else {
-                                if (!meterName.isNotBlank()) { nameFieldRequired = true }
-                                if (!meterCost.isNotBlank()) { costFieldRequired = true }
+                                if (!meterName.isNotBlank()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Field 'Name' is required",
+                                            withDismissAction = true,
+
+                                            )
+                                    }
+                                }
+                                if (!meterCost.isNotBlank()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Field 'Cost Per Unit' is required",
+                                            withDismissAction = true
+                                        )
+                                    }
+                                }
                             }
                         }
                     ) {
-                        Text("Confirm")
+                        Icon(imageVector = Icons.Filled.Check, contentDescription ="add" )
+                        Text(text = "Confirm")
                     }
-                }
-
-                if (nameFieldRequired) {
-                    Text(
-                        text = "Field 'Name' is required",
-                        color = Color.Red,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-
-                if (costFieldRequired) {
-                    Text(
-                        text = "Field 'Cost' is required",
-                        color = Color.Red,
-                        modifier = Modifier.padding(start = 16.dp)
-
-                    )
                 }
             }
         }

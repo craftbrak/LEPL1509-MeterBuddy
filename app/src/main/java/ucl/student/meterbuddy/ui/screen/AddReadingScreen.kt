@@ -189,7 +189,7 @@ data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, 
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
                                 message = "Error: ${e.message}",
-                                actionLabel = "close"
+                                withDismissAction = true
                             )
                             if (result == SnackbarResult.ActionPerformed) {
                                 Log.w("Snackbar", "Snackbar action performed")
