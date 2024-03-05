@@ -8,7 +8,6 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
-import java.util.Date
 
 class MainPageScreenModel(context: Context): ScreenModel {
 

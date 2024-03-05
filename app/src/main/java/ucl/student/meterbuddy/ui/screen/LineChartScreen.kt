@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +14,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import cafe.adriel.voyager.core.screen.Screen
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -30,30 +28,17 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
-import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
-import ucl.student.meterbuddy.data.model.enums.MeterIcon
-import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
-import java.time.LocalDateTime
 
-class LineChartScreen() : Screen {
+class LineChartScreen(meterReadings: List<MeterReading>) : Screen {
+
+    val readingsData = meterReadings
 
     @Composable
     override fun Content() {
 
         val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
         val screenHeight = configuration.screenHeightDp.dp
-
-        val meter = Meter(1, "Electricity", Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true)
-        val readingsData = listOf<MeterReading>(
-            MeterReading(1, meter.meterID, 1123.24f, LocalDateTime.now()),
-            MeterReading(2, meter.meterID, 2943.1f, LocalDateTime.now()),
-            MeterReading(3, meter.meterID, 2951.346f, LocalDateTime.now()),
-            MeterReading(4, meter.meterID, 4324.131f, LocalDateTime.now()),
-            MeterReading(5, meter.meterID, 9682.123f, LocalDateTime.now())
-        )
 
         val xAxisData = AxisData.Builder()
             .axisStepSize(80.dp)
