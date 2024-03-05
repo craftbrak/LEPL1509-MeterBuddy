@@ -1,5 +1,7 @@
 package ucl.student.meterbuddy.ui.pages
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -7,11 +9,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,6 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.ui.screen.AddMeterFormScreen
+import ucl.student.meterbuddy.ui.screen.LineChartScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,12 +49,28 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
                 }
             )
         },
-        floatingActionButton ={
-            ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen(meters)) }) {
-                Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
-                Text("Add Meter")
+        {
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                ExtendedFloatingActionButton(
+                    onClick = { navigator?.push(AddMeterFormScreen(meters)) },
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
+                    Text("Add Meter")
+                }
+
+                ExtendedFloatingActionButton(
+                    onClick = { navigator?.push(LineChartScreen()) }
+                ) {
+                    Icon(imageVector = Icons.Outlined.KeyboardArrowLeft, contentDescription = "Graphics")
+                    Text("Graphics")
+                }
             }
         }
+
     ) { innerPadding ->
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
