@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
@@ -35,14 +37,20 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ")
-    suspend fun getMeterReadingFromMeterID(meterId: Int): List<MeterReading>
+    fun getMeterReadingFromMeterID(meterId: Int): Flow<List<MeterReading>>
     @Transaction
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ORDER BY date ASC ")
     suspend fun getLastMeterReadingFromMeterID(meterId: Int): MeterReading
 
     @Transaction
     @Query("SELECT * FROM Meter WHERE housingID= :housingId ")
-    suspend fun getMetersFromHousing(housingId: Int): List<Meter>
+    fun getMetersFromHousing(housingId: Int): Flow<List<Meter>>
 
+    @Query("Select * FROM METER")
+    fun getMeters(): Flow<List<Meter>>
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateMeter(meter: Meter)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateMeterReading(meter: MeterReading)
 }

@@ -1,76 +1,102 @@
 package ucl.student.meterbuddy.viewmodel
 
 import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.repository.LocalMeterRepository
+import ucl.student.meterbuddy.data.repository.MeterRepository
 import java.util.Date
 
 class MainPageScreenModel(context: Context): ScreenModel {
 
-    private val userDao = UserDatabase.getInstance(context).userDao
+    private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
+    private val _state = mutableStateOf(MainPageState())
+    val state: State<MainPageState> = _state
 
-    var meters : MutableList<Meter> = mutableListOf(
-        Meter(1, "Electricity",Unit.KILO_WATT_HOUR, MeterIcon.Electricity, MeterType.ELECTRICITY,1,23121.23,true),
-        Meter(2, "Gas",Unit.LITER, MeterIcon.Gas, MeterType.GAS,1,23121.23,true),
-        Meter(3, "Water",Unit.CUBIC_METER, MeterIcon.Water, MeterType.WATER,1,23121.23,true),
-        Meter(4, "Heating",Unit.CENTIMETER, MeterIcon.Other, MeterType.HOT_WATER,1,23121.23,true),
-    )
-
-    fun addMeter(id: Int, name: String, unit: Unit, icon: MeterIcon, type: MeterType, housingID: Int, cost: Double, additive: Boolean) {
-        meters.add(Meter(id, name, unit, icon, type, housingID, cost, additive))
+    init {
+        getAllMeters()
+    }
+    fun addMeter(metre:Meter) {
+        screenModelScope.launch {
+            meterRepository.addMeter(metre)
+            Log.i("Add Meter", metre.toString())
+        }
     }
 
-    fun listAllMeters(): MutableList<Meter> {
-        return meters
+    fun getAllMeters() {
+
+        screenModelScope.launch {
+            meterRepository.getMeters().collect {
+                Log.i("getMeter","Get meter Call $it")
+                it.toMutableList()
+                _state.value = state.value.copy(
+                    listMeter = it
+                )
+            }
+        }
+
     }
 
     suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {
-        return userDao.getMeterReadingFromMeterID(meter.meterID).last()
+        return meterRepository.getMeterReadings(meter.meterID).last().last()
     }
 
-    suspend fun getLastReadingOfEachMeter(meter: Meter): MutableList<MeterReading> {
-        val lastReadings = mutableListOf<MeterReading>()
-        meters.forEach { meter ->
-            lastReadings.add(getLastReadingOfMeter(meter))
-        }
-        return lastReadings
-    }
-
-    fun filterMetersByType(type: MeterType): MutableList<Meter> {
-        return meters.filter { meter ->
-            meter.meterType == type
-        }.toMutableList()
-    }
-
-    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
-        return meters.filter { meter ->
-            meter.meterUnit == unit
-        }.toMutableList()
-    }
+//    suspend fun getLastReadingOfEachMeter(meter: Meter): MutableList<MeterReading> {
+//        val lastReadings = mutableListOf<MeterReading>()
+//        return meterRepository.getMeterReadings(meter.meterID).last()
+//        meters.collect { meter ->
+//            lastReadings.add(getLastReadingOfMeter(meter))
+//        }
+//        return lastReadings
+//    }
+//    fun filterMetersByType(type: MeterType): MutableList<Meter> {
+//        return meters.filter { meter ->
+//            meter.meterType == type
+//        }.toMutableList()
+//    }
+//
+//    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
+//        return meters.filter { meter ->
+//            meter.meterUnit == unit
+//        }.toMutableList()
+//    }
 
     fun getMeterDetails(meter: Meter): String {
         return "Meter details: name = ${meter.meterName}, unit = ${meter.meterUnit}, icon = ${meter.meterIcon}, type = ${meter.meterType}, housingID = ${meter.housingID}, cost = ${meter.meterCost}, additive = ${meter.additiveMeter}"
     }
 
-    fun getTotalConsumption(): Double {
-        return meters.sumOf { meter ->
-            meter.meterCost
-        }
-    }
-
-    fun removeMeter(meter: Meter) {
-        meters.remove(meter)
-    }
-
-    fun isMeterExists(name: String): Boolean {
-        return meters.any { meter ->
-            meter.meterName == name }
-    }
+//    fun getTotalConsumption(): Double {
+//        return meters.sumOf { meter ->
+//            meter.meterCost
+//        }
+//    }
+//
+//    fun removeMeter(meter: Meter) {
+//        meters.remove(meter)
+//    }
+//
+//    fun isMeterExists(name: String): Boolean {
+//        return meters.any { meter ->
+//            meter.meterName == name }
+//    }
 
 //    suspend fun getMeterReadingsForDateRange(startDate: Date, endDate: Date): List<MeterReading> {
 //        return getAllMeterReadings().filter { meterReading ->
@@ -78,21 +104,21 @@ class MainPageScreenModel(context: Context): ScreenModel {
 //        }
 //    }
 
-    suspend fun getAllMeterReadings(): List<MeterReading> {
-        var allMeterReadingsList = mutableListOf<MeterReading>()
-        meters.forEach { meter ->
-            allMeterReadingsList += userDao.getMeterReadingFromMeterID(meter.meterID)
-        }
-        return allMeterReadingsList
-    }
-
-    fun sortMeterByName(): List<Meter> {
-        return meters.sortedBy { it.meterName }
-    }
-
-    fun getTotalMeterCount(): Int {
-        return meters.size
-    }
+//    suspend fun getAllMeterReadings(): List<MeterReading> {
+//        var allMeterReadingsList = mutableListOf<MeterReading>()
+//        meters.forEach { meter ->
+//            allMeterReadingsList += meterRepository.getMeterReadings(meter.meterID).last()
+//        }
+//        return allMeterReadingsList
+//    }
+//
+//    fun sortMeterByName(): List<Meter> {
+//        return meters.sortedBy { it.meterName }
+//    }
+//
+//    fun getTotalMeterCount(): Int {
+//        return meters.size
+//    }
 
     suspend fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
         return meterReading.value > threshold

@@ -66,41 +66,19 @@ class TypeConverters {
     @TypeConverter
     fun toUnit(unit: String): Unit {
         return when (unit) {
-            "kWh" -> {
-                Unit.KILO_WATT_HOUR
-            }
-            "m3" -> {
-                Unit.CUBIC_METER
-            }
-            "L" -> {
-                Unit.LITER
-            }
-            "G" -> {
-                Unit.GALLON
-            }
-            "Gj" -> {
-                Unit.GIGA_JOULE
-            }
-            "MW" -> {
-                Unit.MEGA_WATT_HOUR
-            }
-            "h" -> {
-                Unit.HOUR
-            }
-            "cm" -> {
-                Unit.CENTIMETER
-            }
-            "Kg" -> {
-                Unit.KILOGRAM
-            }
-            "St" -> {
-                Unit.STAIR
-            }
-            "Mb" -> {
-                Unit.MEGABYTE
-            }
+            "Kilowatt Hour" -> Unit.KILO_WATT_HOUR
+            "Cubic Meter" -> Unit.CUBIC_METER
+            "Liter" -> Unit.LITER
+            "Gallon" -> Unit.GALLON
+            "Gigajoule" -> Unit.GIGA_JOULE
+            "Megawatt" -> Unit.MEGA_WATT_HOUR
+            "Hour" -> Unit.HOUR
+            "Centimeter" -> Unit.CENTIMETER
+            "Kilogram" -> Unit.KILOGRAM
+            "Staire" -> Unit.STAIR
+            "Megabyte" -> Unit.MEGABYTE
             else -> {
-                throw IllegalArgumentException("Could not recognize unit")
+                throw IllegalArgumentException("Could not recognize unit ${unit}")
             }
         }
     }

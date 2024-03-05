@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -31,7 +32,7 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 fun MainPage(mainPageScreenModel: MainPageScreenModel) {
 
     val navigator = LocalNavigator.current
-    val meters = mainPageScreenModel.listAllMeters()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -48,7 +49,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
             )
         },
         floatingActionButton ={
-            ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen(meters)) }) {
+            ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen(mainPageScreenModel)) }) {
                 Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
                 Text("Add Meter")
             }
@@ -57,7 +58,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)) {
-            items(meters) { meter ->
+            items(mainPageScreenModel.state.value.listMeter) { meter ->
                 MeterOverviewCard(
                     onClick = {
                         navigator?.push(MeterDetailsScreen(meter))

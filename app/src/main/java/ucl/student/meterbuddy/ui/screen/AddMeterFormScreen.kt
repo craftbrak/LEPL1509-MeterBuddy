@@ -59,8 +59,9 @@ import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.data.model.entity.Meter
+import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
-data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
+data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Screen {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
     @Composable
@@ -209,7 +210,7 @@ data class AddMeterFormScreen(val meters: MutableList<Meter>): Screen {
                                     additiveMeter = isAdditive
                                 )
                                 navigator?.pop()
-                                meters.add(newMeter)
+                                homePageScreenModel.addMeter(newMeter)
                             } else {
                                 if (!meterName.isNotBlank()) {
                                     scope.launch {
