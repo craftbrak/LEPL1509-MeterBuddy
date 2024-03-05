@@ -106,7 +106,6 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                 shape = MaterialTheme.shapes.extraLarge
             ){
                 IconButton(onClick = {
-//                    meterScreenModel.addReading(meterScreenModel.meter.meterID, 2213.0, Date.from(Instant.now()).toString())
                     navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName
                     ) { value, date, note ->
                         meterScreenModel.addReading(value,date,note)
@@ -148,18 +147,18 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                         .padding(8.dp),
                     onclick =
                     {
-//                     navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true
-//                    ) { value, date, note ->
-//                        meterScreenModel.updateReading(reading.readingID, value, date, note)
-//                    })
+                     navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true
+                    ) { value, date, note ->
+                        meterScreenModel.updateReading(reading.readingID, value, date, note)
+                    })
                     },
                     value = reading.value,
                     date = reading.date,
-                    note = "Test",
+                    note = "id: ${reading.readingID}",
                     onEditClick = {
-//                        navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true){ value, date, note ->
-//                        meterScreenModel.updateReading(reading.readingID, value, date, note)
-//                    })
+                        navigator.push(AddReadingScreen(meterScreenModel,meterScreenModel.meter.meterID,meterScreenModel.meter.meterName,reading.date,reading.value, true){ value, date, note ->
+                        meterScreenModel.updateReading(reading.readingID, value, date, note)
+                    })
                     }
                 )
             }

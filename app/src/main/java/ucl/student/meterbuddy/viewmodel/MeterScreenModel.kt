@@ -46,14 +46,20 @@ data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel
     }
     fun updateReading( readingId: Int, value: Float, dateLocalDateTime: LocalDateTime, note: String?= null){
         val mutList = state.value.readings.toMutableList()
-        mutList[readingId]= mutList[readingId].copy(
+        mutList[readingId-1]= mutList[readingId-1].copy(
             value= value,
             date = dateLocalDateTime,
             note = note
         )
-        _state.value= state.value.copy(
-            readings = mutList
-        )
+        screenModelScope.launch {
+            meterRepostiory.updateMeterReading(mutList[readingId-1])
+        }
         Log.i("MeterScreenModel", "Updated reading $readingId to meter ${state.value.meter.meterID}: $value at $dateLocalDateTime")
+    }
+    fun deleteReading(readingId: Int){
+        screenModelScope.launch {
+            meterRepostiory.deleteReading(state.value.readings[readingId-1])
+        }
+        Log.i("MeterScreenModel", "Deleted reading $readingId from meter ${state.value.meter.meterID}")
     }
 }

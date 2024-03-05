@@ -1,6 +1,7 @@
 package ucl.student.meterbuddy.data.data_access
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -53,4 +54,10 @@ interface UserDao {
     suspend fun updateMeter(meter: Meter)
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateMeterReading(meter: MeterReading)
+
+    @Delete
+    suspend fun deleteMeter(meter: Meter)
+
+    @Delete
+    suspend fun deleteMeterReading(meterReading: MeterReading)
 }

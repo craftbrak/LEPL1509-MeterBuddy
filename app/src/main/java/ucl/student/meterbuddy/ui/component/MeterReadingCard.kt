@@ -34,8 +34,9 @@ fun MeterReadingCard(modifier: Modifier,onclick : ()-> Unit, value: Float, date:
     Row (modifier.clickable { onclick() }.clip(shape = RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
         Text(text = value.toString())
         Text(text = date.format(formatter))
+        Text(text = note)
         IconButton(onClick = onEditClick) {
-//            Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
+            Icon(imageVector = Icons.Default.Edit, contentDescription = "edit")
         }
     }
 }

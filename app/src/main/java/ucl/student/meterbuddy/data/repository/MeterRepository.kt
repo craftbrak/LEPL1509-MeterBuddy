@@ -17,7 +17,7 @@ interface MeterRepository {
 
     suspend fun addReading(reading: MeterReading)
 
-    suspend fun deleteReading(id: Int)
+    suspend fun deleteReading(reading: MeterReading)
 
     suspend fun updateMeterReading(meterReading: MeterReading)
 

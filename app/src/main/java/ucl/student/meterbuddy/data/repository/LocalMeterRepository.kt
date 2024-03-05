@@ -30,8 +30,8 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         userDao.insertMeterReading(reading)
     }
 
-    override suspend fun deleteReading(id: Int) {
-        TODO("Not yet implemented")
+    override suspend fun deleteReading(reading: MeterReading) {
+        userDao.deleteMeterReading(reading)
     }
 
     override suspend fun updateMeterReading(meterReading: MeterReading) {
