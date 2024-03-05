@@ -56,7 +56,7 @@ class TypeConverters {
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): Long? {
-        return date?.toInstant(ZoneOffset.of(ZoneId.systemDefault().toString()))?.toEpochMilli()
+        return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
     }
 
     @TypeConverter

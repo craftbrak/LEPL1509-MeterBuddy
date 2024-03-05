@@ -6,34 +6,43 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
+import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
+import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.Date
+import android.content.Context
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
-data class MeterScreenModel(val meter: Meter): ScreenModel {
+data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel {
+    val  meterRepostiory = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
 
-    var readings = mutableListOf(
-        MeterReading(1, meter.meterID, 1123.24f, LocalDateTime.now()),
-        MeterReading(2, meter.meterID, 2343.1f,LocalDateTime.now()),
-        MeterReading(3, meter.meterID, 3231.346f, LocalDateTime.now()),
-        MeterReading(4, meter.meterID, 4324.131f, LocalDateTime.now()),
-        MeterReading(5, meter.meterID, 5682.123f, LocalDateTime.now()),
-    )
 
-    private val _state = mutableStateOf(MeterState(meter, readings))
+    private val _state = mutableStateOf(MeterState(meter))
     val state :State<MeterState> = _state
 
+    init {
+        getAllReadings()
+    }
+    fun getAllReadings(){
+        screenModelScope.launch {
+            meterRepostiory.getMeterReadings(meter.meterID).collect {
+                _state.value = state.value.copy(
+                    readings = it
+                )
+            }
+        }
+
+    }
     fun addReading( reading: Float, date: LocalDateTime, note: String?=null) {
-        val mutList = state.value.readings.toMutableList()
-        mutList.add(MeterReading(state.value.readings.size+1, state.value.meter.meterID, reading, date,note))
-        _state.value= state.value.copy(
-            readings = mutList
-        )
-        Log.i("MeterScreenModel", "Added reading to meter ${state.value.meter.meterID}: $reading at $date")
+        screenModelScope.launch {
+            meterRepostiory.addReading(MeterReading(0, meter.meterID, reading, date, note))
+        }
     }
     fun updateReading( readingId: Int, value: Float, dateLocalDateTime: LocalDateTime, note: String?= null){
         val mutList = state.value.readings.toMutableList()
