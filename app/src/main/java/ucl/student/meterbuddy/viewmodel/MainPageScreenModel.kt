@@ -16,7 +16,7 @@ import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 
 class MainPageScreenModel(context: Context): ScreenModel {
 
-    private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
+    private val meterRepository = LocalMeterRepository(UserDatabase.getInstance(context).userDao)
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
 
@@ -39,7 +39,6 @@ class MainPageScreenModel(context: Context): ScreenModel {
                 )
             }
         }
-
     }
 
     suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {

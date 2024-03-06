@@ -208,7 +208,6 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
                                         snackbarHostState.showSnackbar(
                                             message = "Field 'Name' is required",
                                             withDismissAction = true,
-
                                             )
                                     }
                                 }

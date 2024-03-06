@@ -1,6 +1,7 @@
 package ucl.student.meterbuddy.ui.pages
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,27 +27,33 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.data.UserDatabase
+import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
 import ucl.student.meterbuddy.ui.screen.AddReadingScreen
+import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeterPage(meterScreenModel: MeterScreenModel ) {
+fun MeterPage(meterScreenModel: MeterScreenModel) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.currentOrThrow
+    val meterRepository = LocalMeterRepository(UserDatabase.getInstance(LocalContext.current).userDao)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -110,11 +117,24 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                         Box(
                             modifier = Modifier.padding(70.dp)
                         ) {
-                            Text(
-                                text = "Graphs are not implemented yet but will be here soon",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
+
+                            // TODO(Mettre le graphique parfaitement dans la Box
+                            //  + Changer la fonction createChartLine() pour
+                            //  pouvoir positionner le graphique où on veut)
+
+                            val context = LocalContext.current
+                            val resources: Resources = context.resources
+                            val screenWidth: Int = resources.displayMetrics.widthPixels
+                            val screenHeight: Int = resources.displayMetrics.heightPixels
+
+                            // TODO(Condition pour vérifier que la liste des readings est pas vide)
+                            if (meterRepository.getMeterReadings(meterScreenModel.meter.meterID).collectAsState(initial = emptyList()).value.isNotEmpty()) {
+                                ChartLineModel(meterRepository).createChartLine(
+                                    meter = meterScreenModel.meter,
+                                    height = screenHeight / 10,
+                                    width = screenWidth
+                                )
+                            } else { Text(text = "Need at least one reading of this meter to have a graph.") }
                         }
                     }
                 }
