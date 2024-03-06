@@ -1,8 +1,5 @@
 package ucl.student.meterbuddy.ui.screen
 
-import android.icu.text.SimpleDateFormat
-import android.os.Build
-import android.text.format.DateFormat
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +26,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import java.time.Instant
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -44,9 +40,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
@@ -54,18 +48,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, val meterName: String, val lastDate: LocalDateTime = LocalDateTime.now(), val lastValue: Float?=null, val edit:Boolean =false,val onSubmit: (value: Float, date: LocalDateTime, note:String?)-> Unit): Screen {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -75,7 +65,6 @@ data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, 
         var reading by remember { mutableStateOf(lastValue.toString() )  }
         var note by remember { mutableStateOf("") }
         val context = LocalContext.current
-
 
         // Date formatting
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
@@ -203,6 +192,4 @@ data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, 
             }
         }
     }
-
-
 }

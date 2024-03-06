@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.data.model.enums
 
+
 enum class Unit(val unit: String, val symbol: String){
     KILO_WATT_HOUR("Kilowatt Hour", "kWh"),
     CUBIC_METER("Cubic Meter", "m³"),

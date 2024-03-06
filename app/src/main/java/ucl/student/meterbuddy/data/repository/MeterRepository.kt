@@ -5,6 +5,7 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 
 interface MeterRepository {
+
     fun getMeters() : Flow<List<Meter>>
 
     fun getMeterReadings(id: Int): Flow<List<MeterReading>>

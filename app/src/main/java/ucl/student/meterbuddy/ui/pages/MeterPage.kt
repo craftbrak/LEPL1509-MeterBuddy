@@ -1,9 +1,7 @@
 package ucl.student.meterbuddy.ui.pages
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,11 +38,12 @@ import ucl.student.meterbuddy.ui.component.MeterReadingCard
 import ucl.student.meterbuddy.ui.screen.AddReadingScreen
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeterPage(meterScreenModel: MeterScreenModel ) {
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.currentOrThrow
