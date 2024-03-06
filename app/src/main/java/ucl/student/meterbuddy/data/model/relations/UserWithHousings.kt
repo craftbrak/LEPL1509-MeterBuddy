@@ -6,6 +6,7 @@ import androidx.room.Relation
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.User
 
+
 data class UserWithHousings (
     @Embedded val user: User,
     @Relation(

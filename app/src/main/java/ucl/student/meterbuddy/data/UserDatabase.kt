@@ -23,6 +23,7 @@ import ucl.student.meterbuddy.data.model.relations.HousingUserCrossRef
 
     version = 1
 )
+
 @TypeConverters(ucl.student.meterbuddy.data.model.TypeConverters::class)
 abstract class UserDatabase : RoomDatabase() {
 
@@ -37,9 +38,7 @@ abstract class UserDatabase : RoomDatabase() {
                     context.applicationContext,
                     UserDatabase::class.java,
                     "user_db"
-                ).build().also {
-                    INSTANCE_DB = it
-                }
+                ).build().also { INSTANCE_DB = it }
             }
         }
     }

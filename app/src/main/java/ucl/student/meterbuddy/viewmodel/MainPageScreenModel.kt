@@ -135,17 +135,15 @@ class MainPageScreenModel(context: Context): ScreenModel {
 //        return meters.size
 //    }
 
-    suspend fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
+    fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
         return meterReading.value > threshold
     }
 
-    // How add a MeterReading
     fun addMeterReading(meter: Meter, reading: MeterReading) {
-        // TODO
+        // TODO(not implemented yet)
     }
 
-    // Edit What ?
     fun editMeter(meter: Meter) {
-        // TODO
+        // TODO(not implemented yet)
     }
 }

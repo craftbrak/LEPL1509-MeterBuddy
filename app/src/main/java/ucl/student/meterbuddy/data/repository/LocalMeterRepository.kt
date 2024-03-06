@@ -6,6 +6,7 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 
 class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
+
     override fun getMeters(): Flow<List<Meter>> {
         return userDao.getMeters()
     }

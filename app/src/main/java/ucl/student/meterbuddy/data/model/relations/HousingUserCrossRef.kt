@@ -1,6 +1,5 @@
 package ucl.student.meterbuddy.data.model.relations
 
-
 import androidx.room.Entity
 import ucl.student.meterbuddy.data.model.enums.Role
 
