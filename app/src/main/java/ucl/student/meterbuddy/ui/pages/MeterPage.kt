@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,7 +69,7 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                     IconButton(onClick = {
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
-                                message = "Delete not Implemented yet",
+                                message = "Edit Not Implemented Yet",
                                 actionLabel = "close"
                             )
                             if (result == SnackbarResult.ActionPerformed) {
@@ -76,7 +77,7 @@ fun MeterPage(meterScreenModel: MeterScreenModel ) {
                             }
                         }
                     }) {
-                        Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete Meter")
+                        Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Delete Meter")
                     }
                 })
         },

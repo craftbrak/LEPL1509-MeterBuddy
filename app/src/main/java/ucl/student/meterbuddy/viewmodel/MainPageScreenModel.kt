@@ -7,6 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.last
@@ -42,13 +45,25 @@ class MainPageScreenModel(context: Context): ScreenModel {
     }
 
     fun getAllMeters() {
-
         screenModelScope.launch {
-            meterRepository.getMeters().collect {
-                Log.i("getMeter","Get meter Call $it")
-                it.toMutableList()
+            meterRepository.getMeters().collect { meters ->
+//                Log.i("getMeter","Get meter Call $meters")
                 _state.value = state.value.copy(
-                    listMeter = it
+                    listMeter = meters
+                )
+                val readingJobs=meters.map{ meter->
+                    async(Dispatchers.IO) {
+                        meter.meterID to getLastReadingOfMeter(meter)
+                    }
+                }
+
+                val readingsMap = readingJobs.awaitAll().toMap()
+
+                readingsMap.forEach { (id, reading) ->
+                    Log.i("getMeterReading", "Get meterReading Call $reading")
+                }
+                _state.value = state.value.copy(
+                    lastReading = readingsMap
                 )
             }
         }

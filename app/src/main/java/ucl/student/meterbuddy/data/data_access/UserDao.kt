@@ -36,10 +36,10 @@ interface UserDao {
     @Query("SELECT U.* FROM User as U JOIN HousingUserCrossRef hu on hu.userID JOIN housing h on h.housingID WHERE h.housingName = :housingName ")
     suspend fun getUsersWithHousingName(housingName: String) : List<User>
 
-    @Transaction
-    @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ")
+
+    @Query("SELECT * FROM MeterReading WHERE meterID= :meterId  ORDER BY date ASC")
     fun getMeterReadingFromMeterID(meterId: Int): Flow<List<MeterReading>>
-    @Transaction
+
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ORDER BY date ASC ")
     suspend fun getLastMeterReadingFromMeterID(meterId: Int): MeterReading
 

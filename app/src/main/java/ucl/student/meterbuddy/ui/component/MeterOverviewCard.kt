@@ -38,7 +38,7 @@ fun MeterOverviewCard(
     onClick: () -> Unit = {},
     meterName: String,
     meterIcon: MeterIcon,
-    lastReading: Float,
+    lastReading: Float? = null,
     readingUnit: String,
     tendanceIcon: String,
     tendenceValue: Float,

@@ -66,7 +66,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
                     modifier = Modifier.padding(10.dp),
                     meterName = meter.meterName,
                     meterIcon = meter.meterIcon,
-                    lastReading = 1938f,
+                    lastReading = mainPageScreenModel.state.value.lastReading[meter.meterID]?.value,
                     readingUnit = meter.meterUnit.unit,
                     tendanceIcon = "up",
                     tendenceValue = 10.0f,
