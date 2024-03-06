@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -69,15 +70,19 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
     }
 
     @Composable
-    fun createChartLine(meter: Meter, height: Int, width: Int): LineChartData {
+    // TODO(RETURN TYPE MUST BE : LineChartData)
+    fun createChartLine(meter: Meter, height: Int, width: Int) {
 
         val readings = meterRepository.getMeterReadings(meter.meterID).collectAsState(initial = emptyList()).value
         val values = this.getValuesFromMeterReadings(readings)
         val xData = this.createXAxis(nbPoints = values.size)
         val yData = this.createYAxis(values = values)
-
+        
+        Text(text = "Il devrait y avoir un graph qui s'affiche mais y'a des bugs.")
+            
         // TODO(ERROR HERE => NoSuchElementException)
         // TODO(To remove the error : Comment the part below and remove the returned type)
+        /*
         val lineChartData = LineChartData(
             linePlotData = LinePlotData(
                 lines = listOf(
@@ -125,5 +130,6 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
             }
         }
         return lineChartData
+        */
     }
 }
