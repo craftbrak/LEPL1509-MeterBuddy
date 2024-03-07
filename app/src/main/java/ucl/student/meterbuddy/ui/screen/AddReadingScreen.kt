@@ -61,6 +61,57 @@ import java.time.format.DateTimeFormatter
 
 data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, val meterName: String, val lastDate: LocalDateTime = LocalDateTime.now(), val lastValue: Float?=null, val edit:Boolean =false,val onSubmit: (value: Float, date: LocalDateTime, note:String?)-> Unit): Screen {
 
+    /*************
+     Main function
+     *************/
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() {
+
+        val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+        val navigator = LocalNavigator.currentOrThrow
+
+        var reading by remember { mutableStateOf(lastValue.toString() )  }
+        var note by remember { mutableStateOf("") }
+
+        val showDialog = remember { mutableStateOf(false) }
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli())
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            topBar = { TopBar(navigator) },
+            floatingActionButton = { LockButton() }
+        ) { it ->
+            Column(
+                Modifier
+                    .padding(it)
+                    .fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Spacer(modifier = Modifier.height(150.dp))
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (showDialog.value) { DisplayDateDialog(showDialog, datePickerState) }
+
+                EditDateButton(showDialog, datePickerState, formatter)
+
+                OutlinedTextField(value = reading, onValueChange = { reading = it },label = { Text("Reading Value") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                OutlinedTextField(value = note, onValueChange = { note = it },label = { Text("Reading note") })
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                ConfirmReadingButton(reading, note, snackbarHostState, scope, datePickerState, navigator)
+            }
+        }
+    }
+
      /***********************
       Elements in the TopBar
       **********************/
@@ -169,57 +220,6 @@ data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, 
             dismissButton = { DismissDateButton(showDialog) }
         ) {
             DatePicker(state = datePickerState, dateFormatter = DatePickerFormatter())
-        }
-    }
-
-    /*************
-     Main function
-     *************/
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    override fun Content() {
-
-        val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
-        val scope = rememberCoroutineScope()
-        val navigator = LocalNavigator.currentOrThrow
-
-        var reading by remember { mutableStateOf(lastValue.toString() )  }
-        var note by remember { mutableStateOf("") }
-
-        val showDialog = remember { mutableStateOf(false) }
-        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli())
-
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = { TopBar(navigator) },
-            floatingActionButton = { LockButton() }
-        ) { it ->
-            Column(
-                Modifier
-                    .padding(it)
-                    .fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-
-                Spacer(modifier = Modifier.height(150.dp))
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (showDialog.value) { DisplayDateDialog(showDialog, datePickerState) }
-
-                EditDateButton(showDialog, datePickerState, formatter)
-
-                OutlinedTextField(value = reading, onValueChange = { reading = it },label = { Text("Reading Value") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                OutlinedTextField(value = note, onValueChange = { note = it },label = { Text("Reading note") })
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                ConfirmReadingButton(reading, note, snackbarHostState, scope, datePickerState, navigator)
-            }
         }
     }
 }

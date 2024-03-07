@@ -56,6 +56,11 @@ import kotlin.enums.EnumEntries
 
 data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Screen {
 
+
+    /**************
+     Main function
+     **************/
+
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
     override fun Content() {
@@ -78,8 +83,8 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) } ,
-            topBar = { AppBar(navigator = navigator) },
+            snackbarHost = { SnackbarHost(snackbarHostState) } ,
+            topBar = { TopBar(navigator) },
 
         ) {
             Column(
@@ -126,13 +131,9 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
         }
     }
 
-    @Composable
-    fun DisplayText(text: String) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 8.dp)
-        )
-    }
+    /******************************
+     All the Buttons and their logic
+     ******************************/
 
     @Composable
     fun BackButton(navigator: Navigator?) {
@@ -207,9 +208,14 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
         }
     }
 
+
+    /**********************
+     Elements in the TopBar
+     **********************/
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AppBar(navigator: Navigator?) {
+    fun TopBar(navigator: Navigator?) {
         TopAppBar(
             title = { Text(text = "Add Reading") },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -220,6 +226,11 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
             actions = { }
         )
     }
+
+
+    /******
+     Texts
+     *****/
 
     @Composable
     fun MeterTextField(name: String, onNameChange: (String) -> kotlin.Unit) {
@@ -246,6 +257,19 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
             modifier = Modifier.fillMaxWidth()
         )
     }
+
+    @Composable
+    fun DisplayText(text: String) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+
+
+    /*******
+     Options
+     *******/
 
     @Composable
     @ExperimentalLayoutApi
