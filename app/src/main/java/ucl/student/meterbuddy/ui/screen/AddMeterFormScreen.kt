@@ -45,54 +45,43 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
+import kotlin.enums.EnumEntries
 
 data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     override fun Content() {
 
         var meterName by remember { mutableStateOf("") }
+        var meterCost by remember { mutableStateOf("") }
         var selectedType by remember { mutableStateOf(MeterType.ELECTRICITY) }
         var selectedUnit by remember { mutableStateOf(Unit.KILO_WATT_HOUR) }
-        var meterCost by remember { mutableStateOf("") }
         var isAdditive by remember { mutableStateOf(true) }
-        var nameFieldRequired by remember { mutableStateOf(false) }
-        var costFieldRequired by remember { mutableStateOf(false) }
+        // var nameFieldRequired by remember { mutableStateOf(false) }
+        // var costFieldRequired by remember { mutableStateOf(false) }
+
+        val meterTypes = MeterType.entries
+        val meterIcons = MeterIcon.entries
+        val meterUnits = Unit.entries
+
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
         val navigator = LocalNavigator.current
 
-        val meterTypes =MeterType.entries
-
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost ={ SnackbarHost(hostState = snackbarHostState) } ,
-            topBar = {
-                TopAppBar(
-                    title = {
-                    Text(text = "Add Reading")
-                        },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                    navigationIcon = {
-                    IconButton(onClick = {navigator?.pop()}) {
-                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back" )
-                    }
-                }, actions = {
-
-                    }
-                    )
-            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) } ,
+            topBar = { AppBar(navigator = navigator) },
 
         ) {
             Column(
@@ -101,71 +90,21 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                TextField(
-                    value = meterName,
-                    onValueChange = { meterName = it },
-                    label = { Text("Meter Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                MeterTextField(meterName) { newName -> meterName = newName }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text("Meter Type")
-                FlowRow(Modifier.padding(10.dp),Arrangement.SpaceEvenly) {
-                    meterTypes.forEach { type ->
-                        Column(
-                            modifier = Modifier
-                                .clickable { selectedType = type }
-                                .padding(horizontal = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            IconToggleButton(modifier = Modifier.padding(3.dp),checked = selectedType == type , onCheckedChange ={selectedType =type}) {
-                                Icon(imageVector =ImageVector.vectorResource(id =type.icon.icon ) , contentDescription = type.icon.iconName)
-                            }
-                            Text(
-                                    text = type.type,
-                            modifier = Modifier.padding(start = 8.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(5.dp))
-                    }
-                }
+                MeterTypeOptions(meterTypes, selectedType) { newType -> selectedType = newType }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text("Unit")
-                FlowColumn(
-                    Modifier
-                        .padding(4.dp)
-                        .height(100.dp),Arrangement.SpaceBetween) {
-                    selectedType.units.forEach { unit ->
-                        Row(
-                            modifier = Modifier
-                                .clickable { selectedUnit = unit }
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (unit == selectedUnit),
-                                onClick = null // RadioButton handle selection automatically
-                            )
-                            Text(
-                                text = unit.symbol,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(5.dp))
-                    }
-                }
+                MeterUnitOptions(selectedType, selectedUnit) { newUnit -> selectedUnit = newUnit }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextField(
-                    value = meterCost,
-                    onValueChange = { meterCost = it.takeIf { it.isNotEmpty() } ?: "0.0" },
-                    label = { Text("Cost Per Unit") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                MeterCostTextField(meterCost) { newCost -> meterCost = newCost}
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -174,11 +113,7 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Consumption", modifier = Modifier.weight(1f))
-                    Switch(
-                        checked = isAdditive,
-                        onCheckedChange = { isAdditive = it },
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    SwitchButton(isAdditive) { newBoolean -> isAdditive = newBoolean}
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -187,45 +122,168 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    FilledTonalButton(
-                        onClick = {
-                            if (meterName.isNotBlank() && meterCost.isNotBlank()) {
-                                val newMeter = Meter(
-                                    meterID = 0,
-                                    meterName = meterName,
-                                    meterUnit = selectedUnit,
-                                    meterIcon = MeterIcon.Electricity,
-                                    meterType = selectedType,
-                                    housingID = 0,
-                                    meterCost = meterCost.toDoubleOrNull() ?: 0.0,
-                                    additiveMeter = isAdditive
-                                )
-                                navigator?.pop()
-                                homePageScreenModel.addMeter(newMeter)
-                            } else {
-                                if (!meterName.isNotBlank()) {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = "Field 'Name' is required",
-                                            withDismissAction = true,
-                                            )
-                                    }
-                                }
-                                if (!meterCost.isNotBlank()) {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = "Field 'Cost Per Unit' is required",
-                                            withDismissAction = true
-                                        )
-                                    }
-                                }
-                            }
+                    SubmitButton(meterName, meterCost, selectedUnit, selectedType, isAdditive, navigator, snackbarHostState, scope)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun DisplayText(text: String) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+
+    @Composable
+    fun BackButton(navigator: Navigator?) {
+        IconButton(onClick = { navigator?.pop() }) {
+            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+        }
+    }
+
+    @Composable
+    fun TypeSelectorButton(type: MeterType, selectedType: MeterType, onTypeSelected: (MeterType) -> kotlin.Unit) {
+        IconToggleButton(modifier = Modifier.padding(3.dp),checked = selectedType == type, onCheckedChange = { onTypeSelected(type) }) {
+            Icon(imageVector = ImageVector.vectorResource(id = type.icon.icon), contentDescription = type.icon.iconName)
+        }
+    }
+
+    @Composable
+    fun UnitSelectorButton(unit: Unit, selectedUnit: Unit) {
+        // RadioButton handle selection automatically
+        RadioButton(
+            selected = (unit == selectedUnit),
+            onClick = null
+        )
+    }
+
+    @Composable
+    fun SwitchButton(defaultValue: Boolean, onBooleanChange: (Boolean) -> kotlin.Unit) {
+        Switch(
+            checked = defaultValue,
+            onCheckedChange = { onBooleanChange(defaultValue) },
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+    }
+
+    @Composable
+    fun SubmitButton(meterName: String, meterCost: String, selectedUnit: Unit,
+                     selectedType: MeterType, isAdditive: Boolean, navigator: Navigator?,
+                     snackbarHostState: SnackbarHostState, scope: CoroutineScope)
+    {
+        FilledTonalButton(
+            onClick = {
+                if (meterName.isNotBlank() && meterCost.isNotBlank()) {
+                    // TODO(Update with good variables ?)
+                    val newMeter = Meter(meterID = 0, meterName = meterName, meterUnit = selectedUnit,
+                        meterIcon = MeterIcon.Electricity, meterType = selectedType, housingID = 0,
+                        meterCost = meterCost.toDoubleOrNull() ?: 0.0, additiveMeter = isAdditive)
+
+                    navigator?.pop()
+                    homePageScreenModel.addMeter(newMeter)
+                }
+                else {
+                    if (meterName.isBlank()) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Field 'Name' is required",
+                                withDismissAction = true,
+                            )
                         }
-                    ) {
-                        Icon(imageVector = Icons.Filled.Check, contentDescription ="add" )
-                        Text(text = "Confirm")
+                    }
+                    if (meterCost.isBlank()) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Field 'Cost Per Unit' is required",
+                                withDismissAction = true
+                            )
+                        }
                     }
                 }
+            }
+        ) {
+            Icon(imageVector = Icons.Filled.Check, contentDescription ="add" )
+            Text(text = "Confirm")
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AppBar(navigator: Navigator?) {
+        TopAppBar(
+            title = { Text(text = "Add Reading") },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            navigationIcon = { BackButton(navigator) },
+            actions = { }
+        )
+    }
+
+    @Composable
+    fun MeterTextField(name: String, onNameChange: (String) -> kotlin.Unit) {
+        var nameMeter by remember { mutableStateOf(name) }
+        TextField(
+            value = nameMeter,
+            onValueChange = {
+                nameMeter = it
+                onNameChange(it)
+            },
+            label = { Text("Meter Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+
+    @Composable
+    fun MeterCostTextField(cost: String, onNameChange: (String) -> kotlin.Unit) {
+        TextField(
+            value = cost,
+            onValueChange = { onNameChange(it.takeIf { it.isNotEmpty() } ?: "0.0") },
+            label = { Text("Cost Per Unit") },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+
+    @Composable
+    @ExperimentalLayoutApi
+    fun MeterTypeOptions(meterTypes: EnumEntries<MeterType>, selectedType: MeterType, onTypeSelected: (MeterType) -> kotlin.Unit) {
+        FlowRow(Modifier.padding(10.dp),Arrangement.SpaceEvenly) {
+            meterTypes.forEach { type ->
+                Column(
+                    modifier = Modifier
+                        .clickable { onTypeSelected(type) }
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TypeSelectorButton(type, selectedType, onTypeSelected)
+                }
+                DisplayText(type.type)
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+    }
+
+    @Composable
+    @ExperimentalLayoutApi
+    fun MeterUnitOptions(selectedType: MeterType, selectedUnit: Unit, onUnitSelected: (Unit) -> kotlin.Unit) {
+        FlowColumn(
+            Modifier
+                .padding(4.dp)
+                .height(100.dp),Arrangement.SpaceBetween) {
+            selectedType.units.forEach { unit ->
+                Row(
+                    modifier = Modifier
+                        .clickable { onUnitSelected(unit) }
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    UnitSelectorButton(unit, selectedUnit)
+                    DisplayText(unit.symbol)
+                }
+                Spacer(modifier = Modifier.height(5.dp))
             }
         }
     }
