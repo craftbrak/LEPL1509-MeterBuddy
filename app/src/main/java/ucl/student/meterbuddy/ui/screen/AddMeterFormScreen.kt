@@ -48,7 +48,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.data.model.entity.Meter
@@ -70,7 +69,6 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
         // var costFieldRequired by remember { mutableStateOf(false) }
 
         val meterTypes = MeterType.entries
-        val meterIcons = MeterIcon.entries
         val meterUnits = Unit.entries
 
         val snackbarHostState = remember { SnackbarHostState() }
@@ -163,7 +161,7 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
     fun SwitchButton(defaultValue: Boolean, onBooleanChange: (Boolean) -> kotlin.Unit) {
         Switch(
             checked = defaultValue,
-            onCheckedChange = { onBooleanChange(defaultValue) },
+            onCheckedChange = { newValue -> onBooleanChange(newValue) },
             modifier = Modifier.padding(vertical = 8.dp)
         )
     }
@@ -176,13 +174,13 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
         FilledTonalButton(
             onClick = {
                 if (meterName.isNotBlank() && meterCost.isNotBlank()) {
-                    // TODO(Update with good variables ?)
+                    // TODO ( Update the meterID ? )
                     val newMeter = Meter(meterID = 0, meterName = meterName, meterUnit = selectedUnit,
-                        meterIcon = MeterIcon.Electricity, meterType = selectedType, housingID = 0,
+                        meterIcon = selectedType.icon, meterType = selectedType, housingID = 0,
                         meterCost = meterCost.toDoubleOrNull() ?: 0.0, additiveMeter = isAdditive)
 
-                    navigator?.pop()
                     homePageScreenModel.addMeter(newMeter)
+                    navigator?.pop()
                 }
                 else {
                     if (meterName.isBlank()) {
@@ -241,7 +239,9 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
     fun MeterCostTextField(cost: String, onNameChange: (String) -> kotlin.Unit) {
         TextField(
             value = cost,
-            onValueChange = { onNameChange(it.takeIf { it.isNotEmpty() } ?: "0.0") },
+            onValueChange = { newName ->
+                onNameChange(newName.takeIf { it.isNotEmpty() } ?: "0.0")
+            },
             label = { Text("Cost Per Unit") },
             modifier = Modifier.fillMaxWidth()
         )
