@@ -38,10 +38,17 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
 
     val meterRepository = meterRepository
 
-    fun getValuesFromMeterReadings(meter: List<MeterReading>): List<Float> {
-        val values = mutableListOf<Float>()
-        meter.forEach { reading -> values.add(reading.value) }
-        return values
+    fun getValuesFromMeterReadings(meter: List<MeterReading>): List<Point> {
+        if(meter.size > 0){
+            val values = mutableListOf<Point>()
+            for(m in meter){
+                values.add(Point(m.readingID.toFloat(),m.value))
+            }
+            return values
+
+        } else {
+            return listOf(Point(0f,0f))
+        }
     }
 
     @Composable
@@ -58,7 +65,7 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
     }
 
     @Composable
-    fun createYAxis(values: List<Float>): AxisData {
+    fun createYAxis(values: List<Point>): AxisData {
         return AxisData.Builder()
             .steps(values.size)
             .backgroundColor(Color.Transparent)
@@ -75,19 +82,17 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
 
         val readings = meterRepository.getMeterReadings(meter.meterID).collectAsState(initial = emptyList()).value
         val values = this.getValuesFromMeterReadings(readings)
-        val xData = this.createXAxis(nbPoints = values.size)
+        val xData = createXAxis(nbPoints = values.size)
+
         val yData = this.createYAxis(values = values)
-        
-        Text(text = "Il devrait y avoir un graph qui s'affiche mais y'a des bugs.")
-            
         // TODO(ERROR HERE => NoSuchElementException)
         // TODO(To remove the error : Comment the part below and remove the returned type)
-        /*
+
         val lineChartData = LineChartData(
             linePlotData = LinePlotData(
                 lines = listOf(
                     Line(
-                        dataPoints = values.mapIndexed { idx, it -> Point(idx.toFloat(), it) },
+                        dataPoints = values,
                         LineStyle(
                             color = MaterialTheme.colorScheme.tertiary,
                             lineType = LineType.SmoothCurve(isDotted = false)
@@ -124,12 +129,14 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
                     .height(height.dp)
             ) {
                 LineChart(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
                     lineChartData = lineChartData
                 )
             }
         }
-        return lineChartData
-        */
+
+
     }
 }
