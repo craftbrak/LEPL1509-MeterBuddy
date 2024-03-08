@@ -3,8 +3,6 @@ package ucl.student.meterbuddy.data.model.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
-import java.util.Date
-
 
 @Entity
 data class MeterReading (

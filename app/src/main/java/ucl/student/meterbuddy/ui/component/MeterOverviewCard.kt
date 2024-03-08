@@ -20,10 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
-import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,8 +33,8 @@ fun MeterOverviewCard(
     meterIcon: MeterIcon,
     lastReading: Float? = null,
     readingUnit: String,
-    tendanceIcon: String,
-    tendenceValue: Float,
+    trendIcon: String,
+    trendValue: Float,
     monthlyCost: Float,
     currencySymbol: String
 ) {
@@ -62,19 +60,11 @@ fun MeterOverviewCard(
                 Spacer(Modifier.width(8.dp))
                 Text(text = currencySymbol)
                 Spacer(Modifier.weight(1f))
-                ElevatedSuggestionChip(modifier= Modifier.clickable(enabled = false){}, onClick = { /*TODO*/ },label={
-                    Text(text = tendenceValue.toString())
+                ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
+                    Text(text = trendValue.toString())
                 })
                 Spacer(Modifier.width(10.dp))
             }
         }
-    }
-}
-
-@Preview(name = "MeterOverviewCard")
-@Composable
-fun PreviewMeterOverviewCard() {
-    MeterBuddyTheme {
-        MeterOverviewCard(Modifier.padding(9.dp), meterName = "Electricity", meterIcon = MeterIcon.Water , currencySymbol = "eur", lastReading = 182.159F, monthlyCost = 291F, readingUnit = "Kwh", tendanceIcon = "", tendenceValue = 29F)
     }
 }

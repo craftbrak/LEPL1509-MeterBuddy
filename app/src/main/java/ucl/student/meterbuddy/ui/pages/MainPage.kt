@@ -26,72 +26,79 @@ import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.ui.screen.AddMeterFormScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
+import cafe.adriel.voyager.navigator.Navigator
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.ui.screen.LineChartsScreen
-import ucl.student.meterbuddy.viewmodel.ChartLineModel
-import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MainPage(mainPageScreenModel: MainPageScreenModel) {
 
     val navigator = LocalNavigator.current
     val scope = rememberCoroutineScope()
-    val meterRepository = LocalMeterRepository(UserDatabase.getInstance(LocalContext.current).userDao)
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
-                           .pointerInput(Unit) {
-                               // Detect if the user swipe to the left
-                               detectDragGestures { _, delta ->
-                                    if (delta.x > 0) {
-                                        scope.launch {
-                                            // Push the screen with all the graphs
-                                            navigator?.push(LineChartsScreen(lineModel = ChartLineModel(meterRepository)))
-                                        }
-                                    }
-                                }
-                            },
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
-                title = { Text("Meter Menu") },
-                actions = {
-
-                }
-            )
-        },
-        floatingActionButton ={
-            ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen(mainPageScreenModel)) }) {
-                Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
-                Text("Add Meter")
-            }
-        }
+        modifier = SwiperToLeft(navigator, scope),
+        topBar = { TopBar() },
+        floatingActionButton = { AdderButton(navigator) }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)) {
             items(mainPageScreenModel.state.value.listMeter) { meter ->
                 MeterOverviewCard(
-                    onClick = {
-                        navigator?.push(MeterDetailsScreen(meter))
-                    },
+                    onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                     modifier = Modifier.padding(10.dp),
                     meterName = meter.meterName,
                     meterIcon = meter.meterIcon,
                     lastReading = mainPageScreenModel.state.value.lastReading[meter.meterID]?.value,
                     readingUnit = meter.meterUnit.unit,
-                    tendanceIcon = "up",
-                    tendenceValue = 10.0f,
+                    trendIcon = "up",
+                    trendValue = 10.0f,
                     monthlyCost = 20.0f,
                     currencySymbol = "£"
                 )
             }
         }
+    }
+}
+
+
+@Composable
+fun SwiperToLeft(navigator: Navigator?, scope: CoroutineScope): Modifier {
+    return Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectDragGestures { _, delta ->
+                if (delta.x > 0) {
+                    scope.launch {
+                        navigator?.push(LineChartsScreen)
+                    }
+                }
+            }
+        }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar() {
+    CenterAlignedTopAppBar(
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        title = { Text("Meter Menu") },
+        actions = {
+
+        }
+    )
+}
+
+@Composable
+fun AdderButton(navigator: Navigator?) {
+    ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen()) }) {
+        Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
+        Text("Add Meter")
     }
 }

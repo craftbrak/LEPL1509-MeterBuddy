@@ -16,20 +16,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import co.yml.charts.common.extensions.isNotNull
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
 @Composable
-fun MeterReadingCard(modifier: Modifier, onclick : ()-> Unit, value: Float, date: LocalDateTime, note: String, onDeleteClick: ()-> Unit ) {
-
+fun MeterReadingCard(
+    modifier: Modifier,
+    onclick : ()-> Unit,
+    value: Float,
+    date: LocalDateTime,
+    note: String?,
+    onDeleteClick: ()-> Unit
+) {
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-    
-    //Should be a card and need to be aligned
+
     Row (modifier.clickable { onclick() }.clip(shape = RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
         Text(text = value.toString())
         Text(text = date.format(formatter))
-        Text(text = note)
+        if (note.isNotNull()) { Text(text = note.toString()) }
+        else { Text(text = "No note") }
         IconButton(onClick = onDeleteClick) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "edit")
         }

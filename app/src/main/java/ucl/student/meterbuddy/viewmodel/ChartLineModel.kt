@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,29 +28,23 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
-import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
-import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 
-class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
+object ChartLineModel: ScreenModel {
 
-    val meterRepository = meterRepository
+    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): MutableList<Point>? {
 
-    fun getValuesFromMeterReadings(meter: List<MeterReading>): List<Point> {
-        if(meter.size > 0){
-            val values = mutableListOf<Point>()
-            for(m in meter){
-                values.add(Point(m.readingID.toFloat(),m.value))
-            }
-            return values
+        if (meterReadings.isEmpty()) { return null }
 
-        } else {
-            return listOf(Point(0f,0f))
+        val values = mutableListOf<Point>()
+        meterReadings.forEach {reading ->
+            values.add(Point(reading.readingID.toFloat(), reading.value))
         }
+        return values
     }
 
     @Composable
-    fun createXAxis(nbPoints: Int): AxisData {
+    private fun createXAxis(nbPoints: Int): AxisData {
         return AxisData.Builder()
             .axisStepSize(80.dp)
             .backgroundColor(Color.Transparent)
@@ -65,7 +57,7 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
     }
 
     @Composable
-    fun createYAxis(values: List<Point>): AxisData {
+    private fun createYAxis(values: List<Point>): AxisData {
         return AxisData.Builder()
             .steps(values.size)
             .backgroundColor(Color.Transparent)
@@ -77,66 +69,62 @@ class ChartLineModel(meterRepository: LocalMeterRepository): ScreenModel {
     }
 
     @Composable
-    // TODO(RETURN TYPE MUST BE : LineChartData)
-    fun createChartLine(meter: Meter, height: Int, width: Int) {
+    fun CreateChartLine(readings: List<MeterReading>, height: Int, width: Int) {
 
-        val readings = meterRepository.getMeterReadings(meter.meterID).collectAsState(initial = emptyList()).value
-        val values = this.getValuesFromMeterReadings(readings)
-        val xData = createXAxis(nbPoints = values.size)
+        val values = this.getPointsFromMeterReadings(readings)
 
-        val yData = this.createYAxis(values = values)
-        // TODO(ERROR HERE => NoSuchElementException)
-        // TODO(To remove the error : Comment the part below and remove the returned type)
+        if (values != null) {
+            val xData = createXAxis(nbPoints = values.size)
+            val yData = this.createYAxis(values = values)
 
-        val lineChartData = LineChartData(
-            linePlotData = LinePlotData(
-                lines = listOf(
-                    Line(
-                        dataPoints = values,
-                        LineStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            lineType = LineType.SmoothCurve(isDotted = false)
-                        ),
-                        IntersectionPoint( color = MaterialTheme.colorScheme.tertiary ),
-                        SelectionHighlightPoint( color = MaterialTheme.colorScheme.primary ),
-                        ShadowUnderLine(
-                            alpha = 0.5f,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.inversePrimary,
-                                    Color.Transparent
+            val lineChartData = LineChartData(
+                linePlotData = LinePlotData(
+                    lines = listOf(
+                        Line(
+                            dataPoints = values,
+                            LineStyle(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                lineType = LineType.SmoothCurve(isDotted = false)
+                            ),
+                            IntersectionPoint(color = MaterialTheme.colorScheme.tertiary),
+                            SelectionHighlightPoint(color = MaterialTheme.colorScheme.primary),
+                            ShadowUnderLine(
+                                alpha = 0.5f,
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.inversePrimary,
+                                        Color.Transparent
+                                    )
                                 )
-                            )
-                        ),
-                        SelectionHighlightPopUp()
-                    )
+                            ),
+                            SelectionHighlightPopUp()
+                        )
+                    ),
                 ),
-            ),
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            xAxisData = xData,
-            yAxisData = yData,
-            gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
-        )
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                xAxisData = xData,
+                yAxisData = yData,
+                gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
+            )
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(width.dp)
-                    .height(height.dp)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LineChart(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    lineChartData = lineChartData
-                )
+                        .width(width.dp)
+                        .height(height.dp)
+                ) {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        lineChartData = lineChartData
+                    )
+                }
             }
         }
-
-
     }
 }

@@ -16,13 +16,13 @@ import kotlinx.coroutines.launch
 
 data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel {
 
-    val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
+    private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
     private val _state = mutableStateOf(MeterState(meter))
     val state :State<MeterState> = _state
 
-    init { getAllReadings() }
+    init { getReadings() }
 
-    fun getAllReadings() {
+    fun getReadings() {
         screenModelScope.launch {
             meterRepository.getMeterReadings(meter.meterID).collect {
                 _state.value = state.value.copy(
@@ -32,7 +32,7 @@ data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel
         }
     }
 
-    fun addReading( reading: Float, date: LocalDateTime, note: String?=null) {
+    fun addReading(reading: Float, date: LocalDateTime, note: String?=null) {
         screenModelScope.launch {
             meterRepository.addReading(MeterReading(0, meter.meterID, reading, date, note))
         }

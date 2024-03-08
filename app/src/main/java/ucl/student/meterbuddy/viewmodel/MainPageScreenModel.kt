@@ -4,29 +4,18 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.toCollection
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
-import ucl.student.meterbuddy.data.model.enums.MeterIcon
-import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
-import ucl.student.meterbuddy.data.repository.MeterRepository
-import java.util.Date
+
 
 class MainPageScreenModel(context: Context): ScreenModel {
 
@@ -34,9 +23,8 @@ class MainPageScreenModel(context: Context): ScreenModel {
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
 
-    init {
-        getAllMeters()
-    }
+    init { getAllMeters() }
+
     fun addMeter(metre:Meter) {
         screenModelScope.launch {
             meterRepository.addMeter(metre)
@@ -47,7 +35,7 @@ class MainPageScreenModel(context: Context): ScreenModel {
     fun getAllMeters() {
         screenModelScope.launch {
             meterRepository.getMeters().collect { meters ->
-//                Log.i("getMeter","Get meter Call $meters")
+                Log.i("getMeter","Get meter Call $meters")
                 _state.value = state.value.copy(
                     listMeter = meters
                 )

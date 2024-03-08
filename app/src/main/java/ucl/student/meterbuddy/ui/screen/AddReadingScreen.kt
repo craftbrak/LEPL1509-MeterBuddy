@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.screen
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,14 +54,18 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, val meterName: String, val lastDate: LocalDateTime = LocalDateTime.now(), val lastValue: Float?=null, val edit:Boolean =false,val onSubmit: (value: Float, date: LocalDateTime, note:String?)-> Unit): Screen {
-
+data class AddReadingScreen(val nameMeter: String,
+                            val context: Context,
+                            val lastDate: LocalDateTime = LocalDateTime.now(),
+                            val lastValue: Float ?= null,
+                            val edit: Boolean = false,
+                            val onSubmit: (value: Float, date: LocalDateTime, note:String?)-> Unit): Screen
+{
     /*************
      Main function
      *************/
@@ -124,7 +129,7 @@ data class AddReadingScreen(val screenModel :MeterScreenModel,val meterId: Int, 
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ),
-            title = { Text(text = "${if (!edit)  "Add Reading to" else "Edit Reading of"} $meterName") },
+            title = { Text(text = "${if (edit)  "Edit Reading of" else "Add Reading to"} $nameMeter") },
             navigationIcon = { BackButton(navigator) },
             actions = { }
         )

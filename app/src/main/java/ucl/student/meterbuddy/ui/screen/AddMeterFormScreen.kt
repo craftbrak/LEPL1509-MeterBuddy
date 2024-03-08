@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -54,8 +55,7 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import kotlin.enums.EnumEntries
 
-data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Screen {
-
+class AddMeterFormScreen: Screen {
 
     /**************
      Main function
@@ -74,12 +74,13 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
         // var costFieldRequired by remember { mutableStateOf(false) }
 
         val meterTypes = MeterType.entries
-        val meterUnits = Unit.entries
+        // val meterUnits = Unit.entries
 
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
         val navigator = LocalNavigator.current
+        val mainPageScreenModel = MainPageScreenModel(LocalContext.current)
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -125,7 +126,8 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    SubmitButton(meterName, meterCost, selectedUnit, selectedType, isAdditive, navigator, snackbarHostState, scope)
+                    SubmitButton(meterName, meterCost, selectedUnit, selectedType, isAdditive,
+                        navigator, snackbarHostState, scope, mainPageScreenModel)
                 }
             }
         }
@@ -170,17 +172,18 @@ data class AddMeterFormScreen(val homePageScreenModel: MainPageScreenModel): Scr
     @Composable
     fun SubmitButton(meterName: String, meterCost: String, selectedUnit: Unit,
                      selectedType: MeterType, isAdditive: Boolean, navigator: Navigator?,
-                     snackbarHostState: SnackbarHostState, scope: CoroutineScope)
+                     snackbarHostState: SnackbarHostState, scope: CoroutineScope, mainPageScreenModel: MainPageScreenModel)
     {
         FilledTonalButton(
             onClick = {
+                // val homePageScreenModel = MainPageScreenModel
                 if (meterName.isNotBlank() && meterCost.isNotBlank()) {
                     // TODO ( Update the meterID ? )
                     val newMeter = Meter(meterID = 0, meterName = meterName, meterUnit = selectedUnit,
                         meterIcon = selectedType.icon, meterType = selectedType, housingID = 0,
                         meterCost = meterCost.toDoubleOrNull() ?: 0.0, additiveMeter = isAdditive)
 
-                    homePageScreenModel.addMeter(newMeter)
+                    mainPageScreenModel.addMeter(newMeter)
                     navigator?.pop()
                 }
                 else {

@@ -72,7 +72,7 @@ class TypeConverters {
             "Hour" -> Unit.HOUR
             "Centimeter" -> Unit.CENTIMETER
             "Kilogram" -> Unit.KILOGRAM
-            "Staire" -> Unit.STAIR
+            "Stair" -> Unit.STAIR
             "Megabyte" -> Unit.MEGABYTE
             else -> throw IllegalArgumentException("Could not recognize unit $unit")
         }

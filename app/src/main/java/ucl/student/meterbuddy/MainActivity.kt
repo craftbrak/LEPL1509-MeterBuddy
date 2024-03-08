@@ -16,13 +16,13 @@ import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 
 class MainActivity : ComponentActivity() {
 
-    val LocalScreenContext = compositionLocalOf<Context> { error("No Context provided") }
+    private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MeterBuddyTheme {
-                CompositionLocalProvider(LocalScreenContext provides this) {
+                CompositionLocalProvider(localScreenContext provides this) {
                     HomeScreen.Content()
                 }
                 Surface(

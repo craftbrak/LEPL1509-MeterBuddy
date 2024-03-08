@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import ucl.student.meterbuddy.data.data_access.UserDao
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.enums.MeterType
 
 class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
 
@@ -37,5 +38,11 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
 
     override suspend fun updateMeterReading(meterReading: MeterReading) {
         userDao.updateMeterReading(meterReading)
+    }
+
+    override fun filteredMetersByType(meters: List<Meter>, type: MeterType): List<Meter> {
+        return meters.filter { meter ->
+            meter.meterType == type
+        }
     }
 }
