@@ -13,7 +13,6 @@ import android.content.Context
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.launch
 
-
 data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel {
 
     private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)

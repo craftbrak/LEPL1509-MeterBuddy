@@ -46,7 +46,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)) {
-            items(mainPageScreenModel.state.value.listMeter) { meter ->
+            items(mainPageScreenModel.state.value.meters) { meter ->
                 MeterOverviewCard(
                     onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                     modifier = Modifier.padding(10.dp),

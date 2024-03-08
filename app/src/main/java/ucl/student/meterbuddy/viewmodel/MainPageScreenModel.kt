@@ -2,7 +2,9 @@ package ucl.student.meterbuddy.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 
 
@@ -23,23 +26,16 @@ class MainPageScreenModel(context: Context): ScreenModel {
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
 
-    init { getAllMeters() }
+    init { updateState() }
 
-    fun addMeter(metre:Meter) {
+    private fun updateState() {
         screenModelScope.launch {
-            meterRepository.addMeter(metre)
-            Log.i("Add Meter", metre.toString())
-        }
-    }
-
-    fun getAllMeters() {
-        screenModelScope.launch {
-            meterRepository.getMeters().collect { meters ->
-                Log.i("getMeter","Get meter Call $meters")
+            meterRepository.getMeters().collect { newMeters ->
+                Log.i("getMeter","Get meter Call $newMeters")
                 _state.value = state.value.copy(
-                    listMeter = meters
+                    meters = newMeters
                 )
-                val readingJobs=meters.map{ meter->
+                val readingJobs = newMeters.map{ meter ->
                     async(Dispatchers.IO) {
                         meter.meterID to getLastReadingOfMeter(meter)
                     }
@@ -55,11 +51,38 @@ class MainPageScreenModel(context: Context): ScreenModel {
                 )
             }
         }
-
     }
 
-    suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {
+    fun addMeter(metre:Meter) {
+        screenModelScope.launch {
+            meterRepository.addMeter(metre)
+            Log.i("Add Meter", metre.toString())
+        }
+    }
+
+    private suspend fun getLastReadingOfMeter(meter: Meter): MeterReading {
         return meterRepository.getMeterReadings(meter.meterID).last().last()
+    }
+
+    fun filterMetersByType(type: MeterType): MutableList<Meter> {
+        val meters = state.value.meters
+        return meters.filter { meter ->
+            meter.meterType == type
+        }.toMutableList()
+    }
+
+    @Composable
+    fun getMeterReadings(meter: Meter): List<MeterReading> {
+        return meterRepository.getMeterReadings(meter.meterID).collectAsState(initial = emptyList()).value
+    }
+
+    @Composable
+    fun getMetersReadings(meters: List<Meter>): List<MeterReading> {
+        val readings = mutableListOf<MeterReading>()
+        meters.forEach { meter ->
+            readings += getMeterReadings(meter)
+        }
+        return readings
     }
 
 //    suspend fun getLastReadingOfEachMeter(meter: Meter): MutableList<MeterReading> {
@@ -69,11 +92,6 @@ class MainPageScreenModel(context: Context): ScreenModel {
 //            lastReadings.add(getLastReadingOfMeter(meter))
 //        }
 //        return lastReadings
-//    }
-//    fun filterMetersByType(type: MeterType): MutableList<Meter> {
-//        return meters.filter { meter ->
-//            meter.meterType == type
-//        }.toMutableList()
 //    }
 //
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
