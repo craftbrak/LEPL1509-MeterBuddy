@@ -39,6 +39,10 @@ interface UserDao {
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId  ORDER BY date ASC")
     fun getMeterReadingFromMeterID(meterId: Int): Flow<List<MeterReading>>
 
+
+    @Query("SELECT * FROM METER LEFT JOIN MeterReading ON Meter.meterID = MeterReading.meterID ORDER BY MeterReading.date ASC")
+    fun getMeterSAndReadings(): Flow<Map<Meter,List<MeterReading>>>
+
     @Query("SELECT * FROM MeterReading WHERE meterID= :meterId ORDER BY date ASC ")
     suspend fun getLastMeterReadingFromMeterID(meterId: Int): MeterReading
 

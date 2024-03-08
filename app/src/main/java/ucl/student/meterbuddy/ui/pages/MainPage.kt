@@ -47,12 +47,13 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
             .fillMaxWidth()
             .padding(innerPadding)) {
             items(mainPageScreenModel.state.value.meters) { meter ->
+                val lastReading = mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
                 MeterOverviewCard(
                     onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                     modifier = Modifier.padding(10.dp),
                     meterName = meter.meterName,
                     meterIcon = meter.meterIcon,
-                    lastReading = mainPageScreenModel.state.value.lastReading[meter.meterID]?.value,
+                    lastReading = lastReading ?: 0.0f,
                     readingUnit = meter.meterUnit.unit,
                     trendIcon = "up",
                     trendValue = 10.0f,

@@ -10,6 +10,7 @@ interface MeterRepository {
     fun getMeters() : Flow<List<Meter>>
 
     fun getMeterReadings(id: Int): Flow<List<MeterReading>>
+    fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>>
 
     suspend fun addMeter(meter: Meter)
 

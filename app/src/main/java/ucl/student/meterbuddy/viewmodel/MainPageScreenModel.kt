@@ -31,22 +31,13 @@ class MainPageScreenModel(context: Context): ScreenModel {
 
     private fun updateState() {
         screenModelScope.launch {
-            meterRepository.getMeters().collect { meters ->
-                Log.i("getMeter","Get meter Call $meters")
+            meterRepository.getMeterAndReadings().collect { metersAndReadings ->
+                Log.i("Meters and Readings", metersAndReadings.keys.toString())
                 _state.value = state.value.copy(
-                    meters = meters
-                )
-                val readingJobs = meters.map{ meter ->
-                    async(Dispatchers.IO) {
-                        meter.meterID to getLastReadingOfMeter(meter)
-                    }
-                }
-                val readingsMap = readingJobs.awaitAll().toMap()
-                readingsMap.forEach { (id, reading) ->
-                    Log.i("getMeterReading", "Get meterReading Call $reading")
-                }
-                _state.value = state.value.copy(
-                    lastReading = readingsMap
+                    meters = metersAndReadings.keys.toList(),
+                    lastReading = metersAndReadings.map { (meter, readings) ->
+                        meter.meterID to readings
+                    }.toMap()
                 )
             }
         }

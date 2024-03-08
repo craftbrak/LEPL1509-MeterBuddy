@@ -24,6 +24,10 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         userDao.updateMeter(meter)
     }
 
+    override fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>> {
+        return userDao.getMeterSAndReadings()
+    }
+
     override suspend fun deleteMeter(id: Int) {
         TODO("Not yet implemented")
     }
