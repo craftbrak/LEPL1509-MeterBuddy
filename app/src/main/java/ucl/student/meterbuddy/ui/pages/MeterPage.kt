@@ -101,9 +101,8 @@ fun BoxGraph(meterScreenModel: MeterScreenModel) {
     ) {
         Card(modifier = Modifier.padding(16.dp)) {
             Box(
-                modifier = Modifier.padding(70.dp)
+                modifier = Modifier.padding(10.dp)
             ) {
-                // TODO (Update the graphic in the box)
                 val context = LocalContext.current
                 val resources = context.resources
                 val screenWidth = resources.displayMetrics.widthPixels
@@ -113,11 +112,12 @@ fun BoxGraph(meterScreenModel: MeterScreenModel) {
                 if (readings.isNotEmpty()) {
                     ChartLineModel.CreateChartLine(
                         readings = readings,
+                        type = meterScreenModel.meter.meterType,
+                        unit = meterScreenModel.meter.meterUnit,
                         height = screenHeight / 10,
                         width = screenWidth
                     )
                 }
-                // TODO ( Change the sentence or Display something visually better )
                 else { Text(text = "Need at least one reading of this meter to have a graph.") }
             }
         }

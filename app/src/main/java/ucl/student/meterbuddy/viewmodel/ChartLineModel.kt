@@ -29,53 +29,62 @@ import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.model.enums.Unit
 
 object ChartLineModel: ScreenModel {
 
-    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): MutableList<Point>? {
+    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): List<Point>? {
 
         if (meterReadings.isEmpty()) { return null }
 
         val values = mutableListOf<Point>()
         meterReadings.forEach {reading ->
-            values.add(Point(reading.readingID.toFloat(), reading.value))
+            // TODO ( Implémenter un moyen de rendre la date en Float )
+            val x = reading.date.dayOfYear.toFloat()
+            val y = reading.value
+            values.add(Point(x, y))
         }
-        return values
+        return values.sortedBy { it.x }.sortedBy { it.y }
     }
 
     @Composable
-    private fun createXAxis(nbPoints: Int): AxisData {
+    private fun createXAxis(values: List<Point>): AxisData {
         return AxisData.Builder()
-            .axisStepSize(80.dp)
+            .steps(values.size)
+            .axisStepSize(40.dp)
             .backgroundColor(Color.Transparent)
-            .steps(nbPoints)
-            .labelData { i -> i.toString() }
             .labelAndAxisLinePadding(15.dp)
+            .labelData { i -> values.getOrNull(i)?.x.toString() }
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
+            .axisLabelDescription { "Time (dayOfYear) []" }
+            .shouldDrawAxisLineTillEnd(true)
             .build()
     }
 
     @Composable
-    private fun createYAxis(values: List<Point>): AxisData {
+    private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
         return AxisData.Builder()
             .steps(values.size)
             .backgroundColor(Color.Transparent)
             .labelAndAxisLinePadding(15.dp)
-            .labelData { i -> values.getOrNull(i)?.toString() ?: "" }
+            .labelData { i -> values.getOrNull(i)?.y.toString() }
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
+            .axisLabelDescription { labelAxis}
+            .shouldDrawAxisLineTillEnd(true)
             .build()
     }
 
     @Composable
-    fun CreateChartLine(readings: List<MeterReading>, height: Int, width: Int) {
+    fun CreateChartLine(readings: List<MeterReading>, type: MeterType, unit: Unit, height: Int, width: Int) {
 
         val values = this.getPointsFromMeterReadings(readings)
 
         if (values != null) {
-            val xData = createXAxis(nbPoints = values.size)
-            val yData = this.createYAxis(values = values)
+            val xData = this.createXAxis(values = values)
+            val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $unit ]")
 
             val lineChartData = LineChartData(
                 linePlotData = LinePlotData(

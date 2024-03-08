@@ -2,12 +2,15 @@ package ucl.student.meterbuddy.ui.screen
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
@@ -21,11 +24,30 @@ object LineChartsScreen: Screen {
         val graphModel = ChartLineModel
         val mainPageScreenModel = MainPageScreenModel(context)
 
+        // TODO ( 'meters' is an empty list => BUG )
+        val meters = mainPageScreenModel.state.value.meters
+        if (meters.isEmpty()) {
+            Text("You don't have meter.")
+        }
+
         for (type in MeterType.entries) {
+            // TODO ( Conversion of Unit ! Let the choice to the user of the unique unit )
             val metersFiltered = mainPageScreenModel.filterMetersByType(type)
-            val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
-            graphModel.CreateChartLine(readings, 300, 300)
-            Spacer(modifier = Modifier.height(20.dp))
+            if (metersFiltered.isNotEmpty()) {
+
+                // TODO ( To change = Make a Button to let the choice to the user )
+                val unitOfUser = type.units.last()
+                val readings = mutableListOf<MeterReading>()
+                metersFiltered.forEach { meter ->
+                    val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                    readings += mainPageScreenModel.convertUnitReadings(readingsNotFiltered, meter.meterUnit, unitOfUser)
+                }
+                // val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
+                if (readings.isNotEmpty()) {
+                    graphModel.CreateChartLine(readings, type, Unit.KILO_WATT_HOUR,1000, 1000)
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
     }
 }
