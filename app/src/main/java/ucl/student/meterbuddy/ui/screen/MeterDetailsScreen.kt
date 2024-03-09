@@ -12,3 +12,8 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         MeterPage(meter)
     }
 }
+
+/*
+Add a new Feature :
+
+*/
