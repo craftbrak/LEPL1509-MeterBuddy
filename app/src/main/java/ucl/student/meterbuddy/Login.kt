@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import org.w3c.dom.Text
 
 class Login : ComponentActivity() {
 
@@ -22,6 +24,8 @@ class Login : ComponentActivity() {
 
         val signInButton = findViewById<TextView>(R.id.signInButton)
         val signUpButton = findViewById<TextView>(R.id.signUpButton)
+        val signInWithGoogle = findViewById<RelativeLayout>(R.id.signInWithGoogle)
+        val forgotPasswordButton = findViewById<TextView>(R.id.forgotPasswordButton)
 
         val passwordIcon = findViewById<ImageView>(R.id.passwordIcon)
 
@@ -45,6 +49,14 @@ class Login : ComponentActivity() {
             // Open 'Register' Activity
             val intent = Intent(this, Register::class.java)
             startActivity(intent)
+        }
+
+        signInWithGoogle.setOnClickListener {
+            // Todo()
+        }
+
+        forgotPasswordButton.setOnClickListener {
+            // Todo()
         }
 
         signInButton.setOnClickListener {

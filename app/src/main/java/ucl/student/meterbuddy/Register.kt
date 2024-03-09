@@ -19,6 +19,8 @@ class Register : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        val username = findViewById<EditText>(R.id.username)
+        val fullName = findViewById<EditText>(R.id.fullName)
         val email = findViewById<EditText>(R.id.email)
         val mobile = findViewById<EditText>(R.id.mobile)
         val password = findViewById<EditText>(R.id.password)
@@ -39,11 +41,18 @@ class Register : ComponentActivity() {
         signUpButton.setOnClickListener {
             val mobileTxt = mobile.text.toString()
             val emailTxt = email.text.toString()
+            val fullNameTxt = fullName.toString()
+            val passwordTxt = password.toString()
+            val usernameTxt = username.toString()
 
             // Open OTP Verification Activity
             val intent = Intent(this, OTPVerification::class.java)
+            // TODO (Check if the mobile and the email are valid)
             intent.putExtra("mobile", mobileTxt)
             intent.putExtra("email", emailTxt)
+            intent.putExtra("fullName", fullNameTxt)
+            intent.putExtra("password", passwordTxt)
+            intent.putExtra("username", usernameTxt)
             startActivity(intent)
         }
 
@@ -74,7 +83,7 @@ class Register : ComponentActivity() {
             confirmPasswordIsShown = !confirmPasswordIsShown
 
             // Move the cursor at the last character of the password
-            password.setSelection(password.length())
+            confirmPassword.setSelection(password.length())
         }
     }
 }
