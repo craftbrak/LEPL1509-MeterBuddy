@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Meter Buddy</string>
+    <string name="no_reading">Please add a reading to this meter</string>
+    <string name="meter_menu">"Meter Menu"</string>
 </resources>

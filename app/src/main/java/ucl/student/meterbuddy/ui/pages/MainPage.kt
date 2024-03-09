@@ -26,9 +26,11 @@ import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.ui.screen.AddMeterFormScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.ui.screen.LineChartsScreen
 
 
@@ -53,7 +55,7 @@ fun MainPage(mainPageScreenModel: MainPageScreenModel) {
                     modifier = Modifier.padding(10.dp),
                     meterName = meter.meterName,
                     meterIcon = meter.meterIcon,
-                    lastReading = lastReading ?: 0.0f,
+                    lastReading = lastReading?.toString() ?: null,
                     readingUnit = meter.meterUnit.unit,
                     trendIcon = "up",
                     trendValue = 10.0f,
@@ -89,7 +91,7 @@ fun TopBar() {
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
-        title = { Text("Meter Menu") },
+        title = { Text( stringResource(id = R.string.meter_menu)) },
         actions = {
 
         }

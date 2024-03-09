@@ -19,8 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
+import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 
 
@@ -31,7 +34,7 @@ fun MeterOverviewCard(
     onClick: () -> Unit = {},
     meterName: String,
     meterIcon: MeterIcon,
-    lastReading: Float? = null,
+    lastReading: String?,
     readingUnit: String,
     trendIcon: String,
     trendValue: Float,
@@ -48,23 +51,26 @@ fun MeterOverviewCard(
                 Spacer(Modifier.width(8.dp))
                 Text(text = meterName)
                 Spacer(Modifier.weight(1f))
-                Text(text = lastReading.toString())
+                Text(text = lastReading ?: stringResource(R.string.no_reading))
                 Spacer(Modifier.width(8.dp))
-                Text(text = readingUnit)
+                Text(text = if (lastReading != null) readingUnit else "")
             }
             Spacer(Modifier.height(20.dp))
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.width(10.dp))
-                Text(text = monthlyCost.toString())
-                Spacer(Modifier.width(8.dp))
-                Text(text = currencySymbol)
-                Spacer(Modifier.weight(1f))
-                ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
-                    Text(text = trendValue.toString())
-                })
-                Spacer(Modifier.width(10.dp))
+            if (lastReading !=null){
+                Row(modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width(10.dp))
+                    Text(text = monthlyCost.toString())
+                    Spacer(Modifier.width(8.dp))
+                    Text(text = currencySymbol)
+                    Spacer(Modifier.weight(1f))
+                    ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
+                        Text(text = trendValue.toString())
+                    })
+                    Spacer(Modifier.width(10.dp))
+                }
             }
+
         }
     }
 }
