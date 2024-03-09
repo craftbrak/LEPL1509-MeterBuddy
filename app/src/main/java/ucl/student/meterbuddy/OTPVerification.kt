@@ -6,83 +6,54 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import android.text.TextWatcher as TextWatcher1
+import androidx.activity.ComponentActivity
+import androidx.appcompat.widget.AppCompatButton
 
-class OTPVerification : AppCompatActivity() {
+class OTPVerification : ComponentActivity() {
 
-    private val textWatcher = object : TextWatcher1 {
+    lateinit var otp1: EditText
+    lateinit var otp2: EditText
+    lateinit var otp3: EditText
+    lateinit var otp4: EditText
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            // TODO()
-        }
+    lateinit var resendButton: TextView
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            // TODO()
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            if (s?.length!! > 0) {
-                if (selectedPosition == 0) {
-                    selectedPosition = 1
-                    showKeyboard(OTP2)
-                }
-                else if (selectedPosition == 1) {
-                    selectedPosition = 2
-                    showKeyboard(OTP3)
-                }
-                else if (selectedPosition == 2) {
-                    selectedPosition = 3
-                    showKeyboard(OTP4)
-                }
-            }
-        }
-    }
-
-    var resendButton = findViewById<TextView>(R.id.resendCodeButton)
-
-    var OTP1 = findViewById<EditText>(R.id.OTP_1)
-    var OTP2 = findViewById<EditText>(R.id.OTP_2)
-    var OTP3 = findViewById<EditText>(R.id.OTP_3)
-    var OTP4 = findViewById<EditText>(R.id.OTP_4)
-
-
-    private var resendEnabled = false
-    private val resendTime = 60
-    private var selectedPosition = 0
+    var selectedPosition: Int = 0
+    var resendEnabled: Boolean = false
+    val resendTime: Int = 60
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_otp_verification)
 
-        val OTP_Email = findViewById<TextView>(R.id.OTP_Email)
-        val OTP_Mobile = findViewById<TextView>(R.id.OTP_Mobile)
+        resendButton = findViewById(R.id.resendCodeButton)
 
-        val verifyButton = findViewById<Button>(R.id.verifyButton)
+        otp1 = findViewById(R.id.OTP_1)
+        otp2 = findViewById(R.id.OTP_2)
+        otp3 = findViewById(R.id.OTP_3)
+        otp4 = findViewById(R.id.OTP_4)
+
+        val otpEmail = findViewById<TextView>(R.id.OTP_Email)
+        val otpMobile = findViewById<TextView>(R.id.OTP_Mobile)
+
+        val verifyButton = findViewById<AppCompatButton>(R.id.verifyButton)
 
         // Get extras from Register activity through intent
         val email = intent.getStringExtra("email")
         val mobile = intent.getStringExtra("mobile")
 
         // Set email and mobile to TextView
-        OTP_Email.text = email
-        OTP_Mobile.text = mobile
-
-        OTP1.addTextChangedListener(textWatcher)
-        OTP2.addTextChangedListener(textWatcher)
-        OTP3.addTextChangedListener(textWatcher)
-        OTP4.addTextChangedListener(textWatcher)
+        otpEmail.text = email
+        otpMobile.text = mobile
 
         // By default, open keyboard at OTP1
-        showKeyboard(OTP1)
+        showKeyboard(otp1)
 
         // Start resend code timer
         startCountDownTimer()
@@ -91,18 +62,20 @@ class OTPVerification : AppCompatActivity() {
             // TODO()
             if (resendEnabled) {
                 startCountDownTimer()
-
-            } else {
-
             }
+            // else { }
         }
 
         verifyButton.setOnClickListener {
-            val generateOTP = OTP1.text.toString() + OTP2.text.toString() + OTP3.text.toString() + OTP4.text.toString()
-            if (generateOTP.length == 4) {
-                // TODO (Handle verification code)
-            }
+            val generateOTP = otp1.text.toString() + otp2.text.toString() + otp3.text.toString() + otp4.text.toString()
+            // if (generateOTP.length == 4) {
+            // TODO (Handle verification code)
+            // }
         }
+        otp1.addTextChangedListener(textWatcher)
+        otp2.addTextChangedListener(textWatcher)
+        otp3.addTextChangedListener(textWatcher)
+        otp4.addTextChangedListener(textWatcher)
     }
 
     private fun startCountDownTimer() {
@@ -138,19 +111,46 @@ class OTPVerification : AppCompatActivity() {
         if (keyCode == KeyEvent.KEYCODE_DEL) {
             if (selectedPosition == 3) {
                 selectedPosition = 2
-                showKeyboard(OTP3)
+                showKeyboard(otp3)
             }
             else if (selectedPosition == 2) {
                 selectedPosition = 1
-                showKeyboard(OTP2)
+                showKeyboard(otp2)
             }
             else if (selectedPosition == 1) {
                 selectedPosition = 0
-                showKeyboard(OTP1)
+                showKeyboard(otp1)
             }
-
             return true
         }
         return super.onKeyUp(keyCode, event)
+    }
+
+    private val textWatcher = object : TextWatcher {
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // TODO()
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            // TODO()
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            if (s?.length!! > 0) {
+                if (selectedPosition == 0) {
+                    selectedPosition = 1
+                    showKeyboard(otp2)
+                }
+                else if (selectedPosition == 1) {
+                    selectedPosition = 2
+                    showKeyboard(otp3)
+                }
+                else if (selectedPosition == 2) {
+                    selectedPosition = 3
+                    showKeyboard(otp4)
+                }
+            }
+        }
     }
 }

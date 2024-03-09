@@ -1,26 +1,26 @@
 package ucl.student.meterbuddy
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 
-class Login : AppCompatActivity() {
+class Login : ComponentActivity() {
 
     private var passwordIsShown = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
 
+        val signInButton = findViewById<TextView>(R.id.signInButton)
         val signUpButton = findViewById<TextView>(R.id.signUpButton)
 
         val passwordIcon = findViewById<ImageView>(R.id.passwordIcon)
@@ -37,11 +37,29 @@ class Login : AppCompatActivity() {
             passwordIsShown = !passwordIsShown
 
             // Move the cursor at the last character of the password
+            // TODO (Hide completely the password)
             password.setSelection(password.length())
         }
 
         signUpButton.setOnClickListener {
-            // TODO()
+            // Open 'Register' Activity
+            val intent = Intent(this, Register::class.java)
+            startActivity(intent)
+        }
+
+        signInButton.setOnClickListener {
+            // TODO (Check into Database if the username/password is Ok)
+            val personValidated = true
+            if (personValidated) {
+                // Open 'MainActivity' Activity
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+
+                // End the activity (No 'back' button)
+                finish()
+            } else {
+                // TODO (Display an error message)
+            }
         }
     }
 }

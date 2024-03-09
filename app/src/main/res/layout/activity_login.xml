@@ -67,7 +67,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:padding="10dp"
-            android:src="@drawable/show_password"
+            android:src="@drawable/hide_password"
             android:adjustViewBounds="true"
             android:layout_marginEnd="20dp"/>
 

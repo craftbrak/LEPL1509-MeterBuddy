@@ -6,11 +6,10 @@ import android.text.InputType
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.appcompat.widget.AppCompatButton
 
-class Register : AppCompatActivity() {
+class Register : ComponentActivity() {
 
     private var passwordIsShown = false
     private var confirmPasswordIsShown = false
@@ -18,7 +17,6 @@ class Register : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_register)
 
         val email = findViewById<EditText>(R.id.email)
@@ -31,6 +29,12 @@ class Register : AppCompatActivity() {
 
         val signUpButton = findViewById<AppCompatButton>(R.id.signUpButton)
         val signInButton = findViewById<TextView>(R.id.signInButton)
+
+        signInButton.setOnClickListener {
+            // Open Login Activity
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
+        }
 
         signUpButton.setOnClickListener {
             val mobileTxt = mobile.text.toString()

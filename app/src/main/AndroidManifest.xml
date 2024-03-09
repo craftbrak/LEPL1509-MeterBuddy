@@ -13,9 +13,6 @@
         android:theme="@style/Theme.MeterBuddy"
         tools:targetApi="31" >
         <activity
-            android:name=".Login"
-            android:exported="false" />
-        <activity
             android:name=".OTPVerification"
             android:exported="false" />
         <activity
@@ -25,7 +22,10 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MeterBuddy" >
+            android:theme="@style/Theme.MeterBuddy" />
+        <activity
+            android:name=".Login"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
