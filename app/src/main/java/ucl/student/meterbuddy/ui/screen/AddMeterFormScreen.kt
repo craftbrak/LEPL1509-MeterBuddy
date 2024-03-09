@@ -286,8 +286,9 @@ class AddMeterFormScreen: Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     TypeSelectorButton(type, selectedType, onTypeSelected)
+                    DisplayText(type.type)
                 }
-                DisplayText(type.type)
+
             }
             Spacer(modifier = Modifier.height(5.dp))
         }
