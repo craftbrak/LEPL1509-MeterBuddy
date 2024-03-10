@@ -74,7 +74,7 @@ fun SwiperToLeft(navigator: Navigator?, scope: CoroutineScope): Modifier {
         .fillMaxSize()
         .pointerInput(Unit) {
             detectDragGestures { _, delta ->
-                if (delta.x > 0) {
+                if (delta.y > 0) {
                     scope.launch {
                         navigator?.push(LineChartsScreen)
                     }
