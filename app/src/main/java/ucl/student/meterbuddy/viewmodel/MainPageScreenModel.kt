@@ -108,6 +108,12 @@ class MainPageScreenModel(context: Context): ScreenModel {
         return meterReading.value > threshold
     }
 
+    fun deleteMeter(meter:Meter) {
+        screenModelScope.launch {
+            meterRepository.deleteMeter(meter)
+        }
+    }
+
 
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->
