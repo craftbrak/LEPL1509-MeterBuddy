@@ -51,7 +51,8 @@ data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel
 
     fun deleteReading(readingId: Int) {
         screenModelScope.launch {
-            meterRepository.deleteReading(state.value.readings[readingId-1])
+            state.value.readings.find { it.readingID == readingId }
+                ?.let { meterRepository.deleteReading(it) }
         }
         Log.i("MeterScreenModel", "Deleted reading $readingId from meter ${state.value.meter.meterID}")
     }
