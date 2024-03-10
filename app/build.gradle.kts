@@ -78,6 +78,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
