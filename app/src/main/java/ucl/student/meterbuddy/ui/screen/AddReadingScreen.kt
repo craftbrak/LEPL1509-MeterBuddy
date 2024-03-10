@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
@@ -224,7 +225,7 @@ data class AddReadingScreen(val nameMeter: String,
             confirmButton = { ConfirmDateButton(showDialog, confirmEnabled) },
             dismissButton = { DismissDateButton(showDialog) }
         ) {
-            DatePicker(state = datePickerState, dateFormatter = DatePickerFormatter())
+            DatePicker(state = datePickerState, dateFormatter = DatePickerDefaults.dateFormatter())
         }
     }
 }
