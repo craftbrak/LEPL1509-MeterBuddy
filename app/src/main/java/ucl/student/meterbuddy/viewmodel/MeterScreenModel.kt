@@ -11,6 +11,7 @@ import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import java.time.LocalDateTime
 import android.content.Context
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.core.registry.screenModule
 import kotlinx.coroutines.launch
 
 data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel {
@@ -38,14 +39,12 @@ data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel
     }
 
     fun updateReading( readingId: Int, value: Float, dateLocalDateTime: LocalDateTime, note: String?= null) {
-        val mutList = state.value.readings.toMutableList()
-        mutList[readingId-1]= mutList[readingId-1].copy(
-            value= value,
-            date = dateLocalDateTime,
-            note = note
-        )
         screenModelScope.launch {
-            meterRepository.updateMeterReading(mutList[readingId-1])
+            val reading = state.value.readings.find { it.readingID == readingId }
+            reading?.value = value
+            reading?.date = dateLocalDateTime
+            reading?.note = note
+            meterRepository.updateMeterReading(reading!!)
         }
         Log.i("MeterScreenModel", "Updated reading $readingId to meter ${state.value.meter.meterID}: $value at $dateLocalDateTime")
     }

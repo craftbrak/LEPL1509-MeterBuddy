@@ -12,6 +12,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import cafe.adriel.voyager.navigator.Navigator
+import kotlinx.coroutines.delay
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 
@@ -21,8 +22,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen().apply {
-        }
+        installSplashScreen().apply {}
         setContent {
             MeterBuddyTheme {
                 CompositionLocalProvider(localScreenContext provides this) {

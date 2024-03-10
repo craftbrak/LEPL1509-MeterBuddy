@@ -165,7 +165,7 @@ fun MeterPage(meter: Meter) {
                         .padding(8.dp),
                     onclick =
                     {
-                     navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, meterScreenModel.context, reading.date, reading.value, true) { value, date, note ->
+                     navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, meterScreenModel.context, reading.date, reading.value,reading.note, true) { value, date, note ->
                         meterScreenModel.updateReading(reading.readingID, value, date, note)
                     })
                     },
