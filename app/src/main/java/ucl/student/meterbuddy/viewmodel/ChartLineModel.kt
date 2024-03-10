@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.getNavigatorScreenLifecycleProvider
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -50,30 +53,35 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     private fun createXAxis(values: List<Point>): AxisData {
+        val nbSteps = values.size - 1
+        val maxWidth = 220
+        val stepSize = maxWidth / nbSteps
         return AxisData.Builder()
-            .steps(values.size)
-            .axisStepSize(40.dp)
-            .backgroundColor(Color.Transparent)
-            .labelAndAxisLinePadding(15.dp)
+            .steps(nbSteps)
+            .axisStepSize(stepSize.dp)
             .labelData { i -> values.getOrNull(i)?.x.toString() }
+            .labelAndAxisLinePadding(15.dp)
+            .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelDescription { "Time (dayOfYear) []" }
-            .shouldDrawAxisLineTillEnd(true)
             .build()
     }
 
     @Composable
     private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
+        val nbSteps = values.size - 1
+        val maxHeight = 200
+        val stepSize = maxHeight / nbSteps
         return AxisData.Builder()
-            .steps(values.size)
-            .backgroundColor(Color.Transparent)
-            .labelAndAxisLinePadding(15.dp)
+            .steps(nbSteps)
+            .axisStepSize(stepSize.dp)
             .labelData { i -> values.getOrNull(i)?.y.toString() }
+            .labelAndAxisLinePadding(15.dp)
+            .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
-            .axisLabelDescription { labelAxis}
-            .shouldDrawAxisLineTillEnd(true)
+            .axisLabelDescription { labelAxis }
             .build()
     }
 
