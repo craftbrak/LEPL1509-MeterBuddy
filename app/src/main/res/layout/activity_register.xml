@@ -40,21 +40,6 @@
         android:layout_marginTop="40dp"/>
 
     <EditText
-        android:id="@+id/username"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="@drawable/round_back_dark_blue5_15"
-        android:hint="Username"
-        android:maxLines="1"
-        android:inputType="text"
-        android:textSize="16sp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"/>
-
-    <EditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="55dp"
