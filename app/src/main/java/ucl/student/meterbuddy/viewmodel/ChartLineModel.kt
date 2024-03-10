@@ -53,7 +53,7 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     private fun createXAxis(values: List<Point>): AxisData {
-        val nbSteps = values.size - 1
+        val nbSteps = values.size
         val maxWidth = 220
         val stepSize = maxWidth / nbSteps
         return AxisData.Builder()
@@ -70,7 +70,7 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
-        val nbSteps = values.size - 1
+        val nbSteps = values.size
         val maxHeight = 200
         val stepSize = maxHeight / nbSteps
         return AxisData.Builder()

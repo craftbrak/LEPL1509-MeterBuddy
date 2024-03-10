@@ -58,7 +58,7 @@ import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 
 object HomeScreen : Screen {
 
-    private lateinit var mainPageScreenModel: MainPageScreenModel
+    lateinit var mainPageScreenModel: MainPageScreenModel
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -221,7 +221,7 @@ object HomeScreen : Screen {
                 detectDragGestures { _, delta ->
                     if (delta.y > 0) {
                         scope.launch {
-                            navigator?.push(LineChartsScreen)
+                            navigator?.push(LineChartsScreen(mainPageScreenModel))
                         }
                     }
                 }
@@ -248,8 +248,8 @@ object HomeScreen : Screen {
                 )
                 TabButtons(
                     onClick = {
-                        if (currentScreen != LineChartsScreen)
-                            navigator?.push(LineChartsScreen)
+                        if (currentScreen != LineChartsScreen(mainPageScreenModel))
+                            navigator?.push(LineChartsScreen(mainPageScreenModel))
                     },
                     icon = Icons.Default.ThumbUp,
                     contentDescription = "Stats",
