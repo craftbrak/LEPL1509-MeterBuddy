@@ -1,7 +1,9 @@
 package ucl.student.meterbuddy.ui.component
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,11 +29,12 @@ import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MeterOverviewCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
     meterName: String,
     meterIcon: MeterIcon,
     lastReading: String?,
@@ -42,7 +45,7 @@ fun MeterOverviewCard(
     currencySymbol: String
 ) {
     ElevatedCard(modifier = modifier, onClick = onClick) {
-        Column(modifier= Modifier
+        Column(modifier= Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick )
             .fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp),verticalArrangement = Arrangement.SpaceAround) {
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically) {
