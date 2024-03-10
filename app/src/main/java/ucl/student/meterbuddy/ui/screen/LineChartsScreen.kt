@@ -8,31 +8,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
-import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import ucl.student.meterbuddy.ui.screen.HomeScreen.BottomTabBar
+import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 
-object LineChartsScreen: Screen {
+data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Screen {
 
     @Composable
     override fun Content() {
 
-        val context = LocalContext.current
-
         val graphModel = ChartLineModel
-        val mainPageScreenModel = MainPageScreenModel(context)
         val meters = mainPageScreenModel.state.value.meters
 
         Scaffold(bottomBar = { BottomTabBar() }) { innerPadding ->
             Column(modifier = Modifier.padding(innerPadding)) {
                 if (meters.isEmpty()) {
+                    // TODO ( Do something better )
                     Text("You don't have meter.")
                 }
 
@@ -51,22 +48,24 @@ object LineChartsScreen: Screen {
                                 meter.meterUnit,
                                 unitOfUser
                             )
+                            // TODO ( A enlever ! C'est pour Debug )
+                            Text("$readings")
+                            // val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
+                            if (readings.isNotEmpty()) {
+                                graphModel.CreateChartLine(
+                                    readings,
+                                    type,
+                                    Unit.KILO_WATT_HOUR,
+                                    1000,
+                                    1000
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
                         }
-                        // val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
-                        if (readings.isNotEmpty()) {
-                            graphModel.CreateChartLine(
-                                readings,
-                                type,
-                                Unit.KILO_WATT_HOUR,
-                                1000,
-                                1000
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
                     }
                 }
             }
-            }
+        }
         // TODO ( 'meters' is an empty list => BUG )
     }
 }
