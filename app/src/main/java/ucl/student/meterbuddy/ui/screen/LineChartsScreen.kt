@@ -1,7 +1,10 @@
 package ucl.student.meterbuddy.ui.screen
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +16,8 @@ import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Unit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
+import ucl.student.meterbuddy.ui.screen.HomeScreen.BottomTabBar
+
 
 object LineChartsScreen: Screen {
 
@@ -23,31 +28,45 @@ object LineChartsScreen: Screen {
 
         val graphModel = ChartLineModel
         val mainPageScreenModel = MainPageScreenModel(context)
-
-        // TODO ( 'meters' is an empty list => BUG )
         val meters = mainPageScreenModel.state.value.meters
-        if (meters.isEmpty()) {
-            Text("You don't have meter.")
-        }
 
-        for (type in MeterType.entries) {
-            // TODO ( Conversion of Unit ! Let the choice to the user of the unique unit )
-            val metersFiltered = mainPageScreenModel.filterMetersByType(type)
-            if (metersFiltered.isNotEmpty()) {
+        Scaffold(bottomBar = { BottomTabBar() }) { innerPadding ->
+            Column(modifier = Modifier.padding(innerPadding)) {
+                if (meters.isEmpty()) {
+                    Text("You don't have meter.")
+                }
 
-                // TODO ( To change = Make a Button to let the choice to the user )
-                val unitOfUser = type.units.last()
-                val readings = mutableListOf<MeterReading>()
-                metersFiltered.forEach { meter ->
-                    val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
-                    readings += mainPageScreenModel.convertUnitReadings(readingsNotFiltered, meter.meterUnit, unitOfUser)
+                for (type in MeterType.entries) {
+                    // TODO ( Conversion of Unit ! Let the choice to the user of the unique unit )
+                    val metersFiltered = mainPageScreenModel.filterMetersByType(type)
+                    if (metersFiltered.isNotEmpty()) {
+
+                        // TODO ( To change = Make a Button to let the choice to the user )
+                        val unitOfUser = type.units.last()
+                        val readings = mutableListOf<MeterReading>()
+                        metersFiltered.forEach { meter ->
+                            val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                            readings += mainPageScreenModel.convertUnitReadings(
+                                readingsNotFiltered,
+                                meter.meterUnit,
+                                unitOfUser
+                            )
+                        }
+                        // val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
+                        if (readings.isNotEmpty()) {
+                            graphModel.CreateChartLine(
+                                readings,
+                                type,
+                                Unit.KILO_WATT_HOUR,
+                                1000,
+                                1000
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
                 }
-                // val readings = mainPageScreenModel.getMetersReadings(metersFiltered)
-                if (readings.isNotEmpty()) {
-                    graphModel.CreateChartLine(readings, type, Unit.KILO_WATT_HOUR,1000, 1000)
-                }
-                Spacer(modifier = Modifier.height(20.dp))
             }
-        }
+            }
+        // TODO ( 'meters' is an empty list => BUG )
     }
 }

@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
 
+
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -96,4 +97,5 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
     implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+
 }

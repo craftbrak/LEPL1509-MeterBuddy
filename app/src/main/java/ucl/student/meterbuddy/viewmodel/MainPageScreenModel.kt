@@ -32,7 +32,7 @@ class MainPageScreenModel(context: Context): ScreenModel {
     private fun updateState() {
         screenModelScope.launch {
             meterRepository.getMeterAndReadings().collect { metersAndReadings ->
-                Log.i("Meters and Readings", metersAndReadings.keys.toString())
+//                Log.i("Meters and Readings", metersAndReadings.keys.toString())
                 _state.value = state.value.copy(
                     meters = metersAndReadings.keys.toList(),
                     lastReading = metersAndReadings.map { (meter, readings) ->

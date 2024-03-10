@@ -22,7 +22,7 @@ data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel
 
     init { getReadings() }
 
-    fun getReadings() {
+    private fun getReadings() {
         screenModelScope.launch {
             meterRepository.getMeterReadings(meter.meterID).collect {
                 _state.value = state.value.copy(

@@ -81,7 +81,7 @@ data class AddReadingScreen(val nameMeter: String,
         val navigator = LocalNavigator.currentOrThrow
 
         var reading by remember { mutableStateOf(lastValue.toString() )  }
-        var note by remember { mutableStateOf(lastNote ?:"") }
+        var note by remember { mutableStateOf(lastNote ?: "") }
 
         val showDialog = remember { mutableStateOf(false) }
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")

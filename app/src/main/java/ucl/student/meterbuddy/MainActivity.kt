@@ -11,7 +11,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import kotlinx.coroutines.delay
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
@@ -32,7 +34,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigator (HomeScreen)
+                    Navigator (HomeScreen){
+                        SlideTransition(it)
+                    }
                 }
             }
         }
