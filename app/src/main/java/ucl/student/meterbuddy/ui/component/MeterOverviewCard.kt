@@ -23,10 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getString
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -45,8 +47,10 @@ fun MeterOverviewCard(
     currencySymbol: String
 ) {
     ElevatedCard(modifier = modifier, onClick = onClick) {
-        Column(modifier= Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick )
-            .fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp),verticalArrangement = Arrangement.SpaceAround) {
+        Column(modifier= Modifier
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp),verticalArrangement = Arrangement.SpaceAround) {
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically) {
 
@@ -76,4 +80,18 @@ fun MeterOverviewCard(
 
         }
     }
+}
+@Preview(name = "MeterOverviewCard")
+@Composable
+fun MeterOverviewCardPreview(){
+    MeterOverviewCard(
+        meterName = "Preview",
+        meterIcon = MeterIcon.Electricity,
+        lastReading = 192384.0f.toString(),
+        readingUnit = MeterUnit.CUBIC_METER.unit,
+        trendIcon = "up",
+        trendValue = .23f,
+        monthlyCost = 213f,
+        currencySymbol = "$"
+    )
 }
