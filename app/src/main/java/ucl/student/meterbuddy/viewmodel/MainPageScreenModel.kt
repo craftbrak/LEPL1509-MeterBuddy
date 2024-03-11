@@ -8,16 +8,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 
 
@@ -75,10 +72,10 @@ class MainPageScreenModel(context: Context): ScreenModel {
         return readings
     }
 
-    fun convertUnitReadings(readings: List<MeterReading>, unit: Unit, finalUnit: Unit): List<MeterReading> {
+    fun convertUnitReadings(readings: List<MeterReading>, meterUnit: MeterUnit, finalMeterUnit: MeterUnit): List<MeterReading> {
         val readingsConverted = mutableListOf<MeterReading>()
         readings.forEach { reading ->
-            val factor = getFactorUnitConversion(unit, finalUnit)
+            val factor = getFactorUnitConversion(meterUnit, finalMeterUnit)
             val newMeterReading = MeterReading(reading.readingID, reading.meterID, factor * reading.value, reading.date, reading.note)
             readingsConverted.add(newMeterReading)
         }
@@ -86,15 +83,15 @@ class MainPageScreenModel(context: Context): ScreenModel {
     }
 
     // TODO ( To Implement ! )
-    fun getFactorUnitConversion(unit: Unit, finalUnit: Unit): Float {
-        if (unit == Unit.CENTIMETER) {
-            if (finalUnit == Unit.CUBIC_METER) { return 1.3f }
-            else if (finalUnit == Unit.LITER) { return 2.1f }
+    fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
+        if (meterUnit == MeterUnit.CENTIMETER) {
+            if (finalMeterUnit == MeterUnit.CUBIC_METER) { return 1.3f }
+            else if (finalMeterUnit == MeterUnit.LITER) { return 2.1f }
             else { Error("Bad Unit") }
 
-        } else if (unit == Unit.CUBIC_METER) {
-            if (finalUnit == Unit.CUBIC_METER) { return 3.32f }
-            else if (finalUnit == Unit.LITER) { return 4.0f }
+        } else if (meterUnit == MeterUnit.CUBIC_METER) {
+            if (finalMeterUnit == MeterUnit.CUBIC_METER) { return 3.32f }
+            else if (finalMeterUnit == MeterUnit.LITER) { return 4.0f }
             else { Error("Bad Unit") }
         }
         return 0.0f

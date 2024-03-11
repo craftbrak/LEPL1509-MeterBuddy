@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.lifecycle.getNavigatorScreenLifecycleProvider
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -33,7 +30,7 @@ import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 
 object ChartLineModel: ScreenModel {
 
@@ -86,13 +83,13 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    fun CreateChartLine(readings: List<MeterReading>, type: MeterType, unit: Unit, height: Int, width: Int) {
+    fun CreateChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, height: Int, width: Int) {
 
         val values = this.getPointsFromMeterReadings(readings)
 
         if (values != null) {
             val xData = this.createXAxis(values = values)
-            val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $unit ]")
+            val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
 
             val lineChartData = LineChartData(
                 linePlotData = LinePlotData(

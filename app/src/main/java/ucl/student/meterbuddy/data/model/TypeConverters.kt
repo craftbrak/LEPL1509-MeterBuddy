@@ -6,7 +6,7 @@ import ucl.student.meterbuddy.data.model.enums.Currency
 import ucl.student.meterbuddy.data.model.enums.HousingType
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.Role
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -56,24 +56,24 @@ class TypeConverters {
     }
 
     @TypeConverter
-    fun fromUnit(unit: Unit): String {
-        return unit.unit
+    fun fromUnit(meterUnit: MeterUnit): String {
+        return meterUnit.unit
     }
 
     @TypeConverter
-    fun toUnit(unit: String): Unit {
+    fun toUnit(unit: String): MeterUnit {
         return when (unit) {
-            "Kilowatt Hour" -> Unit.KILO_WATT_HOUR
-            "Cubic Meter" -> Unit.CUBIC_METER
-            "Liter" -> Unit.LITER
-            "Gallon" -> Unit.GALLON
-            "Gigajoule" -> Unit.GIGA_JOULE
-            "Megawatt" -> Unit.MEGA_WATT_HOUR
-            "Hour" -> Unit.HOUR
-            "Centimeter" -> Unit.CENTIMETER
-            "Kilogram" -> Unit.KILOGRAM
-            "Stair" -> Unit.STAIR
-            "Megabyte" -> Unit.MEGABYTE
+            "Kilowatt Hour" -> MeterUnit.KILO_WATT_HOUR
+            "Cubic Meter" -> MeterUnit.CUBIC_METER
+            "Liter" -> MeterUnit.LITER
+            "Gallon" -> MeterUnit.GALLON
+            "Gigajoule" -> MeterUnit.GIGA_JOULE
+            "Megawatt" -> MeterUnit.MEGA_WATT_HOUR
+            "Hour" -> MeterUnit.HOUR
+            "Centimeter" -> MeterUnit.CENTIMETER
+            "Kilogram" -> MeterUnit.KILOGRAM
+            "Stair" -> MeterUnit.STAIR
+            "Megabyte" -> MeterUnit.MEGABYTE
             else -> throw IllegalArgumentException("Could not recognize unit $unit")
         }
     }

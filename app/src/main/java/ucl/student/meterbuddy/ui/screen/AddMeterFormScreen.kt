@@ -50,7 +50,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import kotlin.enums.EnumEntries
@@ -68,7 +68,7 @@ class AddMeterFormScreen: Screen {
         var meterName by remember { mutableStateOf("") }
         var meterCost by remember { mutableStateOf("") }
         var selectedType by remember { mutableStateOf(MeterType.ELECTRICITY) }
-        var selectedUnit by remember { mutableStateOf(Unit.KILO_WATT_HOUR) }
+        var selectedMeterUnit by remember { mutableStateOf(MeterUnit.KILO_WATT_HOUR) }
         var isAdditive by remember { mutableStateOf(true) }
         // var nameFieldRequired by remember { mutableStateOf(false) }
         // var costFieldRequired by remember { mutableStateOf(false) }
@@ -104,7 +104,7 @@ class AddMeterFormScreen: Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text("Unit")
-                MeterUnitOptions(selectedType, selectedUnit) { newUnit -> selectedUnit = newUnit }
+                MeterUnitOptions(selectedType, selectedMeterUnit) { newUnit -> selectedMeterUnit = newUnit }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -126,7 +126,7 @@ class AddMeterFormScreen: Screen {
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    SubmitButton(meterName, meterCost, selectedUnit, selectedType, isAdditive,
+                    SubmitButton(meterName, meterCost, selectedMeterUnit, selectedType, isAdditive,
                         navigator, snackbarHostState, scope, mainPageScreenModel)
                 }
             }
@@ -152,10 +152,10 @@ class AddMeterFormScreen: Screen {
     }
 
     @Composable
-    fun UnitSelectorButton(unit: Unit, selectedUnit: Unit) {
+    fun UnitSelectorButton(meterUnit: MeterUnit, selectedMeterUnit: MeterUnit) {
         // RadioButton handle selection automatically
         RadioButton(
-            selected = (unit == selectedUnit),
+            selected = (meterUnit == selectedMeterUnit),
             onClick = null
         )
     }
@@ -170,7 +170,7 @@ class AddMeterFormScreen: Screen {
     }
 
     @Composable
-    fun SubmitButton(meterName: String, meterCost: String, selectedUnit: Unit,
+    fun SubmitButton(meterName: String, meterCost: String, selectedMeterUnit: MeterUnit,
                      selectedType: MeterType, isAdditive: Boolean, navigator: Navigator?,
                      snackbarHostState: SnackbarHostState, scope: CoroutineScope, mainPageScreenModel: MainPageScreenModel)
     {
@@ -179,7 +179,7 @@ class AddMeterFormScreen: Screen {
                 // val homePageScreenModel = MainPageScreenModel
                 if (meterName.isNotBlank() && meterCost.isNotBlank()) {
                     // TODO ( Update the meterID ? )
-                    val newMeter = Meter(meterID = 0, meterName = meterName, meterUnit = selectedUnit,
+                    val newMeter = Meter(meterID = 0, meterName = meterName, meterUnit = selectedMeterUnit,
                         meterIcon = selectedType.icon, meterType = selectedType, housingID = 0,
                         meterCost = meterCost.toDoubleOrNull() ?: 0.0, additiveMeter = isAdditive)
 
@@ -296,19 +296,19 @@ class AddMeterFormScreen: Screen {
 
     @Composable
     @ExperimentalLayoutApi
-    fun MeterUnitOptions(selectedType: MeterType, selectedUnit: Unit, onUnitSelected: (Unit) -> kotlin.Unit) {
+    fun MeterUnitOptions(selectedType: MeterType, selectedMeterUnit: MeterUnit, onUnitSelected: (MeterUnit) -> kotlin.Unit) {
         FlowColumn(
             Modifier
                 .padding(4.dp)
                 .height(100.dp),Arrangement.SpaceBetween) {
-            selectedType.units.forEach { unit ->
+            selectedType.meterUnits.forEach { unit ->
                 Row(
                     modifier = Modifier
                         .clickable { onUnitSelected(unit) }
                         .padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UnitSelectorButton(unit, selectedUnit)
+                    UnitSelectorButton(unit, selectedMeterUnit)
                     DisplayText(unit.symbol)
                 }
                 Spacer(modifier = Modifier.height(5.dp))

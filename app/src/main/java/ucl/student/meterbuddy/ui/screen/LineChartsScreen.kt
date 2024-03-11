@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.ui.screen.HomeScreen.BottomTabBar
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
@@ -39,7 +39,7 @@ data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Scree
                     if (metersFiltered.isNotEmpty()) {
 
                         // TODO ( To change = Make a Button to let the choice to the user )
-                        val unitOfUser = type.units.last()
+                        val unitOfUser = type.meterUnits.last()
                         val readings = mutableListOf<MeterReading>()
                         metersFiltered.forEach { meter ->
                             val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
@@ -55,7 +55,7 @@ data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Scree
                                 graphModel.CreateChartLine(
                                     readings,
                                     type,
-                                    Unit.KILO_WATT_HOUR,
+                                    MeterUnit.KILO_WATT_HOUR,
                                     1000,
                                     1000
                                 )

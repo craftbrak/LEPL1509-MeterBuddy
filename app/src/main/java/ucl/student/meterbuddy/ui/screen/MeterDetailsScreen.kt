@@ -1,6 +1,5 @@
 package ucl.student.meterbuddy.ui.screen
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -153,7 +152,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                         ChartLineModel.CreateChartLine(
                             readings = readings,
                             type = meterScreenModel.meter.meterType,
-                            unit = meterScreenModel.meter.meterUnit,
+                            meterUnit = meterScreenModel.meter.meterUnit,
                             height = screenHeight / 10,
                             width = screenWidth
                         )
