@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.Unit
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import kotlin.enums.EnumEntries
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -44,13 +44,13 @@ import kotlin.enums.EnumEntries
 fun MeterFormDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> kotlin.Unit,
-    onConfirmation: (name: String, unit: Unit, icon: MeterIcon, type: MeterType, cost: String, additive: Boolean) -> kotlin.Unit,
+    onConfirmation: (name: String, unit: MeterUnit, icon: MeterIcon, type: MeterType, cost: String, additive: Boolean) -> kotlin.Unit,
     showDialog: Boolean
 ) {
     var meterName by remember { mutableStateOf("") }
     var meterCost by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(MeterType.ELECTRICITY) }
-    var selectedUnit by remember { mutableStateOf(Unit.KILO_WATT_HOUR) }
+    var selectedUnit by remember { mutableStateOf(MeterUnit.KILO_WATT_HOUR) }
     var isAdditive by remember { mutableStateOf(true) }
 
     val meterTypes = MeterType.entries
@@ -148,7 +148,7 @@ fun TypeSelectorButton(
 }
 
 @Composable
-fun UnitSelectorButton(unit: Unit, selectedUnit: Unit) {
+fun UnitSelectorButton(unit: MeterUnit, selectedUnit: MeterUnit) {
     // RadioButton handle selection automatically
     RadioButton(
         selected = (unit == selectedUnit),
@@ -234,15 +234,15 @@ fun MeterTypeOptions(
 @ExperimentalLayoutApi
 fun MeterUnitOptions(
     selectedType: MeterType,
-    selectedUnit: Unit,
-    onUnitSelected: (Unit) -> kotlin.Unit
+    selectedUnit: MeterUnit,
+    onUnitSelected: (MeterUnit) -> Unit
 ) {
     FlowColumn(
         Modifier
             .padding(4.dp)
             .height(100.dp), Arrangement.SpaceBetween
     ) {
-        selectedType.units.forEach { unit ->
+        selectedType.meterUnits.forEach { unit ->
             Row(
                 modifier = Modifier
                     .clickable { onUnitSelected(unit) }
