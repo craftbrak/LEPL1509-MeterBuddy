@@ -2,6 +2,28 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BottomTabBarPreview">
+        <State />
+      </entry>
+      <entry key="MeterOverviewCardPreview">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="adb-f17de313-gn7187._adb-tls-connect._tcp" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-03-11T17:34:41.838191203Z" />
+        </State>
+      </entry>
+      <entry key="TabButtonPreview">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>

@@ -40,7 +40,7 @@ class MainPageScreenModel(context: Context): ScreenModel {
         }
     }
 
-    fun addMeter(metre:Meter) {
+    fun  addMeter(metre:Meter) {
         screenModelScope.launch {
             meterRepository.addMeter(metre)
             Log.i("Add Meter", metre.toString())

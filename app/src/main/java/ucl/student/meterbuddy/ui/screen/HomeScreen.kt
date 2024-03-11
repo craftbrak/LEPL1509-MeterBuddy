@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,16 +49,22 @@ import cafe.adriel.voyager.core.screen.Screen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabNavigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.component.MeterFormDialog
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
+import ucl.student.meterbuddy.ui.component.MetersListTab
 
 object HomeScreen : Screen {
 
@@ -67,170 +75,22 @@ object HomeScreen : Screen {
     override fun Content() {
         val context = LocalContext.current
         mainPageScreenModel = rememberScreenModel { MainPageScreenModel(context) }
-        val scope = rememberCoroutineScope()
-        val snackbarHostState = remember {
-            SnackbarHostState()
-        }
-        val navigator = LocalNavigator.current
-        val showBottomSheet = remember { mutableStateOf(false) }
-        val showMeterFormDialog = remember { mutableStateOf(false) }
-        val showDeleteDialog = remember { mutableStateOf(false) }
-        var selectedMeter: Meter? = null
-        Scaffold(
-            modifier = Modifier.fillMaxWidth(),
-            topBar = { TopBar() },
-            floatingActionButton = {
-                ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
-                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
-                    Text("Add Meter")
-                }
-            },
-            bottomBar = { BottomTabBar() },
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            },
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(innerPadding)
-            ) {
-                items(mainPageScreenModel.state.value.meters) { meter ->
-                    val lastReading =
-                        mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
-                    MeterOverviewCard(
-                        onClick = { navigator?.push(MeterDetailsScreen(meter)) },
-                        onLongClick = {
-                            showBottomSheet.value = true
-                            selectedMeter = meter
-                        },
-                        modifier = Modifier.padding(10.dp),
-                        meterName = meter.meterName,
-                        meterIcon = meter.meterIcon,
-                        lastReading = lastReading?.toString(),
-                        readingUnit = meter.meterUnit.unit,
-                        trendIcon = "up",
-                        trendValue = 10.0f,
-                        monthlyCost = 20.0f,
-                        currencySymbol = "£"
-                    )
-                }
-            }
 
-            MeterFormDialog(
-                onDismissRequest = { showMeterFormDialog.value = false },
-                onConfirmation = { name, unit, icon, type, cost, additive ->
-                    val newMeter = Meter(
-                        meterID = 0,
-                        meterName = name,
-                        meterIcon = icon,
-                        meterUnit = unit,
-                        meterType = type,
-                        housingID = 0,
-                        meterCost = cost.toDouble(),
-                        additiveMeter = additive
-                    )
-                    mainPageScreenModel.addMeter(newMeter)
-                    showMeterFormDialog.value = false
-                },
-                showDialog = showMeterFormDialog.value
-            )
-
-            if (showDeleteDialog.value) {
-                AlertDialog(onDismissRequest = { showDeleteDialog.value = false },
-                    confirmButton = {
-                        Button(onClick = {
-                            showDeleteDialog.value = false
-                            mainPageScreenModel.deleteMeter(selectedMeter!!)
-                        }) {
-                            Text("Delete")
-                        }
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.delete_meter_validation_text),
-                        )
-                    },
-                    title = { Text(text = stringResource(id = R.string.delete_meter_validation_title)) },
-                    icon = {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                    },
-                    dismissButton = {
-                        Button(onClick = {
-                            showDeleteDialog.value = false
-                        }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
-            BottomSheet(
-                showBottomSheet = showBottomSheet.value,
-                onDismissRequest = { showBottomSheet.value = false },
-                onEditClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Edit clicked")
-                        //Todo: Open Edit Meter Screen Dialog
-                    }
-                    showBottomSheet.value = false
-                },
-                onDeleteClick = {
-                    showBottomSheet.value = false
-                    showDeleteDialog.value = true
-                },
-            )
+        TabNavigator(tab = MetersListTab){
+            CurrentTab()
         }
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun BottomSheet(
-        showBottomSheet: Boolean,
-        onDismissRequest: () -> Unit,
-        onEditClick: () -> Unit,
-        onDeleteClick: () -> Unit
-    ) {
-        if (showBottomSheet)
-            ModalBottomSheet(onDismissRequest = onDismissRequest) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(25.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = {
-                        onEditClick()
-                    }) {
-                        Text("Edit")
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                    Button(onClick = {
-                        onDeleteClick()
-                    }) {
-                        Text("Delete")
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                    }
+    private fun RowScope.TabNavigationItem(tab: Tab) {
+        val tabNavigator = LocalTabNavigator.current
 
-                }
-                Spacer(modifier = Modifier.heightIn(30.dp))
-            }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    private fun TopBar() {
-        CenterAlignedTopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
-            title = { Text(stringResource(id = R.string.meter_menu)) },
-            actions = {
-
-            }
+        NavigationBarItem(
+            selected = tabNavigator.current == tab,
+            onClick = { tabNavigator.current = tab },
+            icon = { tab.options.icon?.let { Icon(painter = it, contentDescription = tab.options.title) } }
         )
     }
+
 
     @Composable
     private fun SwiperToLeft(navigator: Navigator?, scope: CoroutineScope): Modifier {
@@ -303,4 +163,5 @@ object HomeScreen : Screen {
             )
         }
     }
+
 }
