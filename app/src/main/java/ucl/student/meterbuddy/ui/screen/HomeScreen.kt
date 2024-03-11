@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -120,18 +121,38 @@ object HomeScreen : Screen {
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },
                 onConfirmation = { name, unit, icon, type, cost, additive ->
-                    val newMeter = Meter(
-                        meterID = 0,
-                        meterName = name,
-                        meterIcon = icon,
-                        meterUnit = unit,
-                        meterType = type,
-                        housingID = 0,
-                        meterCost = cost.toDouble(),
-                        additiveMeter = additive
-                    )
-                    mainPageScreenModel.addMeter(newMeter)
-                    showMeterFormDialog.value = false
+                    if(name.isNotBlank() && cost.isNotBlank()) {
+                        val numberCost = cost.toDoubleOrNull()
+                        if (numberCost == null) {
+                            Toast.makeText(context, "Cost must be a number", Toast.LENGTH_SHORT).show()
+                            return@MeterFormDialog
+                        }
+                        if (numberCost < 0) {
+                            Toast.makeText(context, "Cost cannot be negative, if you want to track a production please toggle the consumption off", Toast.LENGTH_LONG)
+                                .show()
+                            return@MeterFormDialog
+                        }
+                        val newMeter = Meter(
+                            meterID = 0,
+                            meterName = name,
+                            meterIcon = icon,
+                            meterUnit = unit,
+                            meterType = type,
+                            housingID = 0,
+                            meterCost = cost.toDouble(),
+                            additiveMeter = additive
+                        )
+                        mainPageScreenModel.addMeter(newMeter)
+                        showMeterFormDialog.value = false
+                    } else {
+                        if(name.isBlank()) {
+                            Toast.makeText(context, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+                        }
+                        if(cost.isBlank()) {
+                            Toast.makeText(context, "Cost cannot be empty", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 },
                 showDialog = showMeterFormDialog.value
             )
