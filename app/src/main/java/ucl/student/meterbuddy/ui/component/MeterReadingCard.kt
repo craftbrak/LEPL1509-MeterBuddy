@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -15,6 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import co.yml.charts.common.extensions.isNotNull
 import java.time.LocalDateTime
@@ -35,7 +39,10 @@ fun MeterReadingCard(
     Row (modifier.clickable { onclick() }.clip(shape = RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
         Text(text = value.toString())
         Text(text = date.format(formatter))
-        if (note.isNotNull()) { Text(text = note.toString()) }
+        if (note.isNotNull()) { Text(text = note.toString() , style = TextStyle(
+            lineBreak = LineBreak.Paragraph
+        ), maxLines = 2, overflow = TextOverflow.Ellipsis, modifier= Modifier.fillMaxWidth(.7f)
+        ) }
         else { Text(text = "No note") }
         IconButton(onClick = onDeleteClick) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "edit")
