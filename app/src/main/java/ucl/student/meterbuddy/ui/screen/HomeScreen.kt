@@ -48,12 +48,14 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
+import ucl.student.meterbuddy.ui.component.MeterFormDialog
 import ucl.student.meterbuddy.ui.component.MeterOverviewCard
 
 object HomeScreen : Screen {
@@ -71,18 +73,23 @@ object HomeScreen : Screen {
         }
         val navigator = LocalNavigator.current
         val showBottomSheet = remember { mutableStateOf(false) }
+        val showMeterFormDialog = remember { mutableStateOf(false) }
         val showDeleteDialog = remember { mutableStateOf(false) }
-        var selectedMeter : Meter? = null
+        var selectedMeter: Meter? = null
         Scaffold(
             modifier = Modifier.fillMaxWidth(),
             topBar = { TopBar() },
-            floatingActionButton = { AdderButton(navigator) },
+            floatingActionButton = {
+                ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
+                    Text("Add Meter")
+                }
+            },
             bottomBar = { BottomTabBar() },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { innerPadding ->
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,6 +116,26 @@ object HomeScreen : Screen {
                     )
                 }
             }
+
+            MeterFormDialog(
+                onDismissRequest = { showMeterFormDialog.value = false },
+                onConfirmation = { name, unit, icon, type, cost, additive ->
+                    val newMeter = Meter(
+                        meterID = 0,
+                        meterName = name,
+                        meterIcon = icon,
+                        meterUnit = unit,
+                        meterType = type,
+                        housingID = 0,
+                        meterCost = cost.toDouble(),
+                        additiveMeter = additive
+                    )
+                    mainPageScreenModel.addMeter(newMeter)
+                    showMeterFormDialog.value = false
+                },
+                showDialog = showMeterFormDialog.value
+            )
+
             if (showDeleteDialog.value) {
                 AlertDialog(onDismissRequest = { showDeleteDialog.value = false },
                     confirmButton = {
@@ -203,14 +230,6 @@ object HomeScreen : Screen {
 
             }
         )
-    }
-
-    @Composable
-    private fun AdderButton(navigator: Navigator?) {
-        ExtendedFloatingActionButton(onClick = { navigator?.push(AddMeterFormScreen()) }) {
-            Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
-            Text("Add Meter")
-        }
     }
 
     @Composable
