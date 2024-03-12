@@ -68,12 +68,12 @@ import ucl.student.meterbuddy.ui.component.MetersListTab
 
 object HomeScreen : Screen {
 
-    lateinit var mainPageScreenModel: MainPageScreenModel
+//    lateinit var mainPageScreenModel: MainPageScreenModel
 
     @Composable
     override fun Content() {
         val context = LocalContext.current
-        mainPageScreenModel = rememberScreenModel { MainPageScreenModel(context) }
+        val mainPageScreenModel = rememberScreenModel { MainPageScreenModel(context) }
 
         TabNavigator(tab = MetersListTab){
             CurrentTab()
@@ -81,18 +81,18 @@ object HomeScreen : Screen {
     }
 
 
-    @Composable
-    private fun SwiperToLeft(navigator: Navigator?, scope: CoroutineScope): Modifier {
-        return Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectDragGestures { _, delta ->
-                    if (delta.y > 0) {
-                        scope.launch {
-                            navigator?.push(LineChartsScreen(mainPageScreenModel))
-                        }
-                    }
-                }
-            }
-    }
+//    @Composable
+//    private fun SwiperToLeft(navigator: Navigator?, scope: CoroutineScope): Modifier {
+//        return Modifier
+//            .fillMaxSize()
+//            .pointerInput(Unit) {
+//                detectDragGestures { _, delta ->
+//                    if (delta.y > 0) {
+//                        scope.launch {
+//                            navigator?.push(LineChartsScreen(mainPageScreenModel))
+//                        }
+//                    }
+//                }
+//            }
+//    }
 }
