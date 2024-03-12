@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -50,6 +51,7 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
+import java.util.Optional
 
 object MetersListTab: Tab {
         override val options: TabOptions
@@ -70,7 +72,7 @@ object MetersListTab: Tab {
         @Composable
         override fun Content() {
 
-            Navigator(screen = MeterList(MainPageScreenModel(context = LocalContext.current))){
+            Navigator(screen = MeterList()){
                 FadeTransition(navigator = it)
             }
 
@@ -79,14 +81,15 @@ object MetersListTab: Tab {
         }
 
 }
-data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
+class MeterList : Screen {
     @Composable
     override fun Content() {
+        val context = LocalContext.current
         val showMeterFormDialog = remember{ mutableStateOf(false)}
         val snackbarHostState = remember {
             SnackbarHostState()
         }
-        val context= LocalContext.current
+        val mainPageScreenModel: MainPageScreenModel = getScreenModel()
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -103,7 +106,7 @@ data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
             val navigator = LocalNavigator.current
             val showBottomSheet = remember { mutableStateOf(false) }
             val showDeleteDialog = remember { mutableStateOf(false) }
-            var selectedMeter: Meter? = null
+            var selectedMeter: MutableState<Optional<Meter>> = remember { mutableStateOf(Optional.empty())}
             val scope = rememberCoroutineScope()
             LazyColumn(
                 modifier = Modifier
@@ -117,7 +120,7 @@ data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
                         onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                         onLongClick = {
                             showBottomSheet.value = true
-                            selectedMeter = meter
+                            selectedMeter.value = Optional.of(meter)
                         },
                         modifier = Modifier.padding(10.dp),
                         meterName = meter.meterName,
@@ -127,7 +130,7 @@ data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
                         trendIcon = "up",
                         trendValue = 10.0f,
                         monthlyCost = 20.0f,
-                        currencySymbol = "£"
+                        currencySymbol = "£" //TODO: USE values instead of hardcoded values
                     )
                 }
             }
@@ -175,7 +178,12 @@ data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
                     confirmButton = {
                         Button(onClick = {
                             showDeleteDialog.value = false
-                            mainPageScreenModel.deleteMeter(selectedMeter!!)
+                            if (selectedMeter.value.isPresent){
+                                mainPageScreenModel.deleteMeter(selectedMeter.value.get())
+                            }
+                            else{
+                                Toast.makeText(context,"Error in delete prosses",Toast.LENGTH_SHORT).show()
+                            }
                         }) {
                             Text("Delete")
                         }

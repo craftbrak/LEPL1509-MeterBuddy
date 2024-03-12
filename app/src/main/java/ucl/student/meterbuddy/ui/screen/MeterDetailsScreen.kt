@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -51,7 +52,9 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
-        val meterScreenModel = MeterScreenModel(meter, context)
+        val meterScreenModel = getScreenModel<MeterScreenModel,MeterScreenModel.Factory>{
+            it.create(meter)
+        }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -74,7 +77,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                             .padding(8.dp),
                         onclick =
                         {
-                            navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, meterScreenModel.context, reading.date, reading.value,reading.note, true) { value, date, note ->
+                            navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, reading.date, reading.value,reading.note, true) { value, date, note ->
                                 meterScreenModel.updateReading(reading.readingID, value, date, note)
                             })
                         },
@@ -127,7 +130,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
             shape = MaterialTheme.shapes.extraLarge
         ) {
             IconButton(onClick = {
-                navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, meterScreenModel.context) { value, date, note ->
+                navigator.push(AddReadingScreen(meterScreenModel.meter.meterName) { value, date, note ->
                     meterScreenModel.addReading(value, date, note)
                 })
             }, modifier = Modifier) {

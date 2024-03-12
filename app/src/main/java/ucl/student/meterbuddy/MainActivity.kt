@@ -25,13 +25,14 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import ucl.student.meterbuddy.ui.component.MetersListTab
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.screen.LineChartsScreen
 import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
@@ -60,7 +61,7 @@ class MainActivity : ComponentActivity() {
                             bottomBar = {
                                 BottomAppBar {
                                     TabNavigationItem(tab = MetersListTab)
-                                    TabNavigationItem(tab = LineChartsScreen(mainPageScreenModel = MainPageScreenModel(context = LocalContext.current)))
+                                    TabNavigationItem(tab = LineChartsScreen())
                                 }
                             }
                         )

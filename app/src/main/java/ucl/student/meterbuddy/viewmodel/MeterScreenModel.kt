@@ -12,15 +12,27 @@ import java.time.LocalDateTime
 import android.content.Context
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.screenModule
+import cafe.adriel.voyager.hilt.ScreenModelFactory
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.data.repository.MeterRepository
 
-data class MeterScreenModel(val meter: Meter, val context: Context): ScreenModel {
+class MeterScreenModel @AssistedInject constructor (
+   @Assisted val meter: Meter,
+    private val meterRepository: MeterRepository
+): ScreenModel {
 
-    private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
     private val _state = mutableStateOf(MeterState(meter))
     val state :State<MeterState> = _state
 
     init { getReadings() }
+
+    @AssistedFactory
+    interface Factory: ScreenModelFactory{
+        fun create(meter:Meter): MeterScreenModel
+    }
 
     private fun getReadings() {
         screenModelScope.launch {

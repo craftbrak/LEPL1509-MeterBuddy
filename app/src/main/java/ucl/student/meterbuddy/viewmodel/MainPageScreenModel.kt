@@ -8,6 +8,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.hilt.ScreenModelFactory
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
@@ -16,11 +20,12 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
+import ucl.student.meterbuddy.data.repository.MeterRepository
+import javax.inject.Inject
 
 
-class MainPageScreenModel(context: Context): ScreenModel {
+class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository): ScreenModel {
 
-    private val meterRepository = LocalMeterRepository( UserDatabase.getInstance(context).userDao)
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
 

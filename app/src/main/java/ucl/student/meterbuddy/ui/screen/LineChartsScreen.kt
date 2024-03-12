@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import ucl.student.meterbuddy.R
@@ -28,7 +29,8 @@ import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 
-data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Tab {
+class LineChartsScreen: Tab {
+
     override val options: TabOptions
         @Composable
         get() {
@@ -46,7 +48,7 @@ data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Tab {
 
     @Composable
     override fun Content() {
-
+        val mainPageScreenModel: MainPageScreenModel = getScreenModel()
         val graphModel = ChartLineModel
         val meters = mainPageScreenModel.state.value.meters
 

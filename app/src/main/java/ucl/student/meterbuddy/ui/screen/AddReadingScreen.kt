@@ -61,7 +61,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 data class AddReadingScreen(val nameMeter: String,
-                            val context: Context,
                             val lastDate: LocalDateTime = LocalDateTime.now(),
                             val lastValue: Float ?= null,
                             val lastNote: String ?= null,

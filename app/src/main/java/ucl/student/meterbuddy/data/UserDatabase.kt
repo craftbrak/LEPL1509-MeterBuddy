@@ -31,7 +31,7 @@ abstract class UserDatabase : RoomDatabase() {
 
     companion object {
         private var INSTANCE_DB: UserDatabase?= null
-
+        const val DATABASE_NAME ="rabbit_and_vampire_db"
         fun getInstance(context: Context) : UserDatabase {
             synchronized(this) {
                 return INSTANCE_DB ?: Room.databaseBuilder(

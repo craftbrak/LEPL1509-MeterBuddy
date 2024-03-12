@@ -72,8 +72,6 @@ object HomeScreen : Screen {
 
     @Composable
     override fun Content() {
-        val context = LocalContext.current
-        val mainPageScreenModel = rememberScreenModel { MainPageScreenModel(context) }
 
         TabNavigator(tab = MetersListTab){
             CurrentTab()
