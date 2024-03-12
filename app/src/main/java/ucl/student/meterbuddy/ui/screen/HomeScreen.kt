@@ -70,7 +70,6 @@ object HomeScreen : Screen {
 
     lateinit var mainPageScreenModel: MainPageScreenModel
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val context = LocalContext.current
@@ -79,16 +78,6 @@ object HomeScreen : Screen {
         TabNavigator(tab = MetersListTab){
             CurrentTab()
         }
-    }
-    @Composable
-    private fun RowScope.TabNavigationItem(tab: Tab) {
-        val tabNavigator = LocalTabNavigator.current
-
-        NavigationBarItem(
-            selected = tabNavigator.current == tab,
-            onClick = { tabNavigator.current = tab },
-            icon = { tab.options.icon?.let { Icon(painter = it, contentDescription = tab.options.title) } }
-        )
     }
 
 
@@ -106,62 +95,4 @@ object HomeScreen : Screen {
                 }
             }
     }
-
-    @Composable
-    fun BottomTabBar() {
-        BottomAppBar(modifier = Modifier.fillMaxWidth()) {
-            val navigator = LocalNavigator.current
-            val currentScreen = navigator?.lastItem
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TabButtons(
-                    onClick = {
-                        if (currentScreen?.javaClass != HomeScreen::class.java)
-                            navigator?.pop()
-                    },
-                    icon = Icons.Default.Home,
-                    contentDescription = "Home",
-                    currentScreen?.javaClass == HomeScreen::class.java
-                )
-                TabButtons(
-                    onClick = {
-                        if (currentScreen != LineChartsScreen(mainPageScreenModel))
-                            navigator?.push(LineChartsScreen(mainPageScreenModel))
-                    },
-                    icon = Icons.Default.ThumbUp,
-                    contentDescription = "Stats",
-                    currentScreen?.javaClass == LineChartsScreen::class.java
-                )
-
-            }
-        }
-    }
-
-    @Composable
-    fun TabButtons(
-        onClick: () -> Unit,
-        icon: ImageVector,
-        contentDescription: String,
-        selected: Boolean = false
-    ) {
-        val color =
-            if (selected) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.onSurface
-        Column(
-            modifier = Modifier
-                .clickable { onClick() }
-                .padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(imageVector = icon, contentDescription = contentDescription, tint = color)
-            Text(
-                text = contentDescription,
-                style = MaterialTheme.typography.bodySmall,
-                color = color
-            )
-        }
-    }
-
 }

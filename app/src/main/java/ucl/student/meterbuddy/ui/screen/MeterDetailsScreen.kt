@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -56,7 +57,10 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
             modifier = Modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = { AppTopBar(meter.meterName, navigator, scope, snackbarHostState) },
-            floatingActionButton = { AdderButton(meterScreenModel, navigator) }
+            floatingActionButton = { AdderButton(meterScreenModel, navigator) },
+            bottomBar = { BottomAppBar {
+
+            }}
         ) { innerPadding ->
             LazyColumn(modifier = Modifier
                 .fillMaxSize()

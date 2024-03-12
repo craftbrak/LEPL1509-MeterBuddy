@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MeterBuddyTheme {
                 CompositionLocalProvider(localScreenContext provides this) {
-                    HomeScreen.Content()
+                    MetersListTab.Content()
                 }
                 Surface(
                     modifier = Modifier.fillMaxSize(),

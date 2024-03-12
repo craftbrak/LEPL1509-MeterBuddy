@@ -12,8 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -23,7 +25,6 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
-import ucl.student.meterbuddy.ui.screen.HomeScreen.BottomTabBar
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 
@@ -32,7 +33,7 @@ data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Tab {
         @Composable
         get() {
             val title = stringResource(R.string.stat_tab)
-            val icon = rememberVectorPainter(Icons.Default.Star)
+            val icon = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.baseline_query_stats_24))
 
             return remember {
                 TabOptions(
@@ -49,7 +50,7 @@ data class LineChartsScreen(val mainPageScreenModel: MainPageScreenModel): Tab {
         val graphModel = ChartLineModel
         val meters = mainPageScreenModel.state.value.meters
 
-        Scaffold(bottomBar = { BottomTabBar() }) { innerPadding ->
+        Scaffold() { innerPadding ->
             Column(modifier = Modifier.padding(innerPadding)) {
                 if (meters.isEmpty()) {
                     // TODO ( Do something better )

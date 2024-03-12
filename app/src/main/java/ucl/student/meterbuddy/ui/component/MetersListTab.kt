@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,12 +40,16 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.FadeTransition
+import cafe.adriel.voyager.transitions.ScaleTransition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
+import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
+
 object MetersListTab: Tab {
         override val options: TabOptions
             @Composable
@@ -64,14 +69,16 @@ object MetersListTab: Tab {
         @Composable
         override fun Content() {
 
-            Navigator(screen = MeterList)
+            Navigator(screen = MeterList(MainPageScreenModel(context = LocalContext.current))){
+                FadeTransition(navigator = it)
+            }
 
 
 
         }
 
 }
-object MeterList: Screen {
+data class MeterList(val mainPageScreenModel: MainPageScreenModel): Screen {
     @Composable
     override fun Content() {
         val showMeterFormDialog = remember{ mutableStateOf(false)}
@@ -89,8 +96,7 @@ object MeterList: Screen {
                 }
             },
             topBar = {TopBar() },
-            bottomBar = { BottomAppBar {}
-            }
+            bottomBar = { BottomAppBar {}  }
         ) {
             val navigator = LocalNavigator.current
             val showBottomSheet = remember { mutableStateOf(false) }
@@ -102,9 +108,9 @@ object MeterList: Screen {
                     .fillMaxWidth()
                     .padding(it)
             ) {
-                items(HomeScreen.mainPageScreenModel.state.value.meters) { meter ->
+                items(mainPageScreenModel.state.value.meters) { meter ->
                     val lastReading =
-                        HomeScreen.mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
+                        mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
                     MeterOverviewCard(
                         onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                         onLongClick = {
