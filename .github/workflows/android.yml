@@ -24,3 +24,12 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Release APK Publisher
+      # You may pin to the exact commit or the version.
+      # uses: nightcrawler-/action-release-apk@2e64ff4ed716a67973753941590155abaeb07e7d
+      uses: nightcrawler-/action-release-apk@1.0.2
+      #with:
+        # Github secret token to allow automated publishing of APK to release.
+        #GITHUB_TOKEN: # optional
+          
