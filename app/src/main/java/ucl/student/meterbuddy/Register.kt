@@ -28,7 +28,7 @@ class Register : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        username = findViewById(R.id.username)
+        username = findViewById(R.id.fullName)
         fullName = findViewById(R.id.fullName)
         email = findViewById(R.id.email)
         mobile = findViewById(R.id.mobile)
