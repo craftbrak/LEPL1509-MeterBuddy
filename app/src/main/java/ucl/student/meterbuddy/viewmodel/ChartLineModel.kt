@@ -1,15 +1,11 @@
 package ucl.student.meterbuddy.viewmodel
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -34,15 +30,26 @@ import ucl.student.meterbuddy.data.model.enums.MeterUnit
 
 object ChartLineModel: ScreenModel {
 
+    @Composable
     private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): List<Point>? {
 
         if (meterReadings.isEmpty()) { return null }
 
+        meterReadings.sortedBy { it.date.dayOfYear.toFloat() }
+
         val values = mutableListOf<Point>()
+        val xValues = mutableListOf<Float>()
         meterReadings.forEach {reading ->
+
             // TODO ( Implémenter un moyen de rendre la date en Float )
             val x = reading.date.dayOfYear.toFloat()
-            val y = reading.value
+            var y = reading.value
+
+            if (xValues.contains(x)) {
+                y += values.last().y
+                values.removeAt(values.size - 1)
+            } else { xValues.add(x) }
+
             values.add(Point(x, y))
         }
         return values.sortedBy { it.x }.sortedBy { it.y }
@@ -83,62 +90,50 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    fun CreateChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, height: Int, width: Int) {
+    fun DisplayChartLine(graph: LineChartData, width: Int, height: Int) {
+        LineChart(modifier = Modifier
+            .width(width.dp)
+            .height(height.dp),
+            lineChartData = graph
+        )
+    }
 
-        val values = this.getPointsFromMeterReadings(readings)
+    @Composable
+    fun createChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit): LineChartData? {
 
-        if (values != null) {
-            val xData = this.createXAxis(values = values)
-            val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
+        val values = this.getPointsFromMeterReadings(readings) ?: return null
 
-            val lineChartData = LineChartData(
-                linePlotData = LinePlotData(
-                    lines = listOf(
-                        Line(
-                            dataPoints = values,
-                            LineStyle(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                lineType = LineType.SmoothCurve(isDotted = false)
-                            ),
-                            IntersectionPoint(color = MaterialTheme.colorScheme.tertiary),
-                            SelectionHighlightPoint(color = MaterialTheme.colorScheme.primary),
-                            ShadowUnderLine(
-                                alpha = 0.5f,
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.inversePrimary,
-                                        Color.Transparent
-                                    )
+        val xData = this.createXAxis(values = values)
+        val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
+
+        return LineChartData(
+            linePlotData = LinePlotData(
+                lines = listOf(
+                    Line(
+                        dataPoints = values,
+                        LineStyle(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            lineType = LineType.SmoothCurve(isDotted = false)
+                        ),
+                        IntersectionPoint(color = MaterialTheme.colorScheme.tertiary),
+                        SelectionHighlightPoint(color = MaterialTheme.colorScheme.primary),
+                        ShadowUnderLine(
+                            alpha = 0.5f,
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.inversePrimary,
+                                    Color.Transparent
                                 )
-                            ),
-                            SelectionHighlightPopUp()
-                        )
-                    ),
-                ),
-                backgroundColor = MaterialTheme.colorScheme.surface,
-                xAxisData = xData,
-                yAxisData = yData,
-                gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
-            )
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(width.dp)
-                        .height(height.dp)
-                ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = lineChartData
+                            )
+                        ),
+                        SelectionHighlightPopUp()
                     )
-                }
-            }
-        }
+                ),
+            ),
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            xAxisData = xData,
+            yAxisData = yData,
+            gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
+        )
     }
 }

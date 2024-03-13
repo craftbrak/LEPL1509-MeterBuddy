@@ -88,7 +88,7 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
     }
 
     // TODO ( To Implement ! )
-    fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
+    private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
         if (meterUnit == MeterUnit.CENTIMETER) {
             if (finalMeterUnit == MeterUnit.CUBIC_METER) { return 1.3f }
             else if (finalMeterUnit == MeterUnit.LITER) { return 2.1f }
@@ -99,7 +99,7 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
             else if (finalMeterUnit == MeterUnit.LITER) { return 4.0f }
             else { Error("Bad Unit") }
         }
-        return 0.0f
+        return 1.0f
     }
 
     fun getMeterDetails(meter: Meter): String {

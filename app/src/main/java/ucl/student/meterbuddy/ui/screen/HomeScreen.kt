@@ -68,7 +68,7 @@ import ucl.student.meterbuddy.ui.component.MetersListTab
 
 object HomeScreen : Screen {
 
-//    lateinit var mainPageScreenModel: MainPageScreenModel
+    //   lateinit var mainPageScreenModel: MainPageScreenModel
 
     @Composable
     override fun Content() {

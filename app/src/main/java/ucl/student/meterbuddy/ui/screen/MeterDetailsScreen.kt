@@ -1,10 +1,14 @@
 package ucl.student.meterbuddy.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -30,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -37,6 +42,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.yml.charts.ui.linechart.LineChart
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Meter
@@ -149,19 +155,16 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                 Box(
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    val context = LocalContext.current
-                    val resources = context.resources
-                    val screenWidth = resources.displayMetrics.widthPixels
-                    val screenHeight = resources.displayMetrics.heightPixels
-
                     val readings = meterScreenModel.state.value.readings
                     if (readings.isNotEmpty()) {
-                        ChartLineModel.CreateChartLine(
-                            readings = readings,
-                            type = meterScreenModel.meter.meterType,
-                            meterUnit = meterScreenModel.meter.meterUnit,
-                            height = screenHeight / 10,
-                            width = screenWidth
+                        val graph = ChartLineModel.createChartLine(
+                                        readings = readings,
+                                        type = meterScreenModel.meter.meterType,
+                                        meterUnit = meterScreenModel.meter.meterUnit,
+                                    )
+                        ChartLineModel.DisplayChartLine(graph = graph!!,
+                                                        width = LocalConfiguration.current.screenWidthDp,
+                                                        height = 300
                         )
                     }
                     else { Text(text = "Need at least one reading of this meter to have a graph.") }
