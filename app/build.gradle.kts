@@ -28,13 +28,25 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+    flavorDimensions.add("dbType")
+    productFlavors{
+        create("dbTypeFirebase") {
+            dimension = "dbType"
+            applicationIdSuffix = ".firebase"
+        }
+        create("dbTypeLocal") {
+            dimension = "dbType"
+            applicationIdSuffix =".local"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

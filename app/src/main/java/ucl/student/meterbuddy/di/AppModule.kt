@@ -40,38 +40,4 @@ abstract class AppModule {
 
 
 }
-//@Module
-//@InstallIn(SingletonComponent::class)
-//object AppModuleObject{
-//    @Provides
-//    @Singleton
-//    fun provideLocalMeterRepository(db: UserDatabase): MeterRepository{
-//        return LocalMeterRepository(db.userDao)
-//    }
-//
-//    @Provides
-//    @Singleton
-//    fun provideUserDatabase(app: Application): UserDatabase{
-//        return Room.databaseBuilder(
-//            app,
-//            UserDatabase::class.java,
-//            UserDatabase.DATABASE_NAME
-//        ).build()
-//    }
-//
-//}
-@Module
-@InstallIn(SingletonComponent::class)
-object FirebaseDbModule{
-    @Provides
-    @Singleton
-    fun provideFirebaseFirestore(): FirebaseFirestore {
-        return Firebase.firestore
-    }
-    @Provides
-    @Singleton
-    fun provideFirebaseMeterRepository(db: FirebaseFirestore): MeterRepository{
-        return  FireBaseMeterRepository(db)
-    }
 
-}
