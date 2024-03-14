@@ -8,12 +8,12 @@ import ucl.student.meterbuddy.data.model.enums.MeterUnit
 
 @Entity
 data class Meter (
-    @PrimaryKey(autoGenerate = true) val meterID: Int,
-    val meterName: String,
-    val meterUnit: MeterUnit,
-    val meterIcon: MeterIcon,
-    val meterType: MeterType,
-    val housingID: Int,
-    val meterCost: Double,
-    val additiveMeter: Boolean
+    @PrimaryKey(autoGenerate = true) var meterID: Int = -1,
+    val meterName: String = "",
+    val meterUnit: MeterUnit = MeterUnit.KILO_WATT_HOUR,
+    val meterIcon: MeterIcon = MeterIcon.Electricity,
+    val meterType: MeterType = MeterType.ELECTRICITY,
+    val housingID: Int = -1,
+    val meterCost: Double = 0.0001,
+    val additiveMeter: Boolean =true
 )

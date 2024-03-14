@@ -25,6 +25,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import ucl.student.meterbuddy.ui.component.MetersListTab
@@ -36,8 +37,8 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 class MainActivity : ComponentActivity() {
 
     private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
+//    private lateinit var analytics: FirebaseAnalytics
+    override fun onCreate(savedInstanceState: Bundle?)      {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {}
         setContent {
