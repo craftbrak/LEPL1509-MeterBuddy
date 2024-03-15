@@ -84,10 +84,14 @@ dependencies {
     implementation("androidx.activity:activity:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation( "org.mockito:mockito-core")
+    testImplementation ("org.mockito.kotlin:mockito-kotlin")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.squareup.moshi:moshi:1.15.0")
