@@ -1,12 +1,10 @@
 package ucl.student.meterbuddy.ui.screen
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,11 +29,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FloatingActionButton
@@ -78,7 +76,7 @@ data class AddReadingScreen(
     @Composable
     override fun Content() {
 
-        val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+        val hostState: SnackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
 
@@ -93,7 +91,7 @@ data class AddReadingScreen(
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            snackbarHost = { SnackbarHost(hostState = hostState) },
             topBar = { TopBar(navigator) },
             floatingActionButton = { LockButton() }
         ) { it ->
@@ -134,7 +132,7 @@ data class AddReadingScreen(
                 ConfirmReadingButton(
                     reading,
                     note,
-                    snackbarHostState,
+                    hostState,
                     scope,
                     datePickerState,
                     navigator
@@ -176,7 +174,7 @@ data class AddReadingScreen(
     @Composable
     fun BackButton(navigator: Navigator?) {
         IconButton(onClick = { navigator?.pop() }) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
         }
     }
 
@@ -199,7 +197,7 @@ data class AddReadingScreen(
         TextButton(
             onClick = { showDialog.value = false }
         ) {
-            Text("Cancel")
+            Text(stringResource(id = R.string.cancel))
         }
     }
 
@@ -209,7 +207,7 @@ data class AddReadingScreen(
             onClick = { showDialog.value = false },
             enabled = confirmEnabled.value
         ) {
-            Text("OK")
+            Text(stringResource(id = R.string.confirm))
         }
     }
 
@@ -237,7 +235,7 @@ data class AddReadingScreen(
     fun ConfirmReadingButton(
         reading: String,
         note: String,
-        snackbarHostState: SnackbarHostState,
+        snackBarHostState: SnackbarHostState,
         scope: CoroutineScope,
         datePickerState: DatePickerState,
         navigator: Navigator
@@ -252,17 +250,17 @@ data class AddReadingScreen(
                 ); navigator.pop()
             } catch (e: NumberFormatException) {
                 scope.launch {
-                    val result = snackbarHostState.showSnackbar(
+                    val result = snackBarHostState.showSnackbar(
                         message = "Error: ${e.message}",
                         withDismissAction = true
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        Log.w("Snackbar", "Snackbar action performed")
+                        Log.w("Snack bar", "Snack bar action performed")
                     }
                 }
             }
         }) {
-            Text(text = if (edit) "Update" else "Add")
+            Text(text = if (edit) stringResource(id = R.string.update) else stringResource(id = R.string.add))
         }
     }
 

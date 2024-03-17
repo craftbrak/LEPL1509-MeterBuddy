@@ -8,4 +8,8 @@
     <string name="stat_tab">Stats\n</string>
     <string name="edit_reading">Edit Reading of</string>
     <string name="add_reading">Add Reading to</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="update">Update</string>
+    <string name="add">Add</string>
 </resources>
