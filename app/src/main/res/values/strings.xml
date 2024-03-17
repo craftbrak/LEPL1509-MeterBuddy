@@ -6,4 +6,6 @@
     <string name="delete_meter_validation_text">Deleting this meter will also delete all it\'s reading. this action cannot be reverted</string>
     <string name="delete_meter_validation_title">Are You Sure ?</string>
     <string name="stat_tab">Stats\n</string>
+    <string name="edit_reading">Edit Reading of</string>
+    <string name="add_reading">Add Reading to</string>
 </resources>
