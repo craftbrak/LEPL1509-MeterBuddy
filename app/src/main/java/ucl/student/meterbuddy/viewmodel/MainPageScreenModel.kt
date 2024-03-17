@@ -45,10 +45,15 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
         }
     }
 
+    fun updateMeter(meter: Meter) {
+        screenModelScope.launch {
+            meterRepository.updateMeter(meter)
+        }
+    }
+
     fun  addMeter(metre:Meter) {
         screenModelScope.launch {
             meterRepository.addMeter(metre)
-            Log.i("Add Meter", metre.toString())
         }
     }
 
