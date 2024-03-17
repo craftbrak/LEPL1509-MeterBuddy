@@ -223,7 +223,7 @@ fun MeterTypeOptions(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TypeSelectorButton(type, selectedType, onTypeSelected)
-                DisplayText(type.icon.iconName)
+                DisplayText(type.type)
             }
         }
         Spacer(modifier = Modifier.height(5.dp))
