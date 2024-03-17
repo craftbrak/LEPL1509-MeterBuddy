@@ -53,39 +53,40 @@ import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import java.util.Optional
 
-object MetersListTab: Tab {
-        override val options: TabOptions
-            @Composable
-            get() {
-                val title = stringResource(R.string.home_tab)
-                val icon = rememberVectorPainter(Icons.Default.Home)
-
-                return remember {
-                    TabOptions(
-                        index = 0u,
-                        title = title,
-                        icon = icon
-                    )
-                }
-            }
-
+object MetersListTab : Tab {
+    override val options: TabOptions
         @Composable
-        override fun Content() {
+        get() {
+            val title = stringResource(R.string.home_tab)
+            val icon = rememberVectorPainter(Icons.Default.Home)
 
-            Navigator(screen = MeterList()){
-                FadeTransition(navigator = it)
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
             }
-
-
-
         }
 
+    @Composable
+    override fun Content() {
+
+        Navigator(screen = MeterList()) {
+            FadeTransition(navigator = it)
+        }
+
+
+    }
+
 }
+
 class MeterList : Screen {
     @Composable
     override fun Content() {
         val context = LocalContext.current
-        val showMeterFormDialog = remember{ mutableStateOf(false)}
+        val showMeterFormDialog = remember { mutableStateOf(false) }
+        val showEditFormDialog = remember { mutableStateOf(false) }
         val snackbarHostState = remember {
             SnackbarHostState()
         }
@@ -100,13 +101,14 @@ class MeterList : Screen {
                     Text("Add Meter")
                 }
             },
-            topBar = {TopBar() },
-            bottomBar = { BottomAppBar {}  }
+            topBar = { TopBar() },
+            bottomBar = { BottomAppBar {} }
         ) {
             val navigator = LocalNavigator.current
             val showBottomSheet = remember { mutableStateOf(false) }
             val showDeleteDialog = remember { mutableStateOf(false) }
-            var selectedMeter: MutableState<Optional<Meter>> = remember { mutableStateOf(Optional.empty())}
+            var selectedMeter: MutableState<Optional<Meter>> =
+                remember { mutableStateOf(Optional.empty()) }
             val scope = rememberCoroutineScope()
             LazyColumn(
                 modifier = Modifier
@@ -138,14 +140,19 @@ class MeterList : Screen {
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },
                 onConfirmation = { name, unit, icon, type, cost, additive ->
-                    if(name.isNotBlank() && cost.isNotBlank()) {
+                    if (name.isNotBlank() && cost.isNotBlank()) {
                         val numberCost = cost.toDoubleOrNull()
                         if (numberCost == null) {
-                            Toast.makeText(context, "Cost must be a number", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Cost must be a number", Toast.LENGTH_SHORT)
+                                .show()
                             return@MeterFormDialog
                         }
                         if (numberCost < 0) {
-                            Toast.makeText(context, "Cost cannot be negative, if you want to track a production please toggle the consumption off", Toast.LENGTH_LONG)
+                            Toast.makeText(
+                                context,
+                                "Cost cannot be negative, if you want to track a production please toggle the consumption off",
+                                Toast.LENGTH_LONG
+                            )
                                 .show()
                             return@MeterFormDialog
                         }
@@ -162,10 +169,11 @@ class MeterList : Screen {
                         mainPageScreenModel.addMeter(newMeter)
                         showMeterFormDialog.value = false
                     } else {
-                        if(name.isBlank()) {
-                            Toast.makeText(context, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+                        if (name.isBlank()) {
+                            Toast.makeText(context, "Name cannot be empty", Toast.LENGTH_SHORT)
+                                .show()
                         }
-                        if(cost.isBlank()) {
+                        if (cost.isBlank()) {
                             Toast.makeText(context, "Cost cannot be empty", Toast.LENGTH_SHORT)
                                 .show()
                         }
@@ -178,11 +186,14 @@ class MeterList : Screen {
                     confirmButton = {
                         Button(onClick = {
                             showDeleteDialog.value = false
-                            if (selectedMeter.value.isPresent){
+                            if (selectedMeter.value.isPresent) {
                                 mainPageScreenModel.deleteMeter(selectedMeter.value.get())
-                            }
-                            else{
-                                Toast.makeText(context,"Error in delete prosses",Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Error in delete prosses",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }) {
                             Text("Delete")
@@ -206,15 +217,69 @@ class MeterList : Screen {
                     }
                 )
             }
+
+            if (selectedMeter.value.isPresent) {
+                MeterFormDialog(
+                    onDismissRequest = {
+                        selectedMeter.value = Optional.empty()
+                        showEditFormDialog.value = false },
+                    onConfirmation = { name, unit, icon, type, cost, additive ->
+                        if (name.isNotBlank() && cost.isNotBlank()) {
+                            val numberCost = cost.toDoubleOrNull()
+                            if (numberCost == null) {
+                                Toast.makeText(context, "Cost must be a number", Toast.LENGTH_SHORT)
+                                    .show()
+                                return@MeterFormDialog
+                            }
+                            if (numberCost < 0) {
+                                Toast.makeText(
+                                    context,
+                                    "Cost cannot be negative, if you want to track a production please toggle the consumption off",
+                                    Toast.LENGTH_LONG
+                                )
+                                    .show()
+                                return@MeterFormDialog
+                            }
+                            val newMeter = Meter(
+                                meterID = selectedMeter.value.get().meterID,
+                                meterName = name,
+                                meterIcon = icon,
+                                meterUnit = unit,
+                                meterType = type,
+                                housingID = 0,
+                                meterCost = cost.toDouble(),
+                                additiveMeter = additive
+                            )
+                            mainPageScreenModel.updateMeter(newMeter)
+                            selectedMeter.value = Optional.empty()
+                            showEditFormDialog.value = false
+                        } else {
+                            if (name.isBlank()) {
+                                Toast.makeText(context, "Name cannot be empty", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                            if (cost.isBlank()) {
+                                Toast.makeText(context, "Cost cannot be empty", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    },
+                    showDialog = showEditFormDialog.value,
+                    lastMeterName = selectedMeter.value.get().meterName,
+                    lastMeterCost = selectedMeter.value.get().meterCost.toString(),
+                    lastMeterType = selectedMeter.value.get().meterType,
+                    lastMeterUnit = selectedMeter.value.get().meterUnit,
+                    lastIsAdditive = selectedMeter.value.get().additiveMeter,
+                    edit = true
+                )
+            }
+
             BottomSheet(
                 showBottomSheet = showBottomSheet.value,
                 onDismissRequest = { showBottomSheet.value = false },
                 onEditClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Edit clicked")
-                        //Todo: Open Edit Meter Screen Dialog
-                    }
                     showBottomSheet.value = false
+                    showEditFormDialog.value = true
                 },
                 onDeleteClick = {
                     showBottomSheet.value = false
@@ -223,6 +288,7 @@ class MeterList : Screen {
             )
         }
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun TopBar() {
