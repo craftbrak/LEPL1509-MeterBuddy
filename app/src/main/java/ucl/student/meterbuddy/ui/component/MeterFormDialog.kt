@@ -45,13 +45,18 @@ fun MeterFormDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> kotlin.Unit,
     onConfirmation: (name: String, unit: MeterUnit, icon: MeterIcon, type: MeterType, cost: String, additive: Boolean) -> kotlin.Unit,
-    showDialog: Boolean
+    showDialog: Boolean,
+    lastmeterName: String ?= null,
+    lastMeterCost: String ?= null,
+    lastMeterType: MeterType ?= null,
+    lastMeterUnit: MeterUnit ?= null,
+    lastIsAdditive: Boolean ?= null
 ) {
-    var meterName by remember { mutableStateOf("") }
-    var meterCost by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(MeterType.ELECTRICITY) }
-    var selectedUnit by remember { mutableStateOf(MeterUnit.KILO_WATT_HOUR) }
-    var isAdditive by remember { mutableStateOf(true) }
+    var meterName by remember { mutableStateOf(lastmeterName ?: "") }
+    var meterCost by remember { mutableStateOf(lastMeterCost ?: "") }
+    var selectedType by remember { mutableStateOf(lastMeterType ?: MeterType.ELECTRICITY) }
+    var selectedUnit by remember { mutableStateOf(lastMeterUnit ?: MeterUnit.KILO_WATT_HOUR) }
+    var isAdditive by remember { mutableStateOf(lastIsAdditive ?: true) }
 
     val meterTypes = MeterType.entries
 
