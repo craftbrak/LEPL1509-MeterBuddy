@@ -107,7 +107,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     }
 
     override suspend fun updateMeterReading(meterReading: MeterReading) {
-        meterCollection.document(meterReading.meterID.toString()).collection("readings")
+        meterCollection.document(meterReading.meterID.toString()).collection("readings").document(meterReading.readingID.toString()).set(meterReading,SetOptions.merge())
     }
 
     override fun filteredMetersByType(meters: List<Meter>, type: MeterType): List<Meter> {
