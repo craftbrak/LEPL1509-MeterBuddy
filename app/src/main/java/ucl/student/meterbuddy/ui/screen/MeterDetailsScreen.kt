@@ -1,20 +1,14 @@
 package ucl.student.meterbuddy.ui.screen
 
-import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,14 +29,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import co.yml.charts.ui.linechart.LineChart
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Meter
@@ -57,7 +49,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
-        val context = LocalContext.current
+//        val context = LocalContext.current
         val meterScreenModel = getScreenModel<MeterScreenModel,MeterScreenModel.Factory>{
             it.create(meter)
         }
@@ -107,24 +99,25 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
             title = { Text(text = nameMeter) },
             navigationIcon = {
                 IconButton(onClick = {navigator.pop()}) {
-                    Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                 }
             },
-            actions = {
-                IconButton(onClick = {
-                    scope.launch {
-                        val result = snackbarHostState.showSnackbar(
-                            message = "Edit Not Implemented Yet",
-                            actionLabel = "close"
-                        )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            Log.w("Snackbar", "Snackbar action performed")
-                        }
-                    }
-                }) {
-                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Delete Meter")
-                }
-            })
+//            actions = {
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        val result = snackbarHostState.showSnackbar(
+//                            message = "Edit Not Implemented Yet",
+//                            actionLabel = "close"
+//                        )
+//                        if (result == SnackbarResult.ActionPerformed) {
+//                            Log.w("Snackbar", "Snackbar action performed")
+//                        }
+//                    }
+//                }) {
+//                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Delete Meter")
+//                }
+//            }
+        )
     }
 
     @Composable
