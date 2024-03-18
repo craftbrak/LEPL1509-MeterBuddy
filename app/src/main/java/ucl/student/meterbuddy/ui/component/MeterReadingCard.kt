@@ -19,10 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.yml.charts.common.extensions.isNotNull
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 
 @Composable
@@ -48,4 +51,10 @@ fun MeterReadingCard(
             Icon(imageVector = Icons.Default.Delete, contentDescription = "edit")
         }
     }
+}
+
+@Preview(name = "MeterReadingCard")
+@Composable
+fun MeterReadingCardPreview() {
+    MeterReadingCard(Modifier, {}, 3.6f, LocalDateTime.now(),"My note for the preview", {})
 }

@@ -85,6 +85,7 @@ class TypeConverters {
 
     @TypeConverter
     fun toMeterIcon(icon: String): MeterIcon {
+
         return when (icon) {
             "Electricity" -> MeterIcon.Electricity
             "Gas" -> MeterIcon.Gas
