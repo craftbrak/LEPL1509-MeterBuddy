@@ -1,6 +1,8 @@
 package ucl.student.meterbuddy.data.model
 
 import androidx.room.TypeConverter
+import com.google.firebase.Timestamp
+import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.Currency
 import ucl.student.meterbuddy.data.model.enums.HousingType
@@ -10,6 +12,7 @@ import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.Date
 
 
 class TypeConverters {
@@ -46,12 +49,12 @@ class TypeConverters {
     }
 
     @TypeConverter
-    fun dateFromTimeStamp(value: Long?): LocalDateTime? {
+    fun dateFromLong(value: Long?): LocalDateTime? {
         return value?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneId.systemDefault()) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: LocalDateTime?): Long? {
+    fun dateToLong(date: LocalDateTime?): Long? {
         return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
     }
 
@@ -128,5 +131,40 @@ class TypeConverters {
             "Hot Water" -> MeterType.HOT_WATER
             else -> throw IllegalArgumentException("Could not recognise MeterType")
         }
+    }
+
+    fun dateToTimestamp(date: LocalDateTime): Timestamp {
+        return Timestamp(Date.from(date.toInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))))
+    }
+
+    fun timestampToDate(timestamp: Timestamp): LocalDateTime {
+        return timestamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+    }
+    fun meterReadingToMap(reading: MeterReading): Map<String, *> {
+        return mapOf(
+            "readingID" to reading.readingID,
+            "meterID" to reading.meterID,
+            "value" to reading.value,
+            "date" to TypeConverters().dateToTimestamp(reading.date),
+            "note" to reading.note
+        )
+    }
+
+    fun mapToMeterReading(map: Map<String, Any>): MeterReading {
+        val date = map["date"]
+        val timestamp = if (date is Timestamp) {
+            timestampToDate(date)
+        } else {
+            // Handle the case where date is not a Timestamp
+            // For example, you can use a default value or throw an exception
+            LocalDateTime.now()
+        }
+        return MeterReading(
+            readingID = (map["readingID"] as Long).toInt(),
+            meterID = (map["meterID"] as Long).toInt(),
+            value = (map["value"] as Double).toFloat(),
+            date = timestamp,
+            note = map["note"] as String?
+        )
     }
 }

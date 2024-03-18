@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="ucl.student.meterbuddy" />
+                  <option name="mobileSdkAppId" value="1:969019005848:android:2b06384be89ac417abe9ed" />
+                  <option name="projectId" value="meter-budy" />
+                  <option name="projectNumber" value="969019005848" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -6,9 +6,9 @@ import java.time.LocalDateTime
 
 @Entity
 data class MeterReading (
-    @PrimaryKey(autoGenerate = true) val readingID: Int,
-    val meterID: Int,
-    var value: Float,
-    var date: LocalDateTime,
+    @PrimaryKey(autoGenerate = true) var readingID: Int =-1,
+    val meterID: Int = -1 ,
+    var value: Float =0f,
+    var date: LocalDateTime = LocalDateTime.now(),
     var note: String? = null,
 )
