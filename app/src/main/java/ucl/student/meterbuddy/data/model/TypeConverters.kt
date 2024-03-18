@@ -74,6 +74,7 @@ class TypeConverters {
             "Kilogram" -> MeterUnit.KILOGRAM
             "Stair" -> MeterUnit.STAIR
             "Megabyte" -> MeterUnit.MEGABYTE
+            "Kilometer" -> MeterUnit.KILO_METER
             else -> throw IllegalArgumentException("Could not recognize unit $unit")
         }
     }
@@ -92,6 +93,8 @@ class TypeConverters {
             "Water" -> MeterIcon.Water
             "Heating" -> MeterIcon.Heating
             "Other" -> MeterIcon.Other
+            "Car" -> MeterIcon.Car
+            "Hot Water" ->MeterIcon.HotWater
             else -> throw IllegalArgumentException("Could not recognize icon")
         }
     }
