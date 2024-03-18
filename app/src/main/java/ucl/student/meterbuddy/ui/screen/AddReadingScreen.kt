@@ -1,12 +1,10 @@
 package ucl.student.meterbuddy.ui.screen
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,11 +29,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FloatingActionButton
@@ -50,77 +48,102 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.R
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-data class AddReadingScreen(val nameMeter: String,
-                            val lastDate: LocalDateTime = LocalDateTime.now(),
-                            val lastValue: Float ?= null,
-                            val lastNote: String ?= null,
-                            val edit: Boolean = false,
-                            val onSubmit: (value: Float, date: LocalDateTime, note:String?)-> Unit): Screen
-{
+data class AddReadingScreen(
+    val nameMeter: String,
+    val lastDate: LocalDateTime = LocalDateTime.now(),
+    val lastValue: Float? = null,
+    val lastNote: String? = null,
+    val edit: Boolean = false,
+    val onSubmit: (value: Float, date: LocalDateTime, note: String?) -> Unit
+) : Screen {
     /*************
-     Main function
+    Main function
      *************/
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
 
-        val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+        val hostState: SnackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.currentOrThrow
 
-        var reading by remember { mutableStateOf(lastValue.toString() )  }
+        var reading by remember { mutableStateOf(lastValue.toString()) }
         var note by remember { mutableStateOf(lastNote ?: "") }
 
         val showDialog = remember { mutableStateOf(false) }
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli())
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+        )
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            snackbarHost = { SnackbarHost(hostState = hostState) },
             topBar = { TopBar(navigator) },
             floatingActionButton = { LockButton() }
         ) { it ->
             Column(
                 Modifier
                     .padding(it)
-                    .fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 Spacer(modifier = Modifier.height(150.dp))
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (showDialog.value) { DisplayDateDialog(showDialog, datePickerState) }
+                if (showDialog.value) {
+                    DisplayDateDialog(showDialog, datePickerState)
+                }
 
                 EditDateButton(showDialog, datePickerState, formatter)
 
-                OutlinedTextField(value = reading, onValueChange = { reading = it },label = { Text("Reading Value") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+                OutlinedTextField(
+                    value = reading,
+                    onValueChange = { reading = it },
+                    label = { Text("Reading Value") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                OutlinedTextField(value = note, onValueChange = { note = it },label = { Text("Reading note") })
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("Reading note") })
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                ConfirmReadingButton(reading, note, snackbarHostState, scope, datePickerState, navigator)
+                ConfirmReadingButton(
+                    reading,
+                    note,
+                    hostState,
+                    scope,
+                    datePickerState,
+                    navigator
+                )
             }
         }
     }
 
-     /***********************
-      Elements in the TopBar
-      **********************/
+    /***********************
+    Elements in the TopBar
+     **********************/
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -130,20 +153,28 @@ data class AddReadingScreen(val nameMeter: String,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ),
-            title = { Text(text = "${if (edit)  "Edit Reading of" else "Add Reading to"} $nameMeter") },
+            title = {
+                Text(
+                    text = "${
+                        if (edit) stringResource(id = R.string.edit_reading) else stringResource(
+                            id = R.string.add_reading
+                        )
+                    } $nameMeter"
+                )
+            },
             navigationIcon = { BackButton(navigator) },
             actions = { }
         )
     }
 
     /******************************
-     All the Buttons and their logic
+    All the Buttons and their logic
      ******************************/
 
     @Composable
     fun BackButton(navigator: Navigator?) {
         IconButton(onClick = { navigator?.pop() }) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
         }
     }
 
@@ -166,7 +197,7 @@ data class AddReadingScreen(val nameMeter: String,
         TextButton(
             onClick = { showDialog.value = false }
         ) {
-            Text("Cancel")
+            Text(stringResource(id = R.string.cancel))
         }
     }
 
@@ -176,41 +207,60 @@ data class AddReadingScreen(val nameMeter: String,
             onClick = { showDialog.value = false },
             enabled = confirmEnabled.value
         ) {
-            Text("OK")
+            Text(stringResource(id = R.string.confirm))
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun EditDateButton(showDialog: MutableState<Boolean>, datePickerState: DatePickerState, formatter: DateTimeFormatter) {
+    fun EditDateButton(
+        showDialog: MutableState<Boolean>,
+        datePickerState: DatePickerState,
+        formatter: DateTimeFormatter
+    ) {
         OutlinedButton(onClick = { showDialog.value = true }) {
-            Text(text = LocalDateTime.ofInstant(Instant.ofEpochMilli(datePickerState.selectedDateMillis!!), ZoneId.systemDefault()).format(formatter))
+            Text(
+                text = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
+                    ZoneId.systemDefault()
+                ).format(formatter)
+            )
             Spacer(modifier = Modifier.height(5.dp))
-            Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Edit" )
+            Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Edit")
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun ConfirmReadingButton(reading: String, note: String, snackbarHostState: SnackbarHostState, scope: CoroutineScope, datePickerState: DatePickerState, navigator: Navigator) {
+    fun ConfirmReadingButton(
+        reading: String,
+        note: String,
+        snackBarHostState: SnackbarHostState,
+        scope: CoroutineScope,
+        datePickerState: DatePickerState,
+        navigator: Navigator
+    ) {
         ElevatedButton(onClick = {
             try {
-                onSubmit(reading.toFloat(),LocalDateTime.ofInstant(Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
-                    ZoneId.systemDefault()), note); navigator.pop()
-            }
-            catch (e:NumberFormatException) {
+                onSubmit(
+                    reading.toFloat(), LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
+                        ZoneId.systemDefault()
+                    ), note
+                ); navigator.pop()
+            } catch (e: NumberFormatException) {
                 scope.launch {
-                    val result = snackbarHostState.showSnackbar(
+                    val result = snackBarHostState.showSnackbar(
                         message = "Error: ${e.message}",
                         withDismissAction = true
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        Log.w("Snackbar", "Snackbar action performed")
+                        Log.w("Snack bar", "Snack bar action performed")
                     }
                 }
             }
         }) {
-            Text(text = if (edit) "Update" else "Add")
+            Text(text = if (edit) stringResource(id = R.string.update) else stringResource(id = R.string.add))
         }
     }
 
@@ -218,7 +268,8 @@ data class AddReadingScreen(val nameMeter: String,
     @Composable
     fun DisplayDateDialog(showDialog: MutableState<Boolean>, datePickerState: DatePickerState) {
 
-        val confirmEnabled = remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
+        val confirmEnabled =
+            remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
 
         DatePickerDialog(
             onDismissRequest = { showDialog.value = false },

@@ -31,9 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
@@ -43,15 +46,21 @@ import kotlin.enums.EnumEntries
 @Composable
 fun MeterFormDialog(
     modifier: Modifier = Modifier,
-    onDismissRequest: () -> kotlin.Unit,
-    onConfirmation: (name: String, unit: MeterUnit, icon: MeterIcon, type: MeterType, cost: String, additive: Boolean) -> kotlin.Unit,
-    showDialog: Boolean
+    onDismissRequest: () -> Unit,
+    onConfirmation: (name: String, unit: MeterUnit, icon: MeterIcon, type: MeterType, cost: String, additive: Boolean) -> Unit,
+    showDialog: Boolean,
+    lastMeterName: String = "",
+    lastMeterCost: String = "",
+    lastMeterType: MeterType = MeterType.ELECTRICITY,
+    lastMeterUnit: MeterUnit = MeterUnit.KILO_WATT_HOUR,
+    lastIsAdditive: Boolean = true,
+    edit: Boolean = false
 ) {
-    var meterName by remember { mutableStateOf("") }
-    var meterCost by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(MeterType.ELECTRICITY) }
-    var selectedUnit by remember { mutableStateOf(MeterUnit.KILO_WATT_HOUR) }
-    var isAdditive by remember { mutableStateOf(true) }
+    var meterName by remember { mutableStateOf(lastMeterName) }
+    var meterCost by remember { mutableStateOf(lastMeterCost) }
+    var selectedType by remember { mutableStateOf(lastMeterType) }
+    var selectedUnit by remember { mutableStateOf(lastMeterUnit) }
+    var isAdditive by remember { mutableStateOf(lastIsAdditive) }
 
     val meterTypes = MeterType.entries
 
@@ -67,7 +76,7 @@ fun MeterFormDialog(
                         .padding(horizontal = 16.dp, vertical = 20.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Add a new meter", style = MaterialTheme.typography.headlineSmall)
+                    Text(text = "${if (edit)  stringResource(id = R.string.edit_meter) + " " + meterName else stringResource(id = R.string.add_meter)}", style = MaterialTheme.typography.headlineSmall)
                     MeterTextField(meterName) { newName -> meterName = newName }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -121,14 +130,6 @@ fun MeterFormDialog(
         }
     }
 }
-
-//@Preview(name = "AddMeterFormCard")
-//@Composable
-//fun PreviewAddMeterFormCard() {
-//    MeterBuddyTheme {
-//        AddMeterFormCard(Modifier.padding(9.dp))
-//    }
-//}
 
 @Composable
 fun TypeSelectorButton(
@@ -223,7 +224,7 @@ fun MeterTypeOptions(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TypeSelectorButton(type, selectedType, onTypeSelected)
-                DisplayText(type.icon.iconName)
+                DisplayText(type.type)
             }
         }
         Spacer(modifier = Modifier.height(5.dp))
@@ -255,4 +256,12 @@ fun MeterUnitOptions(
             Spacer(modifier = Modifier.height(5.dp))
         }
     }
+}
+
+@Preview(name = "MeterFormDialog")
+@Composable
+private fun MeterFormDialogPreview() {
+    MeterFormDialog(Modifier, {}, { name, unit, icon, type, cost, additive ->
+        println("Name: $name, Unit: $unit, Icon: $icon, Type: $type, Cost: $cost, Additive: $additive")
+    }, true, "My Electricity Meter", "1.5")
 }

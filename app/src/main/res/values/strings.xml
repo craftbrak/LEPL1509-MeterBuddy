@@ -3,7 +3,16 @@
     <string name="no_reading">Please add a reading to this meter</string>
     <string name="meter_menu">"Meter Menu"</string>
     <string name="home_tab">Meters</string>
-    <string name="delete_meter_validation_text">Deleting this meter will also delete all it\'s reading. this action cannot be reverted</string>
+    <string name="delete_meter_validation_text">Deleting this meter will also delete all it\'s reading. This action cannot be reverted</string>
     <string name="delete_meter_validation_title">Are You Sure ?</string>
     <string name="stat_tab">Stats\n</string>
+    <string name="edit_reading">Edit Reading of</string>
+    <string name="add_reading">Add Reading to</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="update">Update</string>
+    <string name="add">Add</string>
+    <string name="edit_meter">Edit Meter</string>
+    <string name="add_meter">Add a new meter</string>
+    <string name="negative_cost">Cost cannot be negative, if you want to track a production please toggle the consumption off</string>
 </resources>

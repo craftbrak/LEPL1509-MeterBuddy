@@ -1,10 +1,8 @@
 package ucl.student.meterbuddy.viewmodel
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -35,19 +33,19 @@ object ChartLineModel: ScreenModel {
 
         if (meterReadings.isEmpty()) { return null }
 
-        meterReadings.sortedBy { it.date.dayOfYear.toFloat() }
+        val meterReadingsSorted = meterReadings.sortedBy { it.date.dayOfYear }
 
         val values = mutableListOf<Point>()
-        val xValues = mutableListOf<Float>()
-        meterReadings.forEach {reading ->
+        val xValues = mutableSetOf<Float>()
+        meterReadingsSorted.forEach {reading ->
 
             // TODO ( Implémenter un moyen de rendre la date en Float )
             val x = reading.date.dayOfYear.toFloat()
             var y = reading.value
 
-            if (xValues.contains(x)) {
+            if (x in xValues) {
                 y += values.last().y
-                values.removeAt(values.size - 1)
+                values.removeLast()
             } else { xValues.add(x) }
 
             values.add(Point(x, y))
