@@ -65,13 +65,13 @@ fun MeterOverviewCard(
                 Row(modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
                     Spacer(Modifier.width(10.dp))
-                    Text(text = monthlyCost.toString())
-                    Spacer(Modifier.width(8.dp))
-                    Text(text = currencySymbol)
+//                    Text(text = monthlyCost.toString())
+//                    Spacer(Modifier.width(8.dp))
+//                    Text(text = currencySymbol)
                     Spacer(Modifier.weight(1f))
-                    ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
-                        Text(text = trendValue.toString())
-                    })
+//                    ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
+//                        Text(text = trendValue.toString())
+//                    })
                     Spacer(Modifier.width(10.dp))
                 }
             }
