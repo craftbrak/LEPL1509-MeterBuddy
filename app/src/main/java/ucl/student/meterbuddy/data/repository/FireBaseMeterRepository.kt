@@ -32,7 +32,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
 
             val meters = snapshot?.documents?.mapNotNull { it.toObject<Meter>() }
             if (meters != null) {
-                trySend(meters).isSuccess
+                trySend(meters.sortedBy { it.meterType }).isSuccess
             }
         }
 
@@ -50,7 +50,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
                 val readings =
                     snapshot?.documents?.mapNotNull { typeConverters.mapToMeterReading(it.data as Map<String, Any>) }
                 if (readings != null) {
-                    trySend(readings).isSuccess
+                    trySend(readings.sortedBy { it.date }).isSuccess
                 }
             }
                 awaitClose { subscription.remove() }
