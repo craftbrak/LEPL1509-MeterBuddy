@@ -113,7 +113,7 @@ class MeterList : Screen {
             ) {
                 items(mainPageScreenModel.state.value.meters) { meter ->
                     val lastReading =
-                        mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
+                        mainPageScreenModel.state.value.lastReading[meter.meterID]?.firstOrNull()?.value
                     MeterOverviewCard(
                         onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                         onLongClick = {

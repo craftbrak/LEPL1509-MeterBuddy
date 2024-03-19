@@ -50,7 +50,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
                 val readings =
                     snapshot?.documents?.mapNotNull { typeConverters.mapToMeterReading(it.data as Map<String, Any>) }
                 if (readings != null) {
-                    trySend(readings.sortedBy { it.date }).isSuccess
+                    trySend(readings.sortedBy { it.date }.reversed()).isSuccess
                 }
             }
                 awaitClose { subscription.remove() }
