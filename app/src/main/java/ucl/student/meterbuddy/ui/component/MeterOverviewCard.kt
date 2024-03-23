@@ -1,7 +1,7 @@
 package ucl.student.meterbuddy.ui.component
 
-
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
+import ucl.student.meterbuddy.data.model.enums.TrendIcon
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -39,7 +41,7 @@ fun MeterOverviewCard(
     meterIcon: MeterIcon,
     lastReading: String?,
     readingUnit: String,
-    trendIcon: String,
+    trendIcon: TrendIcon,
     trendValue: Float,
     monthlyCost: Float,
     currencySymbol: String
@@ -69,8 +71,10 @@ fun MeterOverviewCard(
                     Spacer(Modifier.width(8.dp))
                     Text(text = currencySymbol)
                     Spacer(Modifier.weight(1f))
+                    Image( painter = painterResource(id = trendIcon.icon), contentDescription = "Trend Icon")
                     ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
-                        Text(text = trendValue.toString())
+                        val formattedTrendValue = String.format("%.2f", trendValue)
+                        Text(text = "$formattedTrendValue %")
                     })
                     Spacer(Modifier.width(10.dp))
                 }
@@ -88,8 +92,8 @@ fun MeterOverviewCardPreview() {
         meterIcon = MeterIcon.Electricity,
         lastReading = 192384.0f.toString(),
         readingUnit = MeterUnit.CUBIC_METER.unit,
-        trendIcon = "up",
-        trendValue = .23f,
+        trendIcon = TrendIcon.Up,
+        trendValue = 23.3f,
         monthlyCost = 213f,
         currencySymbol = "$"
     )

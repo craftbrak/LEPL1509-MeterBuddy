@@ -39,12 +39,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.FadeTransition
-import cafe.adriel.voyager.transitions.ScaleTransition
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
-import ucl.student.meterbuddy.ui.screen.HomeScreen
+import ucl.student.meterbuddy.data.model.enums.TrendIcon
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import java.util.Optional
@@ -71,10 +68,7 @@ object MetersListTab : Tab {
         Navigator(screen = MeterList()) {
             FadeTransition(navigator = it)
         }
-
-
     }
-
 }
 
 class MeterList : Screen {
@@ -82,10 +76,9 @@ class MeterList : Screen {
     override fun Content() {
         val context = LocalContext.current
         val showMeterFormDialog = remember { mutableStateOf(false) }
-        val showEditFormDialog = remember { mutableStateOf(false) }
-        val snackbarHostState = remember {
-            SnackbarHostState()
-        }
+        val showEditFormDialog  = remember { mutableStateOf(false) }
+        val snackbarHostState   = remember { SnackbarHostState() }
+
         val mainPageScreenModel: MainPageScreenModel = getScreenModel()
         Scaffold(
             snackbarHost = {
@@ -103,17 +96,28 @@ class MeterList : Screen {
             val navigator = LocalNavigator.current
             val showBottomSheet = remember { mutableStateOf(false) }
             val showDeleteDialog = remember { mutableStateOf(false) }
-            var selectedMeter: MutableState<Optional<Meter>> =
+            val selectedMeter: MutableState<Optional<Meter>> =
                 remember { mutableStateOf(Optional.empty()) }
-            val scope = rememberCoroutineScope()
+            // val scope = rememberCoroutineScope()
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(it)
             ) {
                 items(mainPageScreenModel.state.value.meters) { meter ->
-                    val lastReading =
-                        mainPageScreenModel.state.value.lastReading[meter.meterID]?.lastOrNull()?.value
+                    val readings = mainPageScreenModel.state.value.lastReading[meter.meterID]
+                    val recentReadingValue = readings?.lastOrNull()?.value
+
+                    val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
+                    else {
+                        val oldReadingValue = readings?.get(readings.size - 2)?.value
+                        100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
+                    }
+
+                    val trendIcon: TrendIcon = if (trendValue == 0.0f) { TrendIcon.Flat }
+                    else if (trendValue > 0) { TrendIcon.Up }
+                    else { TrendIcon.Down }
+
                     MeterOverviewCard(
                         onClick = { navigator?.push(MeterDetailsScreen(meter)) },
                         onLongClick = {
@@ -123,10 +127,10 @@ class MeterList : Screen {
                         modifier = Modifier.padding(10.dp),
                         meterName = meter.meterName,
                         meterIcon = meter.meterIcon,
-                        lastReading = lastReading?.toString(),
+                        lastReading = recentReadingValue.toString(),
                         readingUnit = meter.meterUnit.unit,
-                        trendIcon = "up",
-                        trendValue = 10.0f,
+                        trendIcon = trendIcon,
+                        trendValue = trendValue,
                         monthlyCost = 20.0f,
                         currencySymbol = "£" //TODO: USE values instead of hardcoded values
                     )

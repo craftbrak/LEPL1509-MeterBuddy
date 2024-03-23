@@ -9,5 +9,5 @@ enum class MeterIcon(val icon: Int, val iconName: String) {
     Heating(R.drawable.baseline_fireplace_24, "Heating"),
     Other( R.drawable.baseline_home_24, "Other"),
     Car( R.drawable.baseline_car, "Car"),
-    HotWater(R.drawable.baseline_shower_24, "Hot Water"),
+    HotWater(R.drawable.baseline_shower_24, "Hot Water")
 }
