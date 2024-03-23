@@ -92,8 +92,8 @@ fun MeterOverviewCardPreview() {
         meterIcon = MeterIcon.Electricity,
         lastReading = 192384.0f.toString(),
         readingUnit = MeterUnit.CUBIC_METER.unit,
-        trendIcon = TrendIcon.Up,
-        trendValue = 23.3f,
+        trendIcon = TrendIcon.Down,
+        trendValue = 23.303904f,
         monthlyCost = 213f,
         currencySymbol = "$"
     )

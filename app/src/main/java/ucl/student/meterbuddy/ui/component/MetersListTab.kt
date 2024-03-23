@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -114,8 +115,10 @@ class MeterList : Screen {
                         100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                     }
 
+                    Log.d("TREND", "$recentReadingValue")
+
                     val trendIcon: TrendIcon = if (trendValue == 0.0f) { TrendIcon.Flat }
-                    else if (trendValue > 0) { TrendIcon.Up }
+                    else if (trendValue > 0.0f) { TrendIcon.Up }
                     else { TrendIcon.Down }
 
                     MeterOverviewCard(
