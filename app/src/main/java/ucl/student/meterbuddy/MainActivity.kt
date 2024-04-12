@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -23,6 +24,11 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
+//import androidx.navigation.navigation
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
@@ -31,10 +37,12 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
 import ucl.student.meterbuddy.ui.component.MetersListTab
 import ucl.student.meterbuddy.ui.screen.HomeScreen
 import ucl.student.meterbuddy.ui.screen.LineChartsScreen
+import ucl.student.meterbuddy.ui.screen.LoginScreen
 import ucl.student.meterbuddy.ui.theme.MeterBuddyTheme
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
@@ -53,30 +61,22 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().apply {}
         val user = FirebaseAuth.getInstance().currentUser
 
-        when(mainPageScreenModel.state.value.currentUser.value){
-            is Resource.Error -> {
-                val intent= Intent(this, AuthActivity::class.java)
-                startActivity(intent)
-            }
-            is Resource.Loading -> {
-                //TODO: Display Loading screen
-
-            }
-            is Resource.Success -> {
-
-            }
-        }
+//        when(mainPageScreenModel.state.value.currentUser.value){
+//            is Resource.Error -> {
+//                val intent= Intent(this, AuthActivity::class.java)
+//                startActivity(intent)
+//            }
+//            is Resource.Loading -> {
+//                //TODO: Display Loading screen
+//
+//            }
+//            is Resource.Success -> {
+//
+//            }
+//        }
         setContent {
-            LaunchedEffect(key1 = Unit) {
-                mainPageScreenModel.state.value.currentUser.collect{
-                    when(it){
-                        is Resource.Error -> TODO()
-                        is Resource.Loading -> TODO()
-                        is Resource.Success -> TODO()
-                    }
-                }
-            }
-            MeterBuddyTheme {
+            val navController = rememberNavController()
+            MeterBuddyTheme{
                 CompositionLocalProvider(localScreenContext provides this) {
                     HomeScreen.Content()
                 }
@@ -84,23 +84,60 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TabNavigator(tab = MetersListTab) {
-                        Scaffold(
-                            content = {
-                                it != null
-                                CurrentTab()
-                            },
-                            bottomBar = {
-                                BottomAppBar {
-                                    TabNavigationItem(tab = MetersListTab)
-                                    TabNavigationItem(tab = LineChartsScreen())
-                                }
-                            }
-                        )
+                    NavHost(navController = navController, startDestination = "Auth") {
+                        composable("Auth"){
+                            auth()
+                        }
+                        composable("home"){
+                            mainComp()
+                        }
                     }
 
                 }
+
+
             }
+
+            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
+                mainPageScreenModel.state.value.currentUser.collect{
+                    when(it){
+                        is Resource.Error -> {
+                            when(it.error){
+                                AuthException.BAD_CREDENTIALS -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                                AuthException.NO_NETWORK -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                                AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","merde")
+                            }
+                            navController.navigate("Auth")
+                        }
+                        is Resource.Loading -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                        is Resource.Success ->  navController.navigate("home")
+                    }
+                }
+            }
+        }
+    }
+    @Composable
+    private fun mainComp(){
+        TabNavigator(tab = MetersListTab) {
+            Scaffold(
+                content = {
+                    it != null
+                    CurrentTab()
+                },
+                bottomBar = {
+                    BottomAppBar {
+                        TabNavigationItem(tab = MetersListTab)
+                        TabNavigationItem(tab = LineChartsScreen())
+                    }
+                }
+            )
+        }
+    }
+    @Composable
+    private fun auth(){
+        Navigator(screen = LoginScreen()) {
+            SlideTransition(navigator = it)
         }
     }
     @Composable

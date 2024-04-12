@@ -37,7 +37,7 @@ import ucl.student.meterbuddy.data.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
-class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository , private val authRepository: AuthRepository): ViewModel() {
+class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository , public val authRepository: AuthRepository): ViewModel() {
 
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
@@ -58,7 +58,10 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
             }
             authRepository.getUser().collect{
                 Log.i("New User", it.toString())
-                _state.value.currentUser.value = it
+                _state.value.currentUser.emit(it)
+            }
+            _state.value.currentUser.collect{
+                Log.i("Auth User ", it.toString())
             }
         }
     }
@@ -150,7 +153,7 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
                         Log.w("Login", "Loading")
                     }
                     is Resource.Success -> {
-                        _state.value.currentUser.value =Resource.Success(it.data.user!!)
+                        _state.value.currentUser.emit(Resource.Success(it.data.user!!))
                         shouldFinish.value =true
                         Log.i("Login", "Logged in as ${it.data.user?.email}")
                     }

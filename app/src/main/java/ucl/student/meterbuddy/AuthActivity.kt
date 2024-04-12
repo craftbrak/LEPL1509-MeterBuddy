@@ -36,9 +36,7 @@ class AuthActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigator(screen = LoginScreen()) {
-                        SlideTransition(navigator = it)
-                    }
+
                 }
             }
         }

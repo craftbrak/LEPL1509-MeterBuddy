@@ -67,14 +67,14 @@ class LoginScreen : Screen {
             }
         }
 
-        val context = LocalContext.current
-        LaunchedEffect(mainPageScreenModel.shouldFinish) {
-            mainPageScreenModel.shouldFinish.collect { shouldFinish ->
-                if (shouldFinish && context is Activity) {
-                    context.finish()
-                }
-            }
-        }
+//        val context = LocalContext.current
+//        LaunchedEffect(mainPageScreenModel.shouldFinish) {
+//            mainPageScreenModel.shouldFinish.collect { shouldFinish ->
+//                if (shouldFinish && context is Activity) {
+//                    context.finish()
+//                }
+//            }
+//        }
     }
 
 }

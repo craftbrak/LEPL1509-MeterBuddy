@@ -56,14 +56,19 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override fun getUser(): Flow<Resource<FirebaseUser, AuthException>> = callbackFlow {
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser != null) {
+            trySend(Resource.Success(currentUser))
+        } else {
+            trySend(Resource.Error(AuthException.NO_CURRENT_USER))
+        }
+
         firebaseAuth.addAuthStateListener {
             if (it.currentUser != null) {
                 trySend(Resource.Success(it.currentUser!!))
             } else {
                 trySend(Resource.Error(AuthException.NO_CURRENT_USER))
             }
-
-
         }
     }
 }
