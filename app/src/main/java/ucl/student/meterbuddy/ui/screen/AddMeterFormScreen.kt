@@ -46,6 +46,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +82,7 @@ class AddMeterFormScreen: Screen {
         val scope = rememberCoroutineScope()
 
         val navigator = LocalNavigator.current
-        val mainPageScreenModel: MainPageScreenModel = getScreenModel()
+        val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),

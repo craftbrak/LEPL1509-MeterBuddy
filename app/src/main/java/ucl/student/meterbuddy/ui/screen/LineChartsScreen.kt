@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import co.yml.charts.common.extensions.isNotNull
@@ -35,7 +36,7 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import ucl.student.meterbuddy.data.repository.MeterRepository
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 
-@OptIn(ExperimentalFoundationApi::class)
+
 class LineChartsScreen: Tab {
 
     override val options: TabOptions
@@ -53,10 +54,11 @@ class LineChartsScreen: Tab {
             }
         }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
 
-        val mainPageScreenModel: MainPageScreenModel = getScreenModel()
+        val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         val graphModel = ChartLineModel
         val meters = mainPageScreenModel.state.value.meters
 

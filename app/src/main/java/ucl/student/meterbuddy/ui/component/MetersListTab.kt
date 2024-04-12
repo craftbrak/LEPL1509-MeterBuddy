@@ -35,11 +35,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.FadeTransition
+import cafe.adriel.voyager.transitions.ScaleTransition
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.enums.TrendIcon
@@ -69,7 +73,10 @@ object MetersListTab : Tab {
         Navigator(screen = MeterList()) {
             FadeTransition(navigator = it)
         }
+
+
     }
+
 }
 
 class MeterList : Screen {
@@ -77,10 +84,11 @@ class MeterList : Screen {
     override fun Content() {
         val context = LocalContext.current
         val showMeterFormDialog = remember { mutableStateOf(false) }
-        val showEditFormDialog  = remember { mutableStateOf(false) }
-        val snackbarHostState   = remember { SnackbarHostState() }
-
-        val mainPageScreenModel: MainPageScreenModel = getScreenModel()
+        val showEditFormDialog = remember { mutableStateOf(false) }
+        val snackbarHostState = remember {
+            SnackbarHostState()
+        }
+        val mainPageScreenModel: MainPageScreenModel = getViewModel()
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)

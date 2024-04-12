@@ -6,6 +6,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -18,7 +19,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.data_access.UserDao
+import ucl.student.meterbuddy.data.repository.AuthRepository
 import ucl.student.meterbuddy.data.repository.FireBaseMeterRepository
+import ucl.student.meterbuddy.data.repository.FirebaseAuthRepository
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import ucl.student.meterbuddy.data.repository.MeterRepository
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
@@ -28,16 +31,29 @@ import javax.inject.Singleton
 @Module
 @InstallIn(ActivityComponent::class)
 abstract class AppModule {
-    @Binds
-    @IntoMap
-    @ScreenModelKey(MainPageScreenModel::class)
-    abstract fun bindMainPageScreenModel(mainPageScreenModel: MainPageScreenModel): ScreenModel
+//    @Binds
+//    @IntoMap
+//    @ScreenModelKey(MainPageScreenModel::class)
+//    abstract fun bindMainPageScreenModel(mainPageScreenModel: MainPageScreenModel): ScreenModel
 
     @Binds
     @IntoMap
     @ScreenModelFactoryKey(MeterScreenModel.Factory::class)
-    abstract fun bindMeterPageScreenModel(meterScreenModelFactory: MeterScreenModel.Factory):ScreenModelFactory
+                    abstract fun bindMeterPageScreenModel(meterScreenModelFactory: MeterScreenModel.Factory): ScreenModelFactory
 
+}
 
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModuleStatic {
+    @Provides
+    @Singleton
+    fun providesFirebaseAuth() = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun providesFirebaseAuthRepository(fb: FirebaseAuth): AuthRepository {
+        return FirebaseAuthRepository(fb)
+    }
 }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AppInsightsSettings">
+    <option name="selectedTabId" value="Firebase Crashlytics" />
     <option name="tabSettings">
       <map>
         <entry key="Firebase Crashlytics">
@@ -8,7 +9,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="ucl.student.meterbuddy" />
+                  <option name="appId" value="ucl.student.meterbuddy.firebase" />
                   <option name="mobileSdkAppId" value="1:969019005848:android:2b06384be89ac417abe9ed" />
                   <option name="projectId" value="meter-budy" />
                   <option name="projectNumber" value="969019005848" />

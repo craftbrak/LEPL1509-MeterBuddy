@@ -24,5 +24,4 @@ object FirebaseDbModule{
     fun provideFirebaseMeterRepository(db: FirebaseFirestore): MeterRepository {
         return  FireBaseMeterRepository(db)
     }
-
 }

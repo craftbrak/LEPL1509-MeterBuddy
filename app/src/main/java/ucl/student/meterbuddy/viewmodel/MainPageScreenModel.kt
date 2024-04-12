@@ -6,12 +6,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
@@ -19,20 +29,24 @@ import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
+import ucl.student.meterbuddy.data.repository.AuthRepository
 import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import ucl.student.meterbuddy.data.repository.MeterRepository
+import ucl.student.meterbuddy.data.utils.AuthException
+import ucl.student.meterbuddy.data.utils.Resource
 import javax.inject.Inject
 
-
-class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository): ScreenModel {
+@HiltViewModel
+class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository , private val authRepository: AuthRepository): ViewModel() {
 
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
-
+    val auth = Firebase.auth
+    val shouldFinish = MutableStateFlow<Boolean>(false)
     init { updateState() }
 
     private fun updateState() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             meterRepository.getMeterAndReadings().collect { metersAndReadings ->
 //                Log.i("Meters and Readings", metersAndReadings.keys.toString())
                 _state.value = state.value.copy(
@@ -42,17 +56,21 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
                     }.toMap()
                 )
             }
+            authRepository.getUser().collect{
+                Log.i("New User", it.toString())
+                _state.value.currentUser.value = it
+            }
         }
     }
 
     fun updateMeter(meter: Meter) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             meterRepository.updateMeter(meter)
         }
     }
 
     fun  addMeter(metre:Meter) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             meterRepository.addMeter(metre)
         }
     }
@@ -116,12 +134,38 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
     }
 
     fun deleteMeter(meter:Meter) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             meterRepository.deleteMeter(meter)
         }
     }
 
+    fun loginUser(email: String, password:String){
+        viewModelScope.launch {
+            authRepository.loginUser(email,password).collect{
+                when(it){
+                    is Resource.Error -> {
+                        Log.e("Login Error",it.error.toString())
+                    }
+                    is Resource.Loading -> {
+                        Log.w("Login", "Loading")
+                    }
+                    is Resource.Success -> {
+                        _state.value.currentUser.value =Resource.Success(it.data.user!!)
+                        shouldFinish.value =true
+                        Log.i("Login", "Logged in as ${it.data.user?.email}")
+                    }
+                }
+            }
+        }
+    }
 
+    fun registerUser(email: String, password: String) {
+        this.authRepository.registerUser(email, password)
+    }
+    fun signOut(){
+        auth.signOut()
+        _state.value.currentUser.value = Resource.Error(AuthException.NO_CURRENT_USER)
+    }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->
 //            meter.meterUnit == unit

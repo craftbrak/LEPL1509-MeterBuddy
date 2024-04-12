@@ -15,4 +15,5 @@
     <string name="edit_meter">Edit Meter</string>
     <string name="add_meter">Add a new meter</string>
     <string name="negative_cost">Cost cannot be negative, if you want to track a production please toggle the consumption off</string>
+    <string name="title_activity_auth">AuthActivity</string>
 </resources>
