@@ -11,6 +11,6 @@ interface AuthRepository {
     fun currentUser():Optional<FirebaseUser>
     fun loginUser(email: String, password : String):Flow<Resource<AuthResult, AuthException>>
     fun registerUser(email: String, password: String) : Flow<Resource<AuthResult, AuthException>>
-
+    fun logout()
     fun getUser():Flow<Resource<FirebaseUser,AuthException>>
 }

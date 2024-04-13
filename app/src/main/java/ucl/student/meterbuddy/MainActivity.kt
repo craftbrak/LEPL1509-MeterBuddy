@@ -103,14 +103,14 @@ class MainActivity : ComponentActivity() {
                     when(it){
                         is Resource.Error -> {
                             when(it.error){
-                                AuthException.BAD_CREDENTIALS -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-                                AuthException.NO_NETWORK -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                                AuthException.BAD_CREDENTIALS -> Log.i("Bad Cred","bad cred")
+                                AuthException.NO_NETWORK -> Log.i("No Network","cool")
                                 AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","merde")
+                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                             }
                             navController.navigate("Auth")
                         }
-                        is Resource.Loading -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                        is Resource.Loading -> Log.i("Loading please wait","wait")
                         is Resource.Success ->  navController.navigate("home")
                     }
                 }

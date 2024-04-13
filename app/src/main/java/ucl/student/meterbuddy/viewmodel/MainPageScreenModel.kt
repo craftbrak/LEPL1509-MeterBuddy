@@ -19,6 +19,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
@@ -42,7 +43,6 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
     val auth = Firebase.auth
-    val shouldFinish = MutableStateFlow<Boolean>(false)
     init { updateState() }
 
     private fun updateState() {
@@ -56,12 +56,14 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
                     }.toMap()
                 )
             }
+
+
+        }
+        viewModelScope.launch {
+
             authRepository.getUser().collect{
                 Log.i("New User", it.toString())
                 _state.value.currentUser.emit(it)
-            }
-            _state.value.currentUser.collect{
-                Log.i("Auth User ", it.toString())
             }
         }
     }
@@ -154,7 +156,6 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
                     }
                     is Resource.Success -> {
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
-                        shouldFinish.value =true
                         Log.i("Login", "Logged in as ${it.data.user?.email}")
                     }
                 }
@@ -165,9 +166,9 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
     fun registerUser(email: String, password: String) {
         this.authRepository.registerUser(email, password)
     }
-    fun signOut(){
-        auth.signOut()
-        _state.value.currentUser.value = Resource.Error(AuthException.NO_CURRENT_USER)
+    fun logout(){
+        authRepository.logout()
+//        _state.value.currentUser.value = Resource.Error(AuthException.NO_CURRENT_USER)
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->

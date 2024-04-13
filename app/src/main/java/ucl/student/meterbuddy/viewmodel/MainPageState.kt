@@ -10,5 +10,5 @@ import ucl.student.meterbuddy.data.utils.Resource
 data class MainPageState (
     val meters: List<Meter> = emptyList(),
     val lastReading: Map<Int, List<MeterReading>> = emptyMap(),
-    val currentUser : MutableStateFlow<Resource<FirebaseUser, AuthException>> = MutableStateFlow(Resource.Error(AuthException.NO_CURRENT_USER))
+    val currentUser : MutableStateFlow<Resource<FirebaseUser, AuthException>> = MutableStateFlow(Resource.Loading())
 )

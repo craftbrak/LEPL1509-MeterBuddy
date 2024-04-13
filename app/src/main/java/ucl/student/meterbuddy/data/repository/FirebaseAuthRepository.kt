@@ -3,6 +3,7 @@ package ucl.student.meterbuddy.data.repository
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
@@ -56,19 +57,21 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override fun getUser(): Flow<Resource<FirebaseUser, AuthException>> = callbackFlow {
-        val currentUser = firebaseAuth.currentUser
-        if (currentUser != null) {
-            trySend(Resource.Success(currentUser))
-        } else {
-            trySend(Resource.Error(AuthException.NO_CURRENT_USER))
-        }
-
-        firebaseAuth.addAuthStateListener {
-            if (it.currentUser != null) {
-                trySend(Resource.Success(it.currentUser!!))
+        val authStateListener = FirebaseAuth.AuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser != null) {
+                trySend(Resource.Success(currentUser))
             } else {
                 trySend(Resource.Error(AuthException.NO_CURRENT_USER))
             }
         }
+
+        firebaseAuth.addAuthStateListener(authStateListener)
+
+        awaitClose { firebaseAuth.removeAuthStateListener(authStateListener) }
+    }
+
+    override fun logout() {
+        firebaseAuth.signOut()
     }
 }
