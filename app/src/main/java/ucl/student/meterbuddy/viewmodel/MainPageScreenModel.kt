@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -38,7 +39,9 @@ import ucl.student.meterbuddy.data.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
-class MainPageScreenModel @Inject constructor( private val meterRepository: MeterRepository , public val authRepository: AuthRepository): ViewModel() {
+class MainPageScreenModel @Inject constructor(private val meterRepository: MeterRepository,
+                                              private val savedStateHandle: SavedStateHandle,
+                                              private val authRepository: AuthRepository): ViewModel() {
 
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state

@@ -24,6 +24,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -50,7 +52,8 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 class MainActivity : ComponentActivity() {
 
     private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
-    private val mainPageScreenModel: MainPageScreenModel by viewModels<MainPageScreenModel>()
+    private val mainPageScreenModel: MainPageScreenModel by viewModels()
+
     //    private lateinit var analytics: FirebaseAnalytics
     //TODO: Make a compose Navigation graph , nest current app in it ,
     // set mainpageScreenModel.state.value.currentUser to bw a flow, listen to the flow and navigate based on it
@@ -84,9 +87,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavHost(navController = navController, startDestination = "Auth") {
-                        composable("Auth"){
+                    NavHost(navController = navController, startDestination = "loading") {
+                        composable("auth"){
                             auth()
+                        }
+                        composable("loading"){
+
                         }
                         composable("home"){
                             mainComp()
@@ -108,10 +114,21 @@ class MainActivity : ComponentActivity() {
                                 AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                             }
-                            navController.navigate("Auth")
+                            // Clear the back stack before navigating to the login screen
+
+                            navController.navigate("auth"){
+                                popUpTo(navController.graph.id)
+                            }
                         }
-                        is Resource.Loading -> Log.i("Loading please wait","wait")
-                        is Resource.Success ->  navController.navigate("home")
+                        is Resource.Loading -> {
+                            navController.navigate(navController.graph.startDestinationId)
+                            Log.i("Loading please wait", "wait")
+                        }
+                        is Resource.Success -> {
+                            navController.navigate("home"){
+                                popUpTo(navController.graph.id)
+                            }
+                        }
                     }
                 }
             }
