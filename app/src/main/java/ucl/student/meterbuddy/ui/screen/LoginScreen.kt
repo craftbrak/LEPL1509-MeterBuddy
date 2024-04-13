@@ -3,7 +3,9 @@ package ucl.student.meterbuddy.ui.screen
 import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,9 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
@@ -45,6 +56,8 @@ class LoginScreen : Screen {
         var password by remember { mutableStateOf("") }
         val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         val navigator = LocalNavigator.currentOrThrow
+        var passwordVisible by remember { mutableStateOf(false) }
+        var isLoading by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -75,14 +88,42 @@ class LoginScreen : Screen {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+
+                    IconButton(onClick = {passwordVisible = !passwordVisible}) {
+                        Icon(imageVector = image, "Toggle Password Visibility")
+                    }
+                }
             )
             Spacer(modifier = Modifier.height(50.dp))
-            Button(onClick = { mainPageScreenModel.loginUser(email, password) }) {
+            Button(onClick = {
+                isLoading = true
+                mainPageScreenModel.loginUser(email, password)
+            }) {
                 Text("Login")
             }
             Button(onClick = { navigator.push(RegisterScreen()) }) {
                 Text(text = "Register")
+            }
+
+            if (isLoading) {
+                Dialog(onDismissRequest = { isLoading = false}) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(100.dp).background(Color.White, shape = RoundedCornerShape(8.dp))) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(64.dp),
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    }
+                }
             }
         }
     }
