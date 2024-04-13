@@ -164,7 +164,23 @@ class MainPageScreenModel @Inject constructor( private val meterRepository: Mete
     }
 
     fun registerUser(email: String, password: String) {
-        this.authRepository.registerUser(email, password)
+        viewModelScope.launch {
+            authRepository.registerUser(email, password).collect{
+                when(it){
+                    is Resource.Error -> {
+                        Log.e("Login Error",it.error.toString())
+                    }
+                    is Resource.Loading -> {
+                        Log.w("Login", "Loading")
+                    }
+                    is Resource.Success -> {
+                        _state.value.currentUser.emit(Resource.Success(it.data.user!!))
+                        Log.i("Login", "Logged in as ${it.data.user?.email}")
+                    }
+                }
+            }
+        }
+
     }
     fun logout(){
         authRepository.logout()

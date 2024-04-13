@@ -61,26 +61,12 @@ class RegisterScreen: Screen {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { registerUser(email, password) }) {
+            Button(onClick = { mainPageScreenModel.registerUser(email, password) }) {
                 Text("Register")
             }
             Button(onClick = { navigator.push(LoginScreen()) }) {
                 Text(text = "Login")
             }
         }
-    }
-    private fun registerUser(email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Registration success, update UI with the signed-in user's information
-                    Log.i("Register",task.result.toString())
-                    navigator.push(LoginScreen())
-                } else {
-                    // If registration fails, display a message to the user.
-                    // TODO: Handle registration failure
-                    Log.e("Register", task.exception?.message.toString())
-                }
-            }
     }
 }

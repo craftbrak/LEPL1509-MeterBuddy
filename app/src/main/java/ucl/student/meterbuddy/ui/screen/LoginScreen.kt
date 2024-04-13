@@ -66,15 +66,6 @@ class LoginScreen : Screen {
                 Text(text = "Register")
             }
         }
-
-//        val context = LocalContext.current
-//        LaunchedEffect(mainPageScreenModel.shouldFinish) {
-//            mainPageScreenModel.shouldFinish.collect { shouldFinish ->
-//                if (shouldFinish && context is Activity) {
-//                    context.finish()
-//                }
-//            }
-//        }
     }
 
 }
