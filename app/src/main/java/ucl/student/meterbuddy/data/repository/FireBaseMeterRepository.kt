@@ -11,9 +11,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ucl.student.meterbuddy.data.model.TypeConverters
+import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.utils.DataException
+import ucl.student.meterbuddy.data.utils.Resource
+import ucl.student.meterbuddy.data.utils.Resource.Success
 import java.util.UUID
 import javax.inject.Inject
 
@@ -39,6 +44,64 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         awaitClose { subscription.remove() }
     }
 
+    override fun getHousing(): Flow<List<Resource<Housing, DataException>>> = callbackFlow {
+        val subscription = db.collection("housings").addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(listOf(Resource.Error<Housing, DataException>(DataException.UNKNONW_ERROR)))
+            }
+            snapshot?.documents?.mapNotNull {
+                it.toObject<Housing>()
+            }?.map { housing -> Success<Housing, DataException>(housing) }?.let {
+                trySend(
+                    it
+                ).isSuccess
+            }
+        }
+        awaitClose{ subscription.remove()}
+
+    }
+
+    override fun addHousing(housing: Housing) {
+        val house = if (housing.housingID == 0){
+            val uuid = UUID.randomUUID()
+            val uniqueHousingId = uuid.hashCode()
+            housing.copy(
+                housingID = uniqueHousingId
+            )
+        }else housing
+        db.collection("housings").document(house.housingID.toString()).set(house)
+    }
+
+    override fun updateHousing(housing: Housing) {
+        db.collection("housings").document(housing.housingID.toString()).set(housing, SetOptions.merge())
+    }
+
+    override fun deleteHousing(housing: Housing) {
+        db.collection("housings").document(housing.housingID.toString()).delete()
+    }
+
+    override fun addUserToHousing(housing: Housing, user: User) {
+        db.collection("housings").document(housing.housingID.toString()).collection("members").document(user.userID.toString()).set(user)
+        db.collection("users").document(user.userID.toString()).collection("housings").document(housing.housingID.toString()).set(housing)
+    }
+
+    override fun removeUserFromHousing(housing: Housing, user: User) {
+        db.collection("housings").document(housing.housingID.toString()).collection("members").document(user.userID.toString()).delete()
+    }
+
+    override fun getUsers(): List<Resource<User,DataException>> {
+        val users = mutableListOf<Resource<User,DataException>>()
+        db.collection("users").get().addOnSuccessListener { result ->
+            for (document in result) {
+                val user = document.toObject<User>()
+                users.add(Success(user))
+            }
+        }
+        return users
+    }
+    override fun addUserData(user: User){
+        db.collection("users").document(user.userID.toString()).set(user)
+    }
     override fun getMeterReadings(id: Int): Flow<List<MeterReading>> = callbackFlow {
         val subscription = meterCollection.document(id.toString()).collection("readings")
             .addSnapshotListener { snapshot, error ->
@@ -55,11 +118,6 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
             }
                 awaitClose { subscription.remove() }
     }
-
-
-
-
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>> {
@@ -80,8 +138,10 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         val uniqueMeterId = uuid.hashCode()
 
         // Set the meterId to the uniqueMeterId
-        meter.meterID = uniqueMeterId
-        meterCollection.document(meter.meterID.toString()).set(meter)
+        val met= meter.copy(
+            meterID = uniqueMeterId
+        )
+        meterCollection.document(met.meterID.toString()).set(met)
     }
 
     override suspend fun updateMeter(meter: Meter) {

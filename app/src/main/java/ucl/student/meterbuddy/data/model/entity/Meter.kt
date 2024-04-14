@@ -8,7 +8,7 @@ import ucl.student.meterbuddy.data.model.enums.MeterUnit
 
 @Entity
 data class Meter (
-    @PrimaryKey(autoGenerate = true) var meterID: Int = -1,
+    @PrimaryKey(autoGenerate = true) val meterID: Int = -1,
     val meterName: String = "",
     val meterUnit: MeterUnit = MeterUnit.KILO_WATT_HOUR,
     val meterIcon: MeterIcon = MeterIcon.Electricity,

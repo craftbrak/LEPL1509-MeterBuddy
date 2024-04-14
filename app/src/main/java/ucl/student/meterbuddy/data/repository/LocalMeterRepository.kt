@@ -2,9 +2,13 @@ package ucl.student.meterbuddy.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import ucl.student.meterbuddy.data.data_access.UserDao
+import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.utils.DataException
+import ucl.student.meterbuddy.data.utils.Resource
 
 class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
 
@@ -30,6 +34,38 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
 
     override suspend fun deleteMeter(meter: Meter) {
         userDao.deleteMeter(meter)
+    }
+
+    override fun getHousing(): Flow<List<Resource<Housing, DataException>>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addHousing(housing: Housing) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateHousing(housing: Housing) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteHousing(housing: Housing) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addUserToHousing(housing: Housing, user: User) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeUserFromHousing(housing: Housing, user: User) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUsers(): List<Resource<User, DataException>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addUserData(user: User) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun addReading(reading: MeterReading) {

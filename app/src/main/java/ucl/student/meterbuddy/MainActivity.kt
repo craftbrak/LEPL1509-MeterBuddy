@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
@@ -121,7 +123,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         is Resource.Loading -> {
-                            navController.navigate(navController.graph.startDestinationId)
+                            navController.navigate("loading")
                             Log.i("Loading please wait", "wait")
                         }
                         is Resource.Success -> {

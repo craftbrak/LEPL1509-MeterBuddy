@@ -27,8 +27,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.UserDatabase
+import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.entity.User
+import ucl.student.meterbuddy.data.model.enums.Currency
+import ucl.student.meterbuddy.data.model.enums.HousingType
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.data.repository.AuthRepository
@@ -36,6 +40,7 @@ import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import ucl.student.meterbuddy.data.repository.MeterRepository
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -155,6 +160,7 @@ class MainPageScreenModel @Inject constructor(private val meterRepository: Meter
                         Log.e("Login Error",it.error.toString())
                     }
                     is Resource.Loading -> {
+                        _state.value.currentUser.value = Resource.Loading()
                         Log.w("Login", "Loading")
                     }
                     is Resource.Success -> {
@@ -178,7 +184,12 @@ class MainPageScreenModel @Inject constructor(private val meterRepository: Meter
                     }
                     is Resource.Success -> {
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
-                        Log.i("Login", "Logged in as ${it.data.user?.email}")
+                        val userData = User(it.data.user!!.uid.hashCode(), email, Currency.EUR)
+                        meterRepository.addUserData(userData)
+                        val defaultHousing = Housing(UUID.randomUUID().hashCode(),"My Home",HousingType.House,50,2)
+                        meterRepository.addHousing(defaultHousing)
+                        meterRepository.addUserToHousing(defaultHousing,userData)
+                        Log.i("Register", "Logged in as ${it.data.user?.email}")
                     }
                 }
             }
