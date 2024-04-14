@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +54,7 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 class RegisterScreen: Screen {
     private lateinit var auth: FirebaseAuth
     private lateinit var navigator: Navigator
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         var username by remember { mutableStateOf("") }
@@ -197,36 +201,34 @@ class RegisterScreen: Screen {
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            TextField(
-                value = selectedCurrency,
-                onValueChange = { },
-                label = { Text("Select Currency") },
-                trailingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_drop_down_24),
-                        contentDescription = "Dropdown",
-                        Modifier.clickable { expanded = !expanded }
-                    )
-                },
-                readOnly = true,  // Make the TextField read-only
-                modifier = Modifier.fillMaxWidth().clickable { expanded = true }
-            )
-            DropdownMenu(
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
+                onExpandedChange = { expanded = !expanded}
             ) {
-                currencies.forEach { currency ->
-                    DropdownMenuItem(
-                        text = { Text(currency) },
-                        onClick = {
-                            selectedCurrency = currency
-                            expanded = false
-                        }
-                    )
+                OutlinedTextField(
+                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                    value = selectedCurrency,
+                    onValueChange = { },
+                    label = { Text("Currency") },
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    }
+                )
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
+                    currencies.forEachIndexed { index, currency ->
+                        DropdownMenuItem(
+                            text = { Text(text = currency) },
+                            onClick = {
+                                selectedCurrency = currencies[index]
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                        )
+                    }
+
                 }
             }
-
             Spacer(modifier = Modifier.height(30.dp))
             Button(onClick = {
                 emptyUsername = username.isEmpty()
