@@ -33,8 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -91,15 +93,15 @@ class LoginScreen : Screen {
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
+                    val imageVector = if (passwordVisible)
+                        ImageVector.vectorResource(id = R.drawable.baseline_visibility)
+                    else ImageVector.vectorResource(id = R.drawable.baseline_visibility_off)
 
                     val description = if (passwordVisible) "Hide password" else "Show password"
 
 
                     IconButton(onClick = {passwordVisible = !passwordVisible}) {
-                        Icon(imageVector = image, "Toggle Password Visibility")
+                        Icon(imageVector = imageVector, contentDescription = description)
                     }
                 }
             )
