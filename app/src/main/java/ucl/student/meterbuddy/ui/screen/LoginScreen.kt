@@ -45,6 +45,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
@@ -63,11 +64,17 @@ class LoginScreen : Screen {
     @Composable
     override fun Content() {
         var email by remember { mutableStateOf("") }
+        var emptyEmail by remember { mutableStateOf(false) }
+        var emailFormatError by remember { mutableStateOf(false) }
+
         var password by remember { mutableStateOf("") }
+        var passwordVisible by remember { mutableStateOf(false) }
+        var emptyPassword by remember { mutableStateOf(false) }
+
         val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
-        var passwordVisible by remember { mutableStateOf(false) }
+
         var isLoading by remember { mutableStateOf(false) }
 
         Column(
@@ -94,8 +101,26 @@ class LoginScreen : Screen {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = emptyEmail || emailFormatError && email.isNotEmpty()
             )
+            if (emptyEmail) {
+                Text(
+                    text = "Email cannot be empty",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 16.dp),
+                    textAlign = TextAlign.Start
+                )
+            } else if (emailFormatError) {
+                Text(
+                    text = "Invalid email format",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 16.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
                 value = password,
@@ -114,12 +139,28 @@ class LoginScreen : Screen {
                     IconButton(onClick = {passwordVisible = !passwordVisible}) {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
-                }
+                },
+                isError = emptyPassword,
             )
+            if (emptyPassword) {
+                Text(
+                    text = "Password cannot be empty",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 16.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
             Spacer(modifier = Modifier.height(30.dp))
             Button(onClick = {
-                isLoading = true
-                mainPageScreenModel.loginUser(email, password)
+                emptyEmail = email.isEmpty()
+                emailFormatError = email.contains("@").not() || email.contains(".").not()
+                emptyPassword = password.isEmpty()
+
+                if (!emptyEmail && !emptyPassword) {
+                    isLoading = true
+                    mainPageScreenModel.loginUser(email, password)
+                }
                 },
                 modifier = Modifier.width(350.dp)) {
                 Text("Login")
@@ -134,47 +175,47 @@ class LoginScreen : Screen {
             }
 
 
-            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
-                val currentUserFlow = mainPageScreenModel.state.value.currentUser
-                currentUserFlow.collect{
-                    when(it){
-                        is Resource.Error -> {
-                            isLoading = false
-                            when(it.error){
-                                AuthException.BAD_CREDENTIALS -> {
-                                    Log.i("Bad Cred","bad cred")
-                                    showToast(context = context, message = "Invalid email or password")
-                                }
-                                AuthException.NO_NETWORK -> {
-                                    Log.i("No Network","cool")
-                                    showToast(context = context, message = "No network connection")
-                                }
-                                AuthException.UNKNOWN_ERROR -> {
-                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-                                    showToast(context = context, message = "An unknown error occurred")
-                                }
-                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
-                            }
-                        }
-                        is Resource.Loading -> Log.i("Loading please wait", "wait")
-                        is Resource.Success -> Log.i("Success", "Success")
-                    }
-                }
-            }
+//            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
+//                val currentUserFlow = mainPageScreenModel.state.value.currentUser
+//                currentUserFlow.collect{
+//                    when(it){
+//                        is Resource.Error -> {
+//                            isLoading = false
+//                            when(it.error){
+//                                AuthException.BAD_CREDENTIALS -> {
+//                                    Log.i("Bad Cred","bad cred")
+//                                    showToast(context = context, message = "Invalid email or password")
+//                                }
+//                                AuthException.NO_NETWORK -> {
+//                                    Log.i("No Network","cool")
+//                                    showToast(context = context, message = "No network connection")
+//                                }
+//                                AuthException.UNKNOWN_ERROR -> {
+//                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+//                                    showToast(context = context, message = "An unknown error occurred")
+//                                }
+//                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
+//                            }
+//                        }
+//                        is Resource.Loading -> Log.i("Loading please wait", "wait")
+//                        is Resource.Success -> Log.i("Success", "Success")
+//                    }
+//                }
+//            }
 
-            if (isLoading) {
-                Dialog(onDismissRequest = {isLoading = false}) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier
-                        .size(100.dp)
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp),
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    }
-                }
-            }
+//            if (isLoading) {
+//                Dialog(onDismissRequest = {}) {
+//                    Box(contentAlignment = Alignment.Center, modifier = Modifier
+//                        .size(100.dp)
+//                        .background(Color.White, shape = RoundedCornerShape(8.dp))) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.size(64.dp),
+//                            color = MaterialTheme.colorScheme.secondary,
+//                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 
