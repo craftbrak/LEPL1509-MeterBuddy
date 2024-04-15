@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +51,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.google.firebase.auth.FirebaseAuth
 import ucl.student.meterbuddy.R
+import ucl.student.meterbuddy.data.model.enums.Currency
+import ucl.student.meterbuddy.data.utils.AuthException
+import ucl.student.meterbuddy.data.utils.Resource
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 
 
@@ -71,12 +77,14 @@ class RegisterScreen: Screen {
         var passwordMatchError by remember { mutableStateOf(false) }
         var emptyConfirmPassword by remember { mutableStateOf(false) }
 
-        val currencies = listOf("EUR (€)", "USD ($)", "GBP (£)", "JPY (¥)", "AUD ($)")
+        val currencies = Currency.entries.toTypedArray()
         var selectedCurrency by remember { mutableStateOf(currencies[0]) }
 
         val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         navigator = LocalNavigator.currentOrThrow
         var expanded by remember { mutableStateOf(false) }
+
+        var errorFirebase by remember { mutableStateOf("") }
         var isLoading by remember { mutableStateOf(false) }
 
         auth = mainPageScreenModel.auth
@@ -90,13 +98,23 @@ class RegisterScreen: Screen {
         ) {
             Spacer(modifier = Modifier.height(35.dp))
             Text(text = "Create an account", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            if (errorFirebase.isNotEmpty()) {
+                Text(
+                    text = errorFirebase,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 16.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth(),
-                isError = emptyUsername
+                isError = emptyUsername || errorFirebase.isNotEmpty()
             )
             if (emptyUsername) {
                 Text(
@@ -113,7 +131,8 @@ class RegisterScreen: Screen {
                 onValueChange = { email = it },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                isError = emailFormatError && email.isNotEmpty() || emptyEmail
+                isError = emailFormatError && email.isNotEmpty() || emptyEmail || errorFirebase.isNotEmpty(),
+                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) }
             )
             if (emptyEmail) {
                 Text(
@@ -151,7 +170,7 @@ class RegisterScreen: Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = emptyPassword
+                isError = emptyPassword || errorFirebase.isNotEmpty()
             )
             if (emptyPassword) {
                 Text(
@@ -181,7 +200,7 @@ class RegisterScreen: Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = passwordMatchError && confirmPassword.isNotEmpty() || emptyConfirmPassword
+                isError = passwordMatchError && confirmPassword.isNotEmpty() || emptyConfirmPassword || errorFirebase.isNotEmpty()
             )
             if (emptyConfirmPassword) {
                 Text(
@@ -207,7 +226,7 @@ class RegisterScreen: Screen {
             ) {
                 OutlinedTextField(
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    value = selectedCurrency,
+                    value = "${selectedCurrency.currencyCode} (${selectedCurrency.symbol})",
                     onValueChange = { },
                     label = { Text("Currency") },
                     readOnly = true,
@@ -218,7 +237,7 @@ class RegisterScreen: Screen {
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
                     currencies.forEachIndexed { index, currency ->
                         DropdownMenuItem(
-                            text = { Text(text = currency) },
+                            text = { Text(text = "${currency.currencyCode} (${currency.symbol})") },
                             onClick = {
                                 selectedCurrency = currencies[index]
                                 expanded = false
@@ -237,12 +256,23 @@ class RegisterScreen: Screen {
                 emptyPassword = password.isEmpty()
                 emptyConfirmPassword = confirmPassword.isEmpty()
                 passwordMatchError = password != confirmPassword
+                errorFirebase = ""
 
                 if (!passwordMatchError && !emailFormatError && !emptyEmail && !emptyPassword && !emptyUsername && !emptyConfirmPassword) {
                     isLoading = true
-                    mainPageScreenModel.registerUser(email, password)
-                }}, modifier = Modifier.width(350.dp)) {
-                Text("Register")
+                    val trimmedEmail = email.trim()
+                    mainPageScreenModel.registerUser(trimmedEmail, password, username, selectedCurrency)
+                }},
+                modifier = Modifier.width(350.dp)) {
+                if(isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                } else {
+                    Text("Register")
+                }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
                 Text(text = "Already have an account?", style = MaterialTheme.typography.bodyMedium)
@@ -251,9 +281,43 @@ class RegisterScreen: Screen {
                     Text(text = "Log in")
                 }
             }
-//            Button(onClick = { navigator.push(LoginScreen()) }) {
-//                Text(text = "Login")
-//            }
+
+            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
+                val currentUserFlow = mainPageScreenModel.state.value.currentUser
+                currentUserFlow.collect{
+                    when(it){
+                        is Resource.Error -> {
+                            isLoading = false
+                            when(it.error){
+                                AuthException.BAD_CREDENTIALS -> {
+                                    Log.i("Bad Cred","bad cred")
+//                                    showToast(context = context, message = "Invalid email or password")
+                                    errorFirebase = "Invalid email or password"
+                                }
+                                AuthException.NO_NETWORK -> {
+                                    Log.i("No Network","cool")
+//                                    showToast(context = context, message = "No network connection")
+                                    errorFirebase = "No network connection"
+                                }
+                                AuthException.UNKNOWN_ERROR -> {
+                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+//                                    showToast(context = context, message = "An unknown error occurred")
+                                    errorFirebase = "An unknown error occurred"
+                                }
+                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
+                                AuthException.TO_MANY_ATTEMPT -> {
+                                    Log.i("LoginScreen","To MAny attempts")
+//                                    showToast(context = context, message = "Too many attempt try again later")
+                                    errorFirebase = "Too many attempt, try again later"
+                                }
+                            }
+                        }
+                        is Resource.Loading -> Log.i("Loading please wait", "wait")
+                        is Resource.Success -> Log.i("Success", "Success")
+                    }
+                }
+            }
+
         }
     }
 }
