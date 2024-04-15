@@ -14,7 +14,7 @@ interface MeterRepository {
     fun getMeters() : Flow<List<Meter>>
 
     fun getMeterReadings(id: Int): Flow<List<MeterReading>>
-    fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>>
+    fun getMeterAndReadings(housing: Housing): Flow<Map<Meter, List<MeterReading>>>
 
     suspend fun addMeter(meter: Meter)
 
@@ -30,7 +30,7 @@ interface MeterRepository {
 
     fun filteredMetersByType(meters: List<Meter>, type: MeterType): List<Meter>
 
-    fun getHousing():Flow<List<Resource<Housing, DataException>>>
+    fun getHousing(): Flow<Resource<List<Housing>, DataException>>
     fun addHousing(housing: Housing)
     fun updateHousing(housing: Housing)
     fun deleteHousing(housing: Housing)
@@ -38,6 +38,6 @@ interface MeterRepository {
     fun addUserToHousing(housing: Housing, user: User)
     fun removeUserFromHousing(housing: Housing, user: User)
 
-    fun getUsers(): List<Resource<User, DataException>>
+    fun getUsers(): Resource<List<User>, DataException>
     fun addUserData(user: User)
 }

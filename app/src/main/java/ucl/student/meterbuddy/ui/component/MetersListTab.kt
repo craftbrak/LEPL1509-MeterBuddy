@@ -125,7 +125,7 @@ class MeterList : Screen {
                         100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                     }
 
-                    Log.d("TREND", "$recentReadingValue")
+//                    Log.d("TREND", "$recentReadingValue")
 
                     val trendIcon: TrendIcon = if (trendValue == 0.0f) { TrendIcon.Flat }
                     else if (trendValue > 0.0f) { TrendIcon.Up }

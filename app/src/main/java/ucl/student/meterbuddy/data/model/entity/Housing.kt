@@ -8,8 +8,8 @@ import ucl.student.meterbuddy.data.model.enums.HousingType
 @Entity
 data class Housing (
     @PrimaryKey(autoGenerate = true) val housingID: Int = 0,
-    val housingName: String,
-    val housingType: HousingType,
-    val housingSurface: Int,
-    val housingNbPersons: Int
+    val housingName: String = "My Home",
+    val housingType: HousingType = HousingType.House,
+    val housingSurface: Int = 50,
+    val housingNbPersons: Int = 2
 )

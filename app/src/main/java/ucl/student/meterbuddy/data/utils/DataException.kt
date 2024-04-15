@@ -4,5 +4,6 @@ enum class DataException: MeterBuddyException {
     NO_NETWORK,
     BAD_REQUEST,
     UNAUTHORIZED,
-    UNKNONW_ERROR
+    UNKNONW_ERROR,
+    NO_DATA
 }

@@ -7,6 +7,6 @@ import ucl.student.meterbuddy.data.model.enums.Currency
 @Entity
 data class User (
     @PrimaryKey(autoGenerate = true) val userID: Int,
-    val userName: String,
-    val userCurrency: Currency
+    val userName: String = "Default_User",
+    val userCurrency: Currency = Currency.EUR
 )

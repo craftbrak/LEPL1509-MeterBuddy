@@ -28,7 +28,7 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         userDao.updateMeter(meter)
     }
 
-    override fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>> {
+    override fun getMeterAndReadings(housing: Housing): Flow<Map<Meter, List<MeterReading>>> {
         return userDao.getMeterSAndReadings()
     }
 
@@ -36,7 +36,7 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         userDao.deleteMeter(meter)
     }
 
-    override fun getHousing(): Flow<List<Resource<Housing, DataException>>> {
+    override fun getHousing(): Flow<Resource<List<Housing>, DataException>> {
         TODO("Not yet implemented")
     }
 
@@ -60,7 +60,7 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getUsers(): List<Resource<User, DataException>> {
+    override fun getUsers(): Resource<List<User>, DataException> {
         TODO("Not yet implemented")
     }
 

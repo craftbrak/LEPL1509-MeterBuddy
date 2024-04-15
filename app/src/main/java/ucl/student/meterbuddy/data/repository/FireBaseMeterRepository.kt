@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirestore) :
     MeterRepository {
-    private val meterCollection = db.collection("meters")
+    private var meterCollection = db.collection("meters")
     private val typeConverters = TypeConverters()
 
 
@@ -44,17 +44,19 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         awaitClose { subscription.remove() }
     }
 
-    override fun getHousing(): Flow<List<Resource<Housing, DataException>>> = callbackFlow {
+    override fun getHousing(): Flow<Resource<List<Housing>, DataException>> = callbackFlow {
         val subscription = db.collection("housings").addSnapshotListener { snapshot, error ->
             if (error != null) {
-                trySend(listOf(Resource.Error<Housing, DataException>(DataException.UNKNONW_ERROR)))
+                trySend(Resource.Error(DataException.UNKNONW_ERROR))
             }
             snapshot?.documents?.mapNotNull {
                 it.toObject<Housing>()
-            }?.map { housing -> Success<Housing, DataException>(housing) }?.let {
-                trySend(
-                    it
-                ).isSuccess
+            }?.let {
+                if (it.isEmpty()) {
+                    trySend(Resource.Error(DataException.NO_DATA))
+                } else {
+                    trySend(Success(it)).isSuccess
+                }
             }
         }
         awaitClose{ subscription.remove()}
@@ -89,15 +91,15 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         db.collection("housings").document(housing.housingID.toString()).collection("members").document(user.userID.toString()).delete()
     }
 
-    override fun getUsers(): List<Resource<User,DataException>> {
-        val users = mutableListOf<Resource<User,DataException>>()
+    override fun getUsers(): Resource<List<User>,DataException> {
+        val users = mutableListOf<User>()
         db.collection("users").get().addOnSuccessListener { result ->
             for (document in result) {
                 val user = document.toObject<User>()
-                users.add(Success(user))
+                users.add(user)
             }
         }
-        return users
+        return Success(users.toList())
     }
     override fun addUserData(user: User){
         db.collection("users").document(user.userID.toString()).set(user)
@@ -118,9 +120,9 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
             }
                 awaitClose { subscription.remove() }
     }
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getMeterAndReadings(): Flow<Map<Meter, List<MeterReading>>> {
+    override fun getMeterAndReadings(housing: Housing): Flow<Map<Meter, List<MeterReading>>> {
+        meterCollection = db.collection("housings").document(housing.housingID.toString()).collection("meters")
         return getMeters().flatMapLatest { meters ->
             combine(meters.map { meter ->
                 getMeterReadings(meter.meterID).map { readings ->
