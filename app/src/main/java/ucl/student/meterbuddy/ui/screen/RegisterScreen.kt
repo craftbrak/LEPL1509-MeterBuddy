@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -114,7 +116,10 @@ class RegisterScreen: Screen {
                 onValueChange = { username = it },
                 label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth(),
-                isError = emptyUsername || errorFirebase.isNotEmpty()
+                isError = emptyUsername || errorFirebase.isNotEmpty(),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
             if (emptyUsername) {
                 Text(
@@ -132,7 +137,10 @@ class RegisterScreen: Screen {
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 isError = emailFormatError && email.isNotEmpty() || emptyEmail || errorFirebase.isNotEmpty(),
-                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) }
+                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
             if (emptyEmail) {
                 Text(
@@ -170,7 +178,10 @@ class RegisterScreen: Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = emptyPassword || errorFirebase.isNotEmpty()
+                isError = emptyPassword || errorFirebase.isNotEmpty(),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
             if (emptyPassword) {
                 Text(
@@ -200,7 +211,10 @@ class RegisterScreen: Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = passwordMatchError && confirmPassword.isNotEmpty() || emptyConfirmPassword || errorFirebase.isNotEmpty()
+                isError = passwordMatchError && confirmPassword.isNotEmpty() || emptyConfirmPassword || errorFirebase.isNotEmpty(),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                )
             )
             if (emptyConfirmPassword) {
                 Text(
