@@ -75,6 +75,7 @@ class LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
+        var errorFirebase by remember { mutableStateOf("") }
         var isLoading by remember { mutableStateOf(false) }
 
         Column(
@@ -96,13 +97,24 @@ class LoginScreen : Screen {
             Text(text = "Welcome", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
 //            Spacer(modifier = Modifier.height(15.dp))
             Text(text = "Enter your email address to sign in", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            if (errorFirebase.isNotEmpty()) {
+                Text(
+                    text = errorFirebase,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 16.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                isError = emptyEmail || emailFormatError && email.isNotEmpty()
+                isError = emptyEmail || emailFormatError && email.isNotEmpty() || errorFirebase.isNotEmpty(),
+                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) }
             )
             if (emptyEmail) {
                 Text(
@@ -140,7 +152,7 @@ class LoginScreen : Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = emptyPassword,
+                isError = emptyPassword || errorFirebase.isNotEmpty()
             )
             if (emptyPassword) {
                 Text(
@@ -156,10 +168,12 @@ class LoginScreen : Screen {
                 emptyEmail = email.isEmpty()
                 emailFormatError = email.contains("@").not() || email.contains(".").not()
                 emptyPassword = password.isEmpty()
+                errorFirebase = ""
 
-                if (!emptyEmail && !emptyPassword) {
+                if (!emptyEmail && !emptyPassword && !emailFormatError) {
                     isLoading = true
-                    mainPageScreenModel.loginUser(email, password)
+                    val trimmedEmail = email.trim()
+                    mainPageScreenModel.loginUser(trimmedEmail, password)
                 }
                 },
                 modifier = Modifier.width(350.dp)) {
@@ -193,20 +207,24 @@ class LoginScreen : Screen {
                             when(it.error){
                                 AuthException.BAD_CREDENTIALS -> {
                                     Log.i("Bad Cred","bad cred")
-                                    showToast(context = context, message = "Invalid email or password")
+//                                    showToast(context = context, message = "Invalid email or password")
+                                    errorFirebase = "Invalid email or password"
                                 }
                                 AuthException.NO_NETWORK -> {
                                     Log.i("No Network","cool")
-                                    showToast(context = context, message = "No network connection")
+//                                    showToast(context = context, message = "No network connection")
+                                    errorFirebase = "No network connection"
                                 }
                                 AuthException.UNKNOWN_ERROR -> {
                                     Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-                                    showToast(context = context, message = "An unknown error occurred")
+//                                    showToast(context = context, message = "An unknown error occurred")
+                                    errorFirebase = "An unknown error occurred"
                                 }
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                                 AuthException.TO_MANY_ATTEMPT -> {
                                     Log.i("LoginScreen","To MAny attempts")
-                                    showToast(context = context, message = "Too many attempt try again later")
+//                                    showToast(context = context, message = "Too many attempt try again later")
+                                    errorFirebase = "Too many attempt, try again later"
                                 }
                             }
                         }
