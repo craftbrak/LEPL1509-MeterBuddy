@@ -39,5 +39,8 @@ interface MeterRepository {
     fun removeUserFromHousing(housing: Housing, user: User)
 
     fun getUsers(): Resource<List<User>, DataException>
+    fun getUser(id: String): Resource<User, DataException>
     fun addUserData(user: User)
+    fun setHomeAndUser(housing : Housing, userId: String)
+    fun setHomeCollection(userId: String)
 }

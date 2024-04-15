@@ -67,9 +67,9 @@ class MainPageScreenModel @Inject constructor(
 
     private fun updateState() {
         viewModelScope.launch {
-            authRepository.getUser().collect {
-                _state.value.currentUser.emit(it)
-                when(it){
+            authRepository.getUser().collect { firebaseUserResource ->
+                _state.value.currentUser.emit(firebaseUserResource)
+                when(firebaseUserResource){
                     is Resource.Error -> {
                         Log.w("MainPageScreenModel", "No User")
                     }
@@ -77,7 +77,8 @@ class MainPageScreenModel @Inject constructor(
                         Log.d("MainPageScreenModel", "Loading")
                     }
                     is Resource.Success -> {
-                        Log.d("MainPageScreenModel", "User: ${it.data.email}")
+                        Log.d("MainPageScreenModel", "User: ${firebaseUserResource.data.email}")
+                        meterRepository.setHomeCollection(firebaseUserResource.data.uid)
                         meterRepository.getHousing().collect { housingRessource ->
                             when (housingRessource) {
                                 is Resource.Error -> {
@@ -91,22 +92,10 @@ class MainPageScreenModel @Inject constructor(
                                             _state.value = state.value.copy(
                                                 selectedHousing = Resource.Error(NO_DATA)
                                             )
-                                            state.value.currentUser.collect{
-                                                when(it){
-                                                    is Resource.Error -> {
-                                                        Log.w("MainPageScreenModel", "No User")
-                                                    }
-                                                    is Resource.Loading -> {
-                                                        Log.d("MainPageScreenModel", "Loading")
-                                                    }
-                                                    is Resource.Success -> {
-                                                        val defaultHousing = Housing(housingID = UUID.randomUUID().hashCode())
-                                                        meterRepository.addHousing(defaultHousing)
-                                                        meterRepository.addUserData(User(it.data.uid.hashCode(), it.data.email!!, Currency.EUR))
-                                                        meterRepository.addUserToHousing(defaultHousing, User(it.data.uid.hashCode(), it.data.email!!, Currency.EUR))
-                                                    }
-                                                }
-                                            }
+                                            val defaultHousing = Housing(housingID = UUID.randomUUID().hashCode())
+                                            meterRepository.addHousing(defaultHousing)
+                                            meterRepository.addUserData(User(firebaseUserResource.data.uid.hashCode(), firebaseUserResource.data.email!!, Currency.EUR))
+                                            meterRepository.addUserToHousing(defaultHousing, User(firebaseUserResource.data.uid.hashCode(), firebaseUserResource.data.email!!, Currency.EUR))
                                         }
                                     }
 
@@ -122,6 +111,7 @@ class MainPageScreenModel @Inject constructor(
                                             selectedHousing = Resource.Success(housingRessource.data.first()),
                                             housings = housingRessource.data
                                         )
+                                        meterRepository.setHomeAndUser(housingRessource.data.first(),firebaseUserResource.data.uid)
                                         meterRepository.getMeterAndReadings(housingRessource.data.first()).collect {
                                             _state.value = state.value.copy(
                                                 meters = it.keys.toList(),

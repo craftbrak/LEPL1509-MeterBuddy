@@ -64,7 +64,19 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
+    override fun getUser(id: String): Resource<User, DataException> {
+        TODO("Not yet implemented")
+    }
+
     override fun addUserData(user: User) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setHomeAndUser(housing: Housing, userId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setHomeCollection(userId: String) {
         TODO("Not yet implemented")
     }
 

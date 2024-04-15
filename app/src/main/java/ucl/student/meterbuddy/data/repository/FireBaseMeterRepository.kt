@@ -28,6 +28,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     MeterRepository {
     private var meterCollection = db.collection("meters")
     private val typeConverters = TypeConverters()
+    private var housingCollection = db.collection("housings")
 
 
     override fun getMeters(): Flow<List<Meter>> = callbackFlow {
@@ -52,7 +53,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     }
 
     override fun getHousing(): Flow<Resource<List<Housing>, DataException>> = callbackFlow {
-        val subscription = db.collection("housings").addSnapshotListener { snapshot, error ->
+        val subscription = housingCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.e("MeterRepo", error.toString())
                 trySend(Resource.Error(DataException.UNKNONW_ERROR))
@@ -79,19 +80,19 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
                 housingID = uniqueHousingId
             )
         }else housing
-        db.collection("housings").document(house.housingID.toString()).set(house)
+        housingCollection.document(house.housingID.toString()).set(house)
     }
 
     override fun updateHousing(housing: Housing) {
-        db.collection("housings").document(housing.housingID.toString()).set(housing, SetOptions.merge())
+        housingCollection.document(housing.housingID.toString()).set(housing, SetOptions.merge())
     }
 
     override fun deleteHousing(housing: Housing) {
-        db.collection("housings").document(housing.housingID.toString()).delete()
+        housingCollection.document(housing.housingID.toString()).delete()
     }
 
     override fun addUserToHousing(housing: Housing, user: User) {
-        db.collection("housings").document(housing.housingID.toString()).collection("members").document(user.userID.toString()).set(user)
+        housingCollection.document(housing.housingID.toString()).collection("members").document(user.userID.toString()).set(user)
         db.collection("users").document(user.userID.toString()).collection("housings").document(housing.housingID.toString()).set(housing)
     }
 
@@ -142,6 +143,23 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
             }
         }
     }
+
+    override fun getUser(id: String): Resource<User, DataException> {
+        var user: Resource<User, DataException> = Resource.Error(DataException.NO_DATA)
+        db.collection("users").document(id).get().addOnSuccessListener { result ->
+            user = Success(result.toObject<User>()!!)
+        }
+        return user
+    }
+
+    override fun setHomeAndUser(housing: Housing, userId: String) {
+        meterCollection = db.collection("users").document(userId).collection("housings").document(housing.housingID.toString()).collection("meters")
+    }
+
+    override fun setHomeCollection(userId: String) {
+        housingCollection = db.collection("users").document(userId).collection("housings")
+    }
+
     override suspend fun addMeter(meter: Meter) {
         // Generate a unique UUID
         val uuid = UUID.randomUUID()
