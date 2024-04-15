@@ -271,8 +271,6 @@ class MainPageScreenModel @Inject constructor(
 
                     is Resource.Loading -> {
                         _state.value.currentUser.value = Resource.Loading()
-                        Log.w("Login", "Loading")
-                        _state.value.currentUser.emit(Resource.Loading())
                     }
 
                     is Resource.Success -> {
@@ -289,12 +287,12 @@ class MainPageScreenModel @Inject constructor(
             authRepository.registerUser(email, password).collect {
                 when (it) {
                     is Resource.Error -> {
-                        Log.e("Login Error", it.error.toString())
+                        Log.e("Main Page Screen Model Login Error", it.error.toString())
                         _state.value.currentUser.emit(Resource.Error(it.error))
                     }
 
                     is Resource.Loading -> {
-                        Log.w("Login", "Loading")
+                        _state.value.currentUser.value = Resource.Loading()
                     }
 
                     is Resource.Success -> {
