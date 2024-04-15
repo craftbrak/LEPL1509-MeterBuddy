@@ -1,6 +1,8 @@
 package ucl.student.meterbuddy.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +33,12 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     override fun getMeters(): Flow<List<Meter>> = callbackFlow {
         val subscription = meterCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                Log.e("MeterRepo", error.toString())
+                if (error.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                    throw Exception("FirebaseFirestoreException")
+                } else {
+                    close(error)
+                }
                 return@addSnapshotListener
             }
 
@@ -47,6 +54,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     override fun getHousing(): Flow<Resource<List<Housing>, DataException>> = callbackFlow {
         val subscription = db.collection("housings").addSnapshotListener { snapshot, error ->
             if (error != null) {
+                Log.e("MeterRepo", error.toString())
                 trySend(Resource.Error(DataException.UNKNONW_ERROR))
             }
             snapshot?.documents?.mapNotNull {
@@ -108,6 +116,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         val subscription = meterCollection.document(id.toString()).collection("readings")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
+                    Log.e("MeterRepo", error.toString())
                     close(error)
                     return@addSnapshotListener
                 }

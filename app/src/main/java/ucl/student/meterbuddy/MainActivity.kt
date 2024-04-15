@@ -8,8 +8,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -22,7 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
@@ -64,21 +74,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {}
-        val user = FirebaseAuth.getInstance().currentUser
-
-//        when(mainPageScreenModel.state.value.currentUser.value){
-//            is Resource.Error -> {
-//                val intent= Intent(this, AuthActivity::class.java)
-//                startActivity(intent)
-//            }
-//            is Resource.Loading -> {
-//                //TODO: Display Loading screen
-//
-//            }
-//            is Resource.Success -> {
-//
-//            }
-//        }
         setContent {
             val navController = rememberNavController()
             MeterBuddyTheme{
@@ -94,6 +89,21 @@ class MainActivity : ComponentActivity() {
                             auth()
                         }
                         composable("loading"){
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Image(
+                                    painter = painterResource(id = R.drawable.meter_budy_logo),
+                                    contentDescription = "App Logo",
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
 
                         }
                         composable("home"){
@@ -118,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                 AuthException.TO_MANY_ATTEMPT -> Log.i("MainActivity","ToMAnyAttempt")
                             }
                             // Clear the back stack before navigating to the login screen
-
+                            Log.w("MainActivity","auth error")
                             navController.navigate("auth"){
                                 popUpTo(navController.graph.id)
                             }

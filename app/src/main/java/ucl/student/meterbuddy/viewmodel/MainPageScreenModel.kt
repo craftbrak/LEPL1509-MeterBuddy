@@ -57,7 +57,12 @@ class MainPageScreenModel @Inject constructor(
     val auth = Firebase.auth
 
     init {
-        updateState()
+        try{
+            updateState()
+        }
+        catch(e : Throwable){
+            e.message?.let { Log.e("MainPageScreenModel", it) }
+        }
     }
 
     private fun updateState() {
@@ -318,7 +323,10 @@ class MainPageScreenModel @Inject constructor(
 
     fun logout() {
         authRepository.logout()
-//        _state.value.currentUser.value = Resource.Error(AuthException.NO_CURRENT_USER)
+        viewModelScope.launch {
+            state.value.currentUser.emit(Resource.Error(AuthException.NO_CURRENT_USER))
+        }
+        Log.d("MainScreenModel","Loggued out")
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->
