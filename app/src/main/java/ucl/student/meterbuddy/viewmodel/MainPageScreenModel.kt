@@ -282,7 +282,7 @@ class MainPageScreenModel @Inject constructor(
         }
     }
 
-    fun registerUser(email: String, password: String) {
+    fun registerUser(email: String, password: String, username: String, selectedCurrency: Currency) {
         viewModelScope.launch {
             authRepository.registerUser(email, password).collect {
                 when (it) {
@@ -297,7 +297,7 @@ class MainPageScreenModel @Inject constructor(
 
                     is Resource.Success -> {
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
-                        val userData = User(it.data.user!!.uid.hashCode(), email, Currency.EUR)
+                        val userData = User(it.data.user!!.uid.hashCode(), username, selectedCurrency)
                         meterRepository.addUserData(userData)
                         val defaultHousing = Housing(
                             0,
