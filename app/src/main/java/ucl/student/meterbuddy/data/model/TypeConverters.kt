@@ -20,7 +20,7 @@ class TypeConverters {
 
     @TypeConverter
     fun fromHousingType(housingType: HousingType): String {
-        return housingType.type
+        return housingType.name
     }
 
     @TypeConverter
@@ -30,7 +30,7 @@ class TypeConverters {
 
     @TypeConverter
     fun fromCurrency(currency: Currency): String {
-        return currency.symbol
+        return currency.name
     }
 
     @TypeConverter
@@ -50,7 +50,7 @@ class TypeConverters {
 
     @TypeConverter
     fun fromUnit(meterUnit: MeterUnit): String {
-        return meterUnit.unit
+        return meterUnit.name
     }
 
     @TypeConverter
@@ -60,7 +60,7 @@ class TypeConverters {
 
     @TypeConverter
     fun fromMeterIcon(icon: MeterIcon): String {
-        return icon.iconName
+        return icon.name
     }
 
     @TypeConverter
@@ -70,7 +70,7 @@ class TypeConverters {
 
     @TypeConverter
     fun fromRole(role: Role): String {
-        return role.role
+        return role.name
     }
 
     @TypeConverter
@@ -79,7 +79,7 @@ class TypeConverters {
     }
     @TypeConverter
     fun fromMeterType(meterType: MeterType): String {
-        return meterType.type
+        return meterType.name
     }
 
     @TypeConverter

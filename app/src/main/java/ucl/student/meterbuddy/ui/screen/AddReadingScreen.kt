@@ -114,10 +114,11 @@ data class AddReadingScreen(
                 EditDateButton(showDialog, datePickerState, formatter)
 
                 OutlinedTextField(
-                    value = reading,
+                    value = if (reading != "null") { reading } else { "" },
                     onValueChange = { reading = it },
                     label = { Text("Reading Value") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    placeholder = { if (reading == "null") {Text("0.0")} }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))

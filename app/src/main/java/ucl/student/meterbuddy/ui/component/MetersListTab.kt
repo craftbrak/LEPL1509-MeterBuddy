@@ -117,15 +117,23 @@ class MeterList : Screen {
             ) {
                 items(mainPageScreenModel.state.value.meters) { meter ->
                     val readings = mainPageScreenModel.state.value.lastReading[meter.meterID]
-                    val recentReadingValue = readings?.lastOrNull()?.value
+                    // val recentReadingValue = readings?.lastOrNull()?.value
+
+                    // val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
+                    // else {
+                    //     val oldReadingValue = readings?.get(readings.size - 2)?.value
+                    //  100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
+                    // }
+
+//                    Log.d("TREND", "$recentReadingValue")
+
+                    val recentReadingValue = readings?.firstOrNull()?.value
 
                     val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
                     else {
-                        val oldReadingValue = readings?.get(readings.size - 2)?.value
+                        val oldReadingValue = readings?.get(1)?.value
                         100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                     }
-
-//                    Log.d("TREND", "$recentReadingValue")
 
                     val trendIcon: TrendIcon = if (trendValue == 0.0f) { TrendIcon.Flat }
                     else if (trendValue > 0.0f) { TrendIcon.Up }
