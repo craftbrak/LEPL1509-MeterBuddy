@@ -4,5 +4,6 @@ enum class AuthException : MeterBuddyException {
     BAD_CREDENTIALS,
     NO_NETWORK,
     UNKNOWN_ERROR,
-    NO_CURRENT_USER
+    NO_CURRENT_USER,
+    TO_MANY_ATTEMPT
 }

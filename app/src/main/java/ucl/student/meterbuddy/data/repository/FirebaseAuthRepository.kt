@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -31,8 +32,11 @@ class FirebaseAuthRepository @Inject constructor(
             val res = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             emit(Resource.Success<AuthResult, AuthException>(res))
         }.catch { throwable ->
+            throwable.message?.let { Log.e("AuthRepo", it) }
             when (throwable.message) {
                 ("Invalid Credentials") -> emit(Resource.Error(AuthException.BAD_CREDENTIALS))
+                ("The supplied auth credential is incorrect, malformed or has expired.")-> emit(Resource.Error(AuthException.BAD_CREDENTIALS))
+                ("We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]")-> emit(Resource.Error(AuthException.TO_MANY_ATTEMPT))
                 ("No network") -> emit(Resource.Error(AuthException.NO_NETWORK))
                 else -> emit(Resource.Error(AuthException.UNKNOWN_ERROR))
             }

@@ -115,6 +115,7 @@ class MainActivity : ComponentActivity() {
                                 AuthException.NO_NETWORK -> Log.i("No Network","cool")
                                 AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
+                                AuthException.TO_MANY_ATTEMPT -> Log.i("MainActivity","ToMAnyAttempt")
                             }
                             // Clear the back stack before navigating to the login screen
 

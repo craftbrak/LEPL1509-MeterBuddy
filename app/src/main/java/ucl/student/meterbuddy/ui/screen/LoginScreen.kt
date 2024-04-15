@@ -163,7 +163,16 @@ class LoginScreen : Screen {
                 }
                 },
                 modifier = Modifier.width(350.dp)) {
-                Text("Login")
+                if(isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                }else{
+                    Text("Login")
+                }
+
             }
 //            Spacer(modifier = Modifier.height(20.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
@@ -175,33 +184,37 @@ class LoginScreen : Screen {
             }
 
 
-//            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
-//                val currentUserFlow = mainPageScreenModel.state.value.currentUser
-//                currentUserFlow.collect{
-//                    when(it){
-//                        is Resource.Error -> {
-//                            isLoading = false
-//                            when(it.error){
-//                                AuthException.BAD_CREDENTIALS -> {
-//                                    Log.i("Bad Cred","bad cred")
-//                                    showToast(context = context, message = "Invalid email or password")
-//                                }
-//                                AuthException.NO_NETWORK -> {
-//                                    Log.i("No Network","cool")
-//                                    showToast(context = context, message = "No network connection")
-//                                }
-//                                AuthException.UNKNOWN_ERROR -> {
-//                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-//                                    showToast(context = context, message = "An unknown error occurred")
-//                                }
-//                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
-//                            }
-//                        }
-//                        is Resource.Loading -> Log.i("Loading please wait", "wait")
-//                        is Resource.Success -> Log.i("Success", "Success")
-//                    }
-//                }
-//            }
+            LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
+                val currentUserFlow = mainPageScreenModel.state.value.currentUser
+                currentUserFlow.collect{
+                    when(it){
+                        is Resource.Error -> {
+                            isLoading = false
+                            when(it.error){
+                                AuthException.BAD_CREDENTIALS -> {
+                                    Log.i("Bad Cred","bad cred")
+                                    showToast(context = context, message = "Invalid email or password")
+                                }
+                                AuthException.NO_NETWORK -> {
+                                    Log.i("No Network","cool")
+                                    showToast(context = context, message = "No network connection")
+                                }
+                                AuthException.UNKNOWN_ERROR -> {
+                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+                                    showToast(context = context, message = "An unknown error occurred")
+                                }
+                                AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
+                                AuthException.TO_MANY_ATTEMPT -> {
+                                    Log.i("LoginScreen","To MAny attempts")
+                                    showToast(context = context, message = "Too many attempt try again later")
+                                }
+                            }
+                        }
+                        is Resource.Loading -> Log.i("Loading please wait", "wait")
+                        is Resource.Success -> Log.i("Success", "Success")
+                    }
+                }
+            }
 
 //            if (isLoading) {
 //                Dialog(onDismissRequest = {}) {

@@ -224,7 +224,6 @@ class MainPageScreenModel @Inject constructor(
         return readingsConverted
     }
 
-    // TODO ( To Implement ! )
     private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
         if (meterUnit == MeterUnit.CENTIMETER) {
             if (finalMeterUnit == MeterUnit.CUBIC_METER) {
@@ -267,11 +266,13 @@ class MainPageScreenModel @Inject constructor(
                 when (it) {
                     is Resource.Error -> {
                         Log.e("Login Error", it.error.toString())
+                        _state.value.currentUser.emit(Resource.Error(it.error))
                     }
 
                     is Resource.Loading -> {
                         _state.value.currentUser.value = Resource.Loading()
                         Log.w("Login", "Loading")
+                        _state.value.currentUser.emit(Resource.Loading())
                     }
 
                     is Resource.Success -> {
@@ -289,6 +290,7 @@ class MainPageScreenModel @Inject constructor(
                 when (it) {
                     is Resource.Error -> {
                         Log.e("Login Error", it.error.toString())
+                        _state.value.currentUser.emit(Resource.Error(it.error))
                     }
 
                     is Resource.Loading -> {
