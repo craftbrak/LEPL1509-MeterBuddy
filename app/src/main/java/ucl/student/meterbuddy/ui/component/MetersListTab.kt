@@ -58,6 +58,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.FadeTransition
+import co.yml.charts.common.extensions.isNotNull
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
@@ -178,7 +179,9 @@ class MeterList : Screen {
                                 modifier = Modifier.padding(10.dp),
                                 meterName = meter.meterName,
                                 meterIcon = meter.meterIcon,
-                                lastReading = recentReadingValue.toString(),
+                                lastReading = if (recentReadingValue.isNotNull()) {
+                                    recentReadingValue.toString()
+                                }else null,
                                 readingUnit = meter.meterUnit.unit,
                                 trendIcon = trendIcon,
                                 trendValue = trendValue,
