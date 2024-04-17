@@ -99,6 +99,7 @@ class MainPageScreenModel @Inject constructor(
 //                                                    Currency.EUR
 //                                                )
 //                                            )
+                                            Log.wtf("UpdateState", "No housings")
                                             _state.value = state.value.copy(
                                                 selectedHousing = Resource.Error(NO_DATA),
                                                 housings = emptyList()
@@ -109,19 +110,24 @@ class MainPageScreenModel @Inject constructor(
                                 }
 
                                 is Resource.Loading -> {
-
+                                    Log.wtf("UpdateState", "Loading housings")
                                 }
 
                                 is Resource.Success -> {
                                     if (housingRessource.data.isNotEmpty()) {
-                                        _state.value = state.value.copy(
-                                            selectedHousing = Resource.Success(housingRessource.data.first()),
-                                            housings = housingRessource.data
-                                        )
                                         //TODO: store selected housing ID in localpref and if set use this housing by default
+                                        val selectedHousing = when(state.value.selectedHousing){
+                                            is Resource.Error -> housingRessource.data.first()
+                                            is Resource.Loading -> housingRessource.data.first()
+                                            is Resource.Success -> (state.value.selectedHousing as Resource.Success<Housing, DataException>).data
+                                        }
+                                        _state.value = state.value.copy(
+                                                selectedHousing = Resource.Success(selectedHousing),
+                                        housings = housingRessource.data
+                                        )
                                         meterRepository.setHomeAndUser(
-                                            housingRessource.data.first(),
-                                            firebaseUserResource.data.uid
+                                            selectedHousing,
+                                            firebaseUserResource.data.uid.hashCode().toString()
                                         )
                                         meterRepository.getMeterAndReadings(housingRessource.data.first())
                                             .collect {
@@ -338,9 +344,10 @@ class MainPageScreenModel @Inject constructor(
     }
 
     fun selectHousing(housing: Housing) {
-        _state.value.copy(
+        _state.value=_state.value.copy(
             selectedHousing = Resource.Success(housing)
         )
+        updateState()
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->

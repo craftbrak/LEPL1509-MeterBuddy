@@ -132,7 +132,6 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     }
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getMeterAndReadings(housing: Housing): Flow<Map<Meter, List<MeterReading>>> {
-        meterCollection = db.collection("housings").document(housing.housingID.toString()).collection("meters")
         return getMeters().flatMapLatest { meters ->
             combine(meters.map { meter ->
                 getMeterReadings(meter.meterID).map { readings ->
@@ -154,10 +153,12 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
 
     override fun setHomeAndUser(housing: Housing, userId: String) {
         meterCollection = db.collection("users").document(userId).collection("housings").document(housing.housingID.toString()).collection("meters")
+        Log.d("SetHomeAndUser",meterCollection.path)
     }
 
     override fun setHomeCollection(userId: String) {
         housingCollection = db.collection("users").document(userId).collection("housings")
+        Log.d("SetHome",housingCollection.path)
     }
 
     override suspend fun addMeter(meter: Meter) {
