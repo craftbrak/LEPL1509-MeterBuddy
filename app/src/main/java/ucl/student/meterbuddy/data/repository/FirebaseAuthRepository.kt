@@ -38,6 +38,7 @@ class FirebaseAuthRepository @Inject constructor(
                 ("The supplied auth credential is incorrect, malformed or has expired.")-> emit(Resource.Error(AuthException.BAD_CREDENTIALS))
                 ("We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]")-> emit(Resource.Error(AuthException.TO_MANY_ATTEMPT))
                 ("No network") -> emit(Resource.Error(AuthException.NO_NETWORK))
+                ("A network error (such as timeout, interrupted connection or unreachable host) has occurred.") -> emit(Resource.Error(AuthException.NO_NETWORK))
                 else -> emit(Resource.Error(AuthException.UNKNOWN_ERROR))
             }
         }
@@ -55,6 +56,8 @@ class FirebaseAuthRepository @Inject constructor(
             when (it.message) {
                 ("Invalid Credentials") -> emit(Resource.Error(AuthException.BAD_CREDENTIALS))
                 ("No network") -> emit(Resource.Error(AuthException.NO_NETWORK))
+                ("We have blocked all requests from this device due to unusual activity. Try again later. [ Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. ]")-> emit(Resource.Error(AuthException.TO_MANY_ATTEMPT))
+                ("A network error (such as timeout, interrupted connection or unreachable host) has occurred.") -> emit(Resource.Error(AuthException.NO_NETWORK))
                 else -> emit(Resource.Error(AuthException.UNKNOWN_ERROR))
             }
         }
