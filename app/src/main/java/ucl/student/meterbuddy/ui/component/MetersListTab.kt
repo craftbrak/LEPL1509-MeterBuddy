@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
@@ -69,6 +69,7 @@ import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import java.util.Optional
 
 object MetersListTab : Tab {
+    private fun readResolve(): Any = MetersListTab
     override val options: TabOptions
         @Composable
         get() {
@@ -436,7 +437,7 @@ class MeterList : Screen {
             title = { Text(stringResource(id = R.string.meter_menu)) },
             actions = {
                 IconButton(onClick = { onDisconnectClick() }) {
-                    Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Logout")
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
                 }
             }
         )

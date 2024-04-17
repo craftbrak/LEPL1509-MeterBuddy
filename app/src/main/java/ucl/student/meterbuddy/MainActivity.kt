@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = "loading") {
                         composable("auth"){
-                            auth()
+                            Auth()
                         }
                         composable("loading"){
                             Column(
@@ -155,7 +155,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     @Composable
-    private fun auth(){
+    private fun Auth(){
         Navigator(screen = LoginScreen()) {
             SlideTransition(navigator = it)
         }

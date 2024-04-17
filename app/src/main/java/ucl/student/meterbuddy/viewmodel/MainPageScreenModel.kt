@@ -228,31 +228,35 @@ class MainPageScreenModel @Inject constructor(
         }
         return readingsConverted
     }
-
-    private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
+    @Throws(Error::class)
+    private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float{
         if (meterUnit == MeterUnit.CENTIMETER) {
-            when (finalMeterUnit) {
+            return when (finalMeterUnit) {
                 MeterUnit.CUBIC_METER -> {
-                    return 1.3f
+                    1.3f
                 }
+
                 MeterUnit.LITER -> {
-                    return 2.1f
+                    2.1f
                 }
+
                 else -> {
-                    Error("Bad Unit")
+                    throw Error("Bad Unit")
                 }
             }
 
         } else if (meterUnit == MeterUnit.CUBIC_METER) {
-            when (finalMeterUnit) {
+            return when (finalMeterUnit) {
                 MeterUnit.CUBIC_METER -> {
-                    return 3.32f
+                    3.32f
                 }
+
                 MeterUnit.LITER -> {
-                    return 4.0f
+                    4.0f
                 }
+
                 else -> {
-                    Error("Bad Unit")
+                    throw Error("Bad Unit")
                 }
             }
         }
