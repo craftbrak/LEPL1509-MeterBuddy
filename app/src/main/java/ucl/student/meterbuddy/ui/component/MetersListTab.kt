@@ -2,19 +2,28 @@ package ucl.student.meterbuddy.ui.component
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,28 +36,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.FadeTransition
-import cafe.adriel.voyager.transitions.ScaleTransition
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
+import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.enums.TrendIcon
+import ucl.student.meterbuddy.data.utils.DataException
+import ucl.student.meterbuddy.data.utils.Resource
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import java.util.Optional
@@ -101,7 +111,7 @@ class MeterList : Screen {
                     Text("Add Meter")
                 }
             },
-            topBar = { TopBar(onDisconnectClick = {mainPageScreenModel.logout()}) },
+            topBar = { TopBar(onDisconnectClick = {mainPageScreenModel.logout()}, onHoushingSelect = {housing->mainPageScreenModel.selectHousing(housing)}, Homes = mainPageScreenModel.state.value.housings, selectedHome = mainPageScreenModel.state.value.selectedHousing) },
             bottomBar = { BottomAppBar {} }
         ) {
             val navigator = LocalNavigator.current
@@ -312,12 +322,45 @@ class MeterList : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun TopBar(onDisconnectClick: ()-> Unit) {
+    private fun TopBar(onDisconnectClick: ()-> Unit , onHoushingSelect:(housing:Housing)-> Unit, Homes: List<Housing>, selectedHome:Resource<Housing, DataException>) {
+        var expended by remember {
+            mutableStateOf(false)
+        }
         CenterAlignedTopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
+            navigationIcon = {
+                             Box(modifier= Modifier.wrapContentSize(Alignment.TopStart)){
+                                 when(selectedHome){
+                                     is Resource.Error -> {
+                                         Text(text = "Please add a housing to continue")
+                                     }
+                                     is Resource.Loading -> {
+
+                                     }
+                                     is Resource.Success -> {
+                                         Log.wtf("MeterList","homes :${Homes.size}")
+                                         Button(onClick = { expended = true }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)) {
+                                             Icon(Icons.Outlined.Home, contentDescription ="Home selection" )
+                                             Spacer(modifier = Modifier.size(5.dp))
+                                             Text(text = selectedHome.data.housingName)
+                                             Icon(Icons.Filled.ArrowDropDown, contentDescription ="Home selection" )
+                                         }
+
+                                         DropdownMenu(expanded = expended, onDismissRequest = { expended = false},modifier = Modifier.fillMaxWidth())  {
+                                             Homes.forEach{housing ->
+                                                 DropdownMenuItem(
+                                                     text = { Text(text = housing.housingName)},
+                                                     onClick = { onHoushingSelect(housing) })
+                                             }
+                                         }
+                                     }
+                                 }
+
+                             }
+            },
             title = { Text(stringResource(id = R.string.meter_menu)) },
             actions = {
                 IconButton(onClick = { onDisconnectClick() }) {

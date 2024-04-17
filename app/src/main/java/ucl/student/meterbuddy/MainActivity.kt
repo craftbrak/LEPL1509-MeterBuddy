@@ -41,6 +41,9 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
@@ -57,13 +60,11 @@ class MainActivity : ComponentActivity() {
     private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
     private val mainPageScreenModel: MainPageScreenModel by viewModels()
 
-    //    private lateinit var analytics: FirebaseAnalytics
-    //TODO: Make a compose Navigation graph , nest current app in it ,
-    // set mainpageScreenModel.state.value.currentUser to bw a flow, listen to the flow and navigate based on it
-
+        private lateinit var analytics: FirebaseAnalytics
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        analytics = Firebase.analytics
         installSplashScreen().apply {}
         setContent {
             val navController = rememberNavController()
@@ -98,7 +99,7 @@ class MainActivity : ComponentActivity() {
 
                         }
                         composable("home"){
-                            mainComp()
+                            MainComp()
                         }
                     }
 
@@ -136,12 +137,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
-    private fun mainComp(){
+    private fun MainComp(){
         TabNavigator(tab = MetersListTab) {
             Scaffold(
                 content = {
-                    it != null
                     CurrentTab()
                 },
                 bottomBar = {

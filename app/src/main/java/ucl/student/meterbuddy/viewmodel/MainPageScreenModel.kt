@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -336,6 +335,12 @@ class MainPageScreenModel @Inject constructor(
             state.value.currentUser.emit(Resource.Error(AuthException.NO_CURRENT_USER))
         }
         Log.d("MainScreenModel", "Loggued out")
+    }
+
+    fun selectHousing(housing: Housing) {
+        _state.value.copy(
+            selectedHousing = Resource.Success(housing)
+        )
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->
