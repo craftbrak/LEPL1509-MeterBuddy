@@ -134,66 +134,65 @@ class MeterList : Screen {
             val selectedMeter: MutableState<Optional<Meter>> =
                 remember { mutableStateOf(Optional.empty()) }
             // val scope = rememberCoroutineScope()
-                if (mainPageScreenModel.state.value.meters.isNotEmpty()){
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(it)
-                    ) {
-                        items(mainPageScreenModel.state.value.meters) { meter ->
-                            val readings =
-                                mainPageScreenModel.state.value.lastReading[meter.meterID]
-                            // val recentReadingValue = readings?.lastOrNull()?.value
+            if (mainPageScreenModel.state.value.meters.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(it)
+                ) {
+                    items(mainPageScreenModel.state.value.meters) { meter ->
+                        val readings =
+                            mainPageScreenModel.state.value.lastReading[meter.meterID]
+                        // val recentReadingValue = readings?.lastOrNull()?.value
 
-                            // val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
-                            // else {
-                            //     val oldReadingValue = readings?.get(readings.size - 2)?.value
-                            //  100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
-                            // }
+                        // val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
+                        // else {
+                        //     val oldReadingValue = readings?.get(readings.size - 2)?.value
+                        //  100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
+                        // }
 
 //                    Log.d("TREND", "$recentReadingValue")
 
-                            val recentReadingValue = readings?.firstOrNull()?.value
+                        val recentReadingValue = readings?.firstOrNull()?.value
 
-                            val trendValue: Float = if ((readings?.size ?: 0) < 2) {
-                                0.0f
-                            } else {
-                                val oldReadingValue = readings?.get(1)?.value
-                                100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
-                            }
-
-                            val trendIcon: TrendIcon = if (trendValue == 0.0f) {
-                                TrendIcon.Flat
-                            } else if (trendValue > 0.0f) {
-                                TrendIcon.Up
-                            } else {
-                                TrendIcon.Down
-                            }
-
-                            MeterOverviewCard(
-                                onClick = { navigator?.push(MeterDetailsScreen(meter)) },
-                                onLongClick = {
-                                    showBottomSheet.value = true
-                                    selectedMeter.value = Optional.of(meter)
-                                },
-                                modifier = Modifier.padding(10.dp),
-                                meterName = meter.meterName,
-                                meterIcon = meter.meterIcon,
-                                lastReading = if (recentReadingValue.isNotNull()) {
-                                    recentReadingValue.toString()
-                                }else null,
-                                readingUnit = meter.meterUnit.unit,
-                                trendIcon = trendIcon,
-                                trendValue = trendValue,
-                                monthlyCost = 20.0f,
-                                currencySymbol = "£" //TODO: USE values instead of hardcoded values
-                            )
+                        val trendValue: Float = if ((readings?.size ?: 0) < 2) {
+                            0.0f
+                        } else {
+                            val oldReadingValue = readings?.get(1)?.value
+                            100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                         }
+
+                        val trendIcon: TrendIcon = if (trendValue == 0.0f) {
+                            TrendIcon.Flat
+                        } else if (trendValue > 0.0f) {
+                            TrendIcon.Up
+                        } else {
+                            TrendIcon.Down
+                        }
+
+                        MeterOverviewCard(
+                            onClick = { navigator?.push(MeterDetailsScreen(meter)) },
+                            onLongClick = {
+                                showBottomSheet.value = true
+                                selectedMeter.value = Optional.of(meter)
+                            },
+                            modifier = Modifier.padding(10.dp),
+                            meterName = meter.meterName,
+                            meterIcon = meter.meterIcon,
+                            lastReading = if (recentReadingValue.isNotNull()) {
+                                recentReadingValue.toString()
+                            } else null,
+                            readingUnit = meter.meterUnit.unit,
+                            trendIcon = trendIcon,
+                            trendValue = trendValue,
+                            monthlyCost = 20.0f,
+                            currencySymbol = "£" //TODO: USE values instead of hardcoded values
+                        )
                     }
                 }
-                else{
-                    Text(text = "Please get started by adding a meter")
-                }
+            } else {
+                Text(text = "Please get started by adding a meter")
+            }
 
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },
@@ -416,7 +415,7 @@ class MeterList : Screen {
                                                 Text(text = housing.housingName)
                                             }
                                         },
-                                        onClick = { onHoushingSelect(housing)})
+                                        onClick = { onHoushingSelect(housing); expended = false })
                                 }
                                 DropdownMenuItem(text = {
                                     Row(
@@ -440,7 +439,10 @@ class MeterList : Screen {
             title = { Text(stringResource(id = R.string.meter_menu)) },
             actions = {
                 IconButton(onClick = { onDisconnectClick() }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "Logout"
+                    )
                 }
             }
         )
