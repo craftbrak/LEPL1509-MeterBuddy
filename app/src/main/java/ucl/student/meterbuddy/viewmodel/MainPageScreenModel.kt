@@ -349,7 +349,8 @@ class MainPageScreenModel @Inject constructor(
 
     fun selectHousing(housing: Housing) {
         _state.value=_state.value.copy(
-            selectedHousing = Resource.Success(housing)
+            selectedHousing = Resource.Success(housing),
+            meters = emptyList()
         )
         updateState()
     }
