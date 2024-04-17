@@ -2,19 +2,23 @@ package ucl.student.meterbuddy.ui.component
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
@@ -42,9 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getViewModel
@@ -111,7 +117,14 @@ class MeterList : Screen {
                     Text("Add Meter")
                 }
             },
-            topBar = { TopBar(onDisconnectClick = {mainPageScreenModel.logout()}, onHoushingSelect = {housing->mainPageScreenModel.selectHousing(housing)}, Homes = mainPageScreenModel.state.value.housings, selectedHome = mainPageScreenModel.state.value.selectedHousing) },
+            topBar = {
+                TopBar(
+                    onDisconnectClick = { mainPageScreenModel.logout() },
+                    onHoushingSelect = { housing -> mainPageScreenModel.selectHousing(housing) },
+                    Homes = mainPageScreenModel.state.value.housings,
+                    selectedHome = mainPageScreenModel.state.value.selectedHousing
+                )
+            },
             bottomBar = { BottomAppBar {} }
         ) {
             val navigator = LocalNavigator.current
@@ -139,15 +152,20 @@ class MeterList : Screen {
 
                     val recentReadingValue = readings?.firstOrNull()?.value
 
-                    val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
-                    else {
+                    val trendValue: Float = if ((readings?.size ?: 0) < 2) {
+                        0.0f
+                    } else {
                         val oldReadingValue = readings?.get(1)?.value
                         100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                     }
 
-                    val trendIcon: TrendIcon = if (trendValue == 0.0f) { TrendIcon.Flat }
-                    else if (trendValue > 0.0f) { TrendIcon.Up }
-                    else { TrendIcon.Down }
+                    val trendIcon: TrendIcon = if (trendValue == 0.0f) {
+                        TrendIcon.Flat
+                    } else if (trendValue > 0.0f) {
+                        TrendIcon.Up
+                    } else {
+                        TrendIcon.Down
+                    }
 
                     MeterOverviewCard(
                         onClick = { navigator?.push(MeterDetailsScreen(meter)) },
@@ -253,7 +271,8 @@ class MeterList : Screen {
                 MeterFormDialog(
                     onDismissRequest = {
                         selectedMeter.value = Optional.empty()
-                        showEditFormDialog.value = false },
+                        showEditFormDialog.value = false
+                    },
                     onConfirmation = { name, unit, icon, type, cost, additive ->
                         if (name.isNotBlank() && cost.isNotBlank()) {
                             val numberCost = cost.toDoubleOrNull()
@@ -322,7 +341,12 @@ class MeterList : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun TopBar(onDisconnectClick: ()-> Unit , onHoushingSelect:(housing:Housing)-> Unit, Homes: List<Housing>, selectedHome:Resource<Housing, DataException>) {
+    private fun TopBar(
+        onDisconnectClick: () -> Unit,
+        onHoushingSelect: (housing: Housing) -> Unit,
+        Homes: List<Housing>,
+        selectedHome: Resource<Housing, DataException>
+    ) {
         var expended by remember {
             mutableStateOf(false)
         }
@@ -332,39 +356,83 @@ class MeterList : Screen {
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
             navigationIcon = {
-                             Box(modifier= Modifier.wrapContentSize(Alignment.TopStart)){
-                                 when(selectedHome){
-                                     is Resource.Error -> {
-                                         Text(text = "Please add a housing to continue")
-                                     }
-                                     is Resource.Loading -> {
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                    when (selectedHome) {
+                        is Resource.Error -> {
+                            Text(text = stringResource(R.string.no_housings))
+                        }
 
-                                     }
-                                     is Resource.Success -> {
-                                         Log.wtf("MeterList","homes :${Homes.size}")
-                                         Button(onClick = { expended = true }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)) {
-                                             Icon(Icons.Outlined.Home, contentDescription ="Home selection" )
-                                             Spacer(modifier = Modifier.size(5.dp))
-                                             Text(text = selectedHome.data.housingName)
-                                             Icon(Icons.Filled.ArrowDropDown, contentDescription ="Home selection" )
-                                         }
+                        is Resource.Loading -> {
 
-                                         DropdownMenu(expanded = expended, onDismissRequest = { expended = false},modifier = Modifier.fillMaxWidth())  {
-                                             Homes.forEach{housing ->
-                                                 DropdownMenuItem(
-                                                     text = { Text(text = housing.housingName)},
-                                                     onClick = { onHoushingSelect(housing) })
-                                             }
-                                         }
-                                     }
-                                 }
+                        }
 
-                             }
+                        is Resource.Success -> {
+                            Log.wtf("MeterList", "homes :${Homes.size}")
+                            Button(
+                                onClick = { expended = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Outlined.Home,
+                                    contentDescription = stringResource(R.string.home_selection)
+                                )
+                                Spacer(modifier = Modifier.size(5.dp))
+                                Text(text = selectedHome.data.housingName)
+                                Icon(
+                                    Icons.Filled.ArrowDropDown,
+                                    contentDescription = stringResource(R.string.home_selection)
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = expended,
+                                onDismissRequest = { expended = false },
+                                modifier = Modifier.padding(20.dp)
+                            ) {
+                                Homes.forEach { housing ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                horizontalArrangement = Arrangement.Center,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = ImageVector.vectorResource(
+                                                        housing.housingType.icon
+                                                    ), contentDescription = housing.housingType.type
+                                                )
+                                                Spacer(modifier = Modifier.width(10.dp))
+                                                Text(text = housing.housingName)
+                                            }
+                                        },
+                                        onClick = { onHoushingSelect(housing) })
+                                }
+                                DropdownMenuItem(text = {
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Add,
+                                            contentDescription = stringResource(R.string.add_housing)
+                                        )
+                                        Spacer(modifier = Modifier.size(5.dp))
+                                        Text(text = stringResource(R.string.add_housing))
+                                    }
+                                }, onClick = { /*TODO*/ })
+                            }
+                        }
+                    }
+
+                }
             },
             title = { Text(stringResource(id = R.string.meter_menu)) },
             actions = {
                 IconButton(onClick = { onDisconnectClick() }) {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = "Logout")
+                    Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Logout")
                 }
             }
         )
