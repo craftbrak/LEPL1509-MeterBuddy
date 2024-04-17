@@ -12,7 +12,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +32,6 @@ import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
-import ucl.student.meterbuddy.data.repository.MeterRepository
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 
 
@@ -82,12 +80,14 @@ class LineChartsScreen: Tab {
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ){
-                                graphModel.DisplayChartLine(graph = infos[index].graph, width = 200, height = 300 )
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ){
-                                    Text(text = "Total Energy Consumed :")
-                                    Text(text = "${infos[index].totalEnergyConsumed}")
+                                if(infos.isNotEmpty()){
+                                    graphModel.DisplayChartLine(graph = infos[index].graph, width = 200, height = 300 )
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ){
+                                        Text(text = "Total Energy Consumed :")
+                                        Text(text = "${infos[index].totalEnergyConsumed}")
+                                    }
                                 }
                             }
                         }
