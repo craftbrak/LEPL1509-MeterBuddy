@@ -1,10 +1,13 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -191,7 +194,10 @@ class MeterList : Screen {
                     }
                 }
             } else {
-                Text(text = "Please get started by adding a meter")
+                Column (Modifier.padding(it).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                    Text(text = "Please get started by adding a meter", style = MaterialTheme.typography.headlineMedium)
+                }
+
             }
 
             MeterFormDialog(
