@@ -336,7 +336,7 @@ class MainPageScreenModel @Inject constructor(
                             0,
                             "My Home",
                             HousingType.House,
-                            50,
+                            50f,
                             2
                         )
                         meterRepository.addHousing(defaultHousing)
