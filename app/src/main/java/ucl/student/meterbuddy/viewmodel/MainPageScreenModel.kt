@@ -280,7 +280,22 @@ class MainPageScreenModel @Inject constructor(
     fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
         return meterReading.value > threshold
     }
-
+    fun getUsers(): List<User>{
+        return when(val users =meterRepository.getUsers()){
+            is Resource.Error, is Resource.Loading -> emptyList<User>()
+            is Resource.Success -> {
+                users.data
+            }
+        }
+    }
+    fun getHousingUsers(housing: Housing):List<User>{
+        return when(val users =meterRepository.getHousingMember(housing)){
+            is Resource.Error, is Resource.Loading -> emptyList<User>()
+            is Resource.Success -> {
+                users.data
+            }
+        }
+    }
     fun deleteMeter(meter: Meter) {
         viewModelScope.launch {
             meterRepository.deleteMeter(meter)

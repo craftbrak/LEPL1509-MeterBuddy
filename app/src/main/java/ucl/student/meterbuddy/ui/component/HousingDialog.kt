@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import co.yml.charts.common.extensions.isNotNull
 import ucl.student.meterbuddy.data.model.entity.Housing
+import ucl.student.meterbuddy.data.model.entity.User
 
 @Composable
 fun HousingDialog(
@@ -25,7 +26,9 @@ fun HousingDialog(
     enabled: Boolean,
     onSubmit: (Housing)->Unit,
     onDismissRequest: ()->Unit,
-    initialData: Housing? = null
+    initialData: Housing? = null,
+    users: List<User> = emptyList(),
+    usersOfHousing: List<User> = emptyList()
 ) {
     if (enabled) {
         Dialog(onDismissRequest = onDismissRequest) {
@@ -33,7 +36,7 @@ fun HousingDialog(
                 Column(
                     modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 20.dp),
+                        .padding(horizontal = 10.dp, vertical = 20.dp),
                     verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
@@ -44,7 +47,7 @@ fun HousingDialog(
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     Log.wtf("HousingDialog", initialData?.housingName)
-                    HousingFrom(modifier=Modifier.fillMaxWidth(),onSubmit = { housing -> onSubmit(housing) },initialData)
+                    HousingFrom(modifier=Modifier.fillMaxWidth(),onSubmit = { housing -> onSubmit(housing) },initialData ,users= users, usersOfHousing = usersOfHousing)
                 }
 
             }

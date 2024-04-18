@@ -71,6 +71,13 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
         awaitClose{ subscription.remove()}
 
     }
+    override fun getHousingMember(housing: Housing): Resource<List<User>,DataException>{
+        val users = mutableListOf<User>()
+        housingCollection.document(housing.housingID.toString()).collection("members").get().addOnSuccessListener {
+            result -> result.forEach { u -> users.add(u.toObject<User>())}
+        }
+        return Success(users.toList())
+    }
 
     override fun addHousing(housing: Housing) {
         val house = if (housing.housingID == 0){

@@ -3,16 +3,31 @@ package ucl.student.meterbuddy.ui.component
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
@@ -32,21 +47,28 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import ucl.student.meterbuddy.data.model.entity.Housing
+import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.model.enums.HousingType
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun HousingFrom(
     modifier: Modifier = Modifier,
     onSubmit: (Housing) -> Unit,
-    initialData: Housing? = null
+    initialData: Housing? = null,
+    usersOfHousing:List<User> = emptyList(),
+    users:List<User> = emptyList(),
+    onUserRemove:(User)->Unit = {}
 ) {
     var housingName by remember { mutableStateOf(initialData?.housingName ?: "") }
     var housingType by remember { mutableStateOf(initialData?.housingType ?: HousingType.House) }
     var housingSurface by remember { mutableStateOf(initialData?.housingSurface?.toString() ?: "") }
     var housingNbPersons by remember { mutableIntStateOf(initialData?.housingNbPersons ?: 0) }
     val housingId by remember { mutableStateOf(initialData?.housingID ?: 0) }
+    var showUserSelect by remember { mutableStateOf(false) }
+    var userSearch by remember { mutableStateOf("") }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         OutlinedTextField(
             value = housingName,
@@ -87,7 +109,9 @@ fun HousingFrom(
         Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly){
             Text(text = "Number Of Persons: ", style = MaterialTheme.typography.labelLarge)
             CounterField(counterValue = housingNbPersons.toString(),
-                modifier = Modifier.padding(3.dp).width(150.dp),
+                modifier = Modifier
+                    .padding(3.dp)
+                    .width(150.dp),
                 onMinusChange = {
                     if (housingNbPersons > 0) {
                         housingNbPersons--
@@ -105,13 +129,80 @@ fun HousingFrom(
                 ) ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(imageVector = ImageVector.vectorResource(id = houseType.icon), contentDescription = houseType.name)
-                        Text(text = houseType.type, style = MaterialTheme.typography.bodySmall)
+                        Text(text = houseType.type, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
-
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        ElevatedCard {
+            FlowRow(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                usersOfHousing.forEach {
+                    InputChip(onClick = { /*TODO*/ }, selected = false
+                        , label = {
+                        Text(text = it.userName)
+                            Icon(imageVector = Icons.Filled.Close, contentDescription = Icons.Filled.Close.name)
+                        })
+                }
+                FilledTonalButton(onClick = { showUserSelect = true }) {
+                    Text(text = "Add Member")
+                }
+            }
+        }
+        if (showUserSelect){
+            Dialog(onDismissRequest = { showUserSelect = false }) {
+                Card (Modifier.padding(15.dp)) {
+                    Column (modifier= Modifier.padding(15.dp),horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                        Text("Add Member T  o $housingName")
+                        OutlinedTextField(
+                            userSearch,
+                            { userSearch = it },
+                            label = { Text("Search") },
+                            placeholder = { Text("username") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Search,
+                                    contentDescription = Icons.Filled.Search.name
+                                )
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = { userSearch = "" }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = Icons.Filled.Close.name
+                                    )
+                                }
+                            },
+                            singleLine = true
+                        )
+                        LazyColumn(modifier = Modifier.heightIn(50.dp,500.dp)) {
+                            items(users.filter { u ->
+                                u.userName.contains(
+                                    userSearch,
+                                    ignoreCase = true
+                                )
+                            }) { user ->
+                                FilterChip(
+                                    selected = user in usersOfHousing,
+                                    onClick = { /*TODO*/ },
+                                    label = {
+                                        Text(text = user.userName)
+                                    })
+                            }
+                        }
+                        Button(onClick = { showUserSelect = false }) {
+                            Text(text = "Done")
+                        }
+                    }
 
+                }
+
+            }
+        }
     //        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
     //            OutlinedTextField(
     //                modifier = Modifier
@@ -164,5 +255,7 @@ fun HousingFrom(
 @Preview(name = "HousingHome")
 @Composable
 private fun PreviewHousingHome() {
-    HousingFrom(Modifier.fillMaxWidth(), {})
+    val users = listOf(User(userID = 0, userName = "a"),User(userID = 0, userName = "craftbrak"),User(userID = 0, userName = "craftbrak"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"))
+    val usersOfHousing = listOf(User(userID = 0, userName = "a"),User(userID = 0, userName = "craftbrak"),User(userID = 0, userName = "craftbrak"),User(userID = 0, userName = "tinyhuman"),User(userID = 0, userName = "TheHeavyBackPack"))
+    HousingFrom(Modifier.fillMaxWidth(), {}, usersOfHousing = usersOfHousing, users = users )
 }

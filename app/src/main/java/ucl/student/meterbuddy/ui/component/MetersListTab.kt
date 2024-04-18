@@ -169,7 +169,7 @@ class MeterList : Screen {
                         //  100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                         // }
 
-//                    Log.d("TREND", "$recentReadingValue")
+                        // Log.d("TREND", "$recentReadingValue")
 
                         val recentReadingValue = readings?.firstOrNull()?.value
 
@@ -220,7 +220,15 @@ class MeterList : Screen {
             HousingDialog(enabled = showHousingDialog.value, onSubmit = { housing->
                 mainPageScreenModel.saveHousing(housing)
                 showHousingDialog.value = false
-            }, onDismissRequest = { showHousingDialog.value = false }, initialData = editedHousing.value)
+            }, onDismissRequest = { showHousingDialog.value = false },
+                initialData = editedHousing.value,
+                users = mainPageScreenModel.getUsers(),
+                usersOfHousing = editedHousing.value?.let { it1 ->
+                    mainPageScreenModel.getHousingUsers(
+                        it1
+                    )
+                }?: emptyList()
+                )
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },
                 onConfirmation = { name, unit, icon, type, cost, additive ->

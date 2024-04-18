@@ -80,6 +80,10 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
+    override fun getHousingMember(housing: Housing): Resource<List<User>, DataException> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun addReading(reading: MeterReading) {
         userDao.insertMeterReading(reading)
     }
