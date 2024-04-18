@@ -415,7 +415,7 @@ class MeterList : Screen {
                             DropdownMenu(
                                 expanded = expended,
                                 onDismissRequest = { expended = false },
-                                modifier = Modifier.padding(20.dp)
+                                modifier = Modifier.padding(20.dp),
                             ) {
                                 homes.forEach { housing ->
                                     DropdownMenuItem(

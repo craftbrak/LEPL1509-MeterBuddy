@@ -71,7 +71,11 @@ class MainPageScreenModel @Inject constructor(
                         meterRepository.getHousing().collect { housingRessource ->
                             when (housingRessource) {
                                 is Resource.Error -> {
+                                    _state.value= _state.value.copy(
+                                        housings = emptyList()
+                                    )
                                     when (housingRessource.error) {
+
                                         NO_NETWORK -> TODO()
                                         BAD_REQUEST -> TODO()
                                         UNAUTHORIZED -> TODO()
@@ -111,9 +115,15 @@ class MainPageScreenModel @Inject constructor(
 
                                 is Resource.Loading -> {
                                     Log.wtf("UpdateState", "Loading housings")
+                                    _state.value= _state.value.copy(
+                                        housings = emptyList()
+                                    )
                                 }
 
                                 is Resource.Success -> {
+                                    _state.value= _state.value.copy(
+                                        housings = emptyList()
+                                    )
                                     if (housingRessource.data.isNotEmpty()) {
                                         //TODO: store selected housing ID in localpref and if set use this housing by default
                                         val selectedHousing = when(state.value.selectedHousing){
@@ -358,6 +368,7 @@ class MainPageScreenModel @Inject constructor(
     fun saveHousing(housing: Housing) {
         if(housing.housingID == 0){
             meterRepository.addHousing(housing)
+            updateState()
         }else{
             meterRepository.updateHousing(housing)
         }
