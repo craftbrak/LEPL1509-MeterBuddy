@@ -371,6 +371,8 @@ class MainPageScreenModel @Inject constructor(
             updateState()
         }else{
             meterRepository.updateHousing(housing)
+            updateState()
+            selectHousing(housing)
         }
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {

@@ -1,9 +1,11 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -28,17 +30,21 @@ fun HousingDialog(
     if (enabled) {
         Dialog(onDismissRequest = onDismissRequest) {
             Card(modifier) {
-                Column(modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
+                Column(
+                    modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 20.dp),
                     verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = if (initialData.isNotNull()) {
                             "Edit your Home"
                         } else "Add a Home",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineMedium
                     )
-                    HousingFrom(modifier=Modifier.fillMaxSize(),onSubmit = { housing -> onSubmit(housing) })
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Log.wtf("HousingDialog", initialData?.housingName)
+                    HousingFrom(modifier=Modifier.fillMaxWidth(),onSubmit = { housing -> onSubmit(housing) },initialData)
                 }
 
             }

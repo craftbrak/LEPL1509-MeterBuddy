@@ -1,6 +1,8 @@
 package ucl.student.meterbuddy.ui.component
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +21,9 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -135,6 +137,14 @@ class MeterList : Screen {
                     selectedHome = mainPageScreenModel.state.value.selectedHousing,
                     onAddHomeClick = {
                         showHousingDialog.value = true
+                    },
+                    onUpdateClick = {
+                        showHousingDialog.value = true
+                        editedHousing.value = when(mainPageScreenModel.state.value.selectedHousing){
+                            is Resource.Error -> null
+                            is Resource.Loading -> null
+                            is Resource.Success -> (mainPageScreenModel.state.value.selectedHousing as Resource.Success<Housing, DataException>).data
+                        }
                     }
                 )
             },
@@ -364,14 +374,15 @@ class MeterList : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     private fun TopBar(
         onDisconnectClick: () -> Unit,
         onHoushingSelect: (housing: Housing) -> Unit,
         homes: List<Housing>,
         selectedHome: Resource<Housing, DataException>,
-        onAddHomeClick: ()->Unit
+        onAddHomeClick: () -> Unit,
+        onUpdateClick: () -> Unit
     ) {
         var expended by remember {
             mutableStateOf(false)
@@ -382,79 +393,94 @@ class MeterList : Screen {
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
             navigationIcon = {
-                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
-                    when (selectedHome) {
-                        is Resource.Error -> {
-                            Text(text = stringResource(R.string.no_housings))
-                        }
-
-                        is Resource.Loading -> {
-                            Text(text = "Loading...")
-                        }
-
-                        is Resource.Success -> {
-                            Button(
-                                onClick = { expended = true },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            ) {
-                                Icon(
-                                    Icons.Outlined.Home,
-                                    contentDescription = stringResource(R.string.home_selection)
-                                )
-                                Spacer(modifier = Modifier.size(5.dp))
-                                Text(text = selectedHome.data.housingName)
-                                Icon(
-                                    Icons.Filled.ArrowDropDown,
-                                    contentDescription = stringResource(R.string.home_selection)
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = expended,
-                                onDismissRequest = { expended = false },
-                                modifier = Modifier.padding(20.dp),
-                            ) {
-                                homes.forEach { housing ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Row(
-                                                horizontalArrangement = Arrangement.Center,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Icon(
-                                                    imageVector = ImageVector.vectorResource(
-                                                        housing.housingType.icon
-                                                    ), contentDescription = housing.housingType.type
-                                                )
-                                                Spacer(modifier = Modifier.width(10.dp))
-                                                Text(text = housing.housingName)
-                                            }
-                                        },
-                                        onClick = { onHoushingSelect(housing); expended = false })
-                                }
-                                DropdownMenuItem(text = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.Add,
-                                            contentDescription = stringResource(R.string.add_housing)
-                                        )
-                                        Spacer(modifier = Modifier.size(5.dp))
-                                        Text(text = stringResource(R.string.add_housing))
-                                    }
-                                }, onClick = {onAddHomeClick() })
-                            }
-                        }
-                    }
-
+                IconButton(onClick = { onUpdateClick() }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Settings"
+                    )
                 }
             },
-            title = { Text(stringResource(id = R.string.meter_menu)) },
+            title = { Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                when (selectedHome) {
+                    is Resource.Error -> {
+                        Text(text = stringResource(R.string.no_housings))
+                    }
+
+                    is Resource.Loading -> {
+                        Text(text = "Loading...")
+                    }
+
+                    is Resource.Success -> {
+                        Button(
+                            onClick = { expended = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    expended = true
+                                },
+                                onLongClick = {
+
+                                },
+                                onDoubleClick = {
+                                    onUpdateClick()
+                                },
+                            )
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = selectedHome.data.housingType.icon),
+                                contentDescription = stringResource(R.string.home_selection)
+                            )
+                            Spacer(modifier = Modifier.size(5.dp))
+                            Text(text = selectedHome.data.housingName)
+                            Icon(
+                                Icons.Filled.ArrowDropDown,
+                                contentDescription = stringResource(R.string.home_selection)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expended,
+                            onDismissRequest = { expended = false },
+                            modifier = Modifier.padding(20.dp),
+                        ) {
+                            homes.forEach { housing ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            horizontalArrangement = Arrangement.Center,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = ImageVector.vectorResource(
+                                                    housing.housingType.icon
+                                                ), contentDescription = housing.housingType.type
+                                            )
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Text(text = housing.housingName)
+                                        }
+                                    },
+                                    onClick = { onHoushingSelect(housing); expended = false })
+                            }
+                            DropdownMenuItem(text = {
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Add,
+                                        contentDescription = stringResource(R.string.add_housing)
+                                    )
+                                    Spacer(modifier = Modifier.size(5.dp))
+                                    Text(text = stringResource(R.string.add_housing))
+                                }
+                            }, onClick = {onAddHomeClick() })
+                        }
+                    }
+                }
+
+            } },
             actions = {
                 IconButton(onClick = { onDisconnectClick() }) {
                     Icon(

@@ -1,17 +1,18 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,35 +50,8 @@ fun HousingFrom(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
+        Log.wtf("Housing Form", initialData?.housingName)
 
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            OutlinedTextField(
-                modifier = Modifier.menuAnchor().fillMaxWidth(),
-                value = housingType.name,
-                onValueChange = { },
-                label = { Text("Housing Type") },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                }
-            )
-            ExposedDropdownMenu(
-                expanded = expanded, // Dropdown menus are not yet supported in Compose as of 1.1.1
-                onDismissRequest = { expanded =false},
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                HousingType.entries.forEach {
-                    DropdownMenuItem(text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = ImageVector.vectorResource(id = it.icon), contentDescription = it.name)
-                            Text(text = it.type)
-                        }
-
-                    }, onClick = { housingType = it ; expanded = false })
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = housingSurface,
             onValueChange = { housingSurface = it },
@@ -93,6 +67,52 @@ fun HousingFrom(
             placeholder = { Text("2") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        MultiChoiceSegmentedButtonRow {
+            HousingType.entries.forEachIndexed{index, houseType ->
+                SegmentedButton(checked = housingType == houseType , onCheckedChange = { bool -> housingType = houseType } , shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = HousingType.entries.size
+                ) ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(imageVector = ImageVector.vectorResource(id = houseType.icon), contentDescription = houseType.name)
+                        Text(text = houseType.type, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+
+        }
+
+    //        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+    //            OutlinedTextField(
+    //                modifier = Modifier
+    //                    .menuAnchor()
+    //                    .fillMaxWidth(),
+    //                value = housingType.name,
+    //                onValueChange = { },
+    //                label = { Text("Housing Type") },
+    //                readOnly = true,
+    //                trailingIcon = {
+    //                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+    //                }
+    //            )
+    //            ExposedDropdownMenu(
+    //                expanded = expanded, // Dropdown menus are not yet supported in Compose as of 1.1.1
+    //                onDismissRequest = { expanded =false},
+    //                modifier = Modifier.fillMaxWidth()
+    //            ) {
+    //                HousingType.entries.forEach {
+    //                    DropdownMenuItem(text = {
+    //                        Row(verticalAlignment = Alignment.CenterVertically) {
+    //                            Icon(imageVector = ImageVector.vectorResource(id = it.icon), contentDescription = it.name)
+    //                            Text(text = it.type)
+    //                        }
+    //
+    //                    }, onClick = { housingType = it ; expanded = false })
+    //                }
+    //            }
+    //        }
+
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             onSubmit(
