@@ -1,4 +1,4 @@
-package ucl.student.meterbuddy.ui.screen
+package ucl.student.meterbuddy.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +38,7 @@ fun HousingFrom(
     var housingType by remember { mutableStateOf(initialData?.housingType ?: HousingType.House) }
     var housingSurface by remember { mutableStateOf(initialData?.housingSurface?.toString() ?: "") }
     var housingNbPersons by remember { mutableStateOf(initialData?.housingNbPersons?.toString() ?: "") }
+    val housingId by remember { mutableStateOf(initialData?.housingID ?: 0) }
     var expanded by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         OutlinedTextField(
@@ -96,6 +97,7 @@ fun HousingFrom(
         Button(onClick = {
             onSubmit(
                 Housing(
+                    housingID = housingId,
                     housingName = housingName,
                     housingType = housingType,
                     housingSurface = housingSurface.toIntOrNull() ?: 0,

@@ -1,6 +1,5 @@
 package ucl.student.meterbuddy.ui.component
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -111,6 +110,13 @@ class MeterList : Screen {
             SnackbarHostState()
         }
         val mainPageScreenModel: MainPageScreenModel = getViewModel()
+        val navigator = LocalNavigator.current
+        val showBottomSheet = remember { mutableStateOf(false) }
+        val showDeleteDialog = remember { mutableStateOf(false) }
+        val selectedMeter: MutableState<Optional<Meter>> =
+            remember { mutableStateOf(Optional.empty()) }
+        val editedHousing: MutableState<Housing?> = remember { mutableStateOf(null)}
+        val showHousingDialog = remember{ mutableStateOf(false)}
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -125,17 +131,16 @@ class MeterList : Screen {
                 TopBar(
                     onDisconnectClick = { mainPageScreenModel.logout() },
                     onHoushingSelect = { housing -> mainPageScreenModel.selectHousing(housing) },
-                    Homes = mainPageScreenModel.state.value.housings,
-                    selectedHome = mainPageScreenModel.state.value.selectedHousing
+                    homes = mainPageScreenModel.state.value.housings,
+                    selectedHome = mainPageScreenModel.state.value.selectedHousing,
+                    onAddHomeClick = {
+                        showHousingDialog.value = true
+                    }
                 )
             },
             bottomBar = { BottomAppBar {} }
         ) {
-            val navigator = LocalNavigator.current
-            val showBottomSheet = remember { mutableStateOf(false) }
-            val showDeleteDialog = remember { mutableStateOf(false) }
-            val selectedMeter: MutableState<Optional<Meter>> =
-                remember { mutableStateOf(Optional.empty()) }
+
             // val scope = rememberCoroutineScope()
             if (mainPageScreenModel.state.value.meters.isNotEmpty()) {
                 LazyColumn(
@@ -194,12 +199,18 @@ class MeterList : Screen {
                     }
                 }
             } else {
-                Column (Modifier.padding(it).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                Column (
+                    Modifier
+                        .padding(it)
+                        .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
                     Text(text = "Please get started by adding a meter", style = MaterialTheme.typography.headlineMedium)
                 }
 
             }
-
+            HousingDialog(enabled = showHousingDialog.value, onSubmit = { housing->
+                mainPageScreenModel.saveHousing(housing)
+                showHousingDialog.value = false
+            }, onDismissRequest = { showHousingDialog.value = false }, initialData = editedHousing.value)
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },
                 onConfirmation = { name, unit, icon, type, cost, additive ->
@@ -358,8 +369,9 @@ class MeterList : Screen {
     private fun TopBar(
         onDisconnectClick: () -> Unit,
         onHoushingSelect: (housing: Housing) -> Unit,
-        Homes: List<Housing>,
-        selectedHome: Resource<Housing, DataException>
+        homes: List<Housing>,
+        selectedHome: Resource<Housing, DataException>,
+        onAddHomeClick: ()->Unit
     ) {
         var expended by remember {
             mutableStateOf(false)
@@ -405,7 +417,7 @@ class MeterList : Screen {
                                 onDismissRequest = { expended = false },
                                 modifier = Modifier.padding(20.dp)
                             ) {
-                                Homes.forEach { housing ->
+                                homes.forEach { housing ->
                                     DropdownMenuItem(
                                         text = {
                                             Row(
@@ -435,7 +447,7 @@ class MeterList : Screen {
                                         Spacer(modifier = Modifier.size(5.dp))
                                         Text(text = stringResource(R.string.add_housing))
                                     }
-                                }, onClick = { /*TODO: Open Add houising page/popup */ })
+                                }, onClick = {onAddHomeClick() })
                             }
                         }
                     }

@@ -354,6 +354,14 @@ class MainPageScreenModel @Inject constructor(
         )
         updateState()
     }
+
+    fun saveHousing(housing: Housing) {
+        if(housing.housingID == 0){
+            meterRepository.addHousing(housing)
+        }else{
+            meterRepository.updateHousing(housing)
+        }
+    }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->
 //            meter.meterUnit == unit
