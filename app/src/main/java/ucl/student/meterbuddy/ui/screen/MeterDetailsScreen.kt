@@ -1,5 +1,8 @@
 package ucl.student.meterbuddy.ui.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +14,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -28,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
@@ -37,6 +43,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
@@ -141,15 +148,19 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
     @Composable
     private fun BoxGraph(meterScreenModel: MeterScreenModel) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .fillMaxSize()
+                .background(Color.White),
             contentAlignment = Alignment.Center
+
         ) {
             Card(modifier = Modifier.padding(16.dp)) {
                 Box(
                     modifier = Modifier.padding(10.dp)
                 ) {
                     val readings = meterScreenModel.state.value.readings
-                    if (readings.isNotEmpty()) {
+                    if (readings.size >= 2)
+                    {
                         val graph = ChartLineModel.createChartLine(
                                         readings = readings,
                                         type = meterScreenModel.meter.meterType,
@@ -160,7 +171,14 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                                                         height = 300
                         )
                     }
-                    else { Text(text = "Need at least one reading of this meter to have a graph.") }
+                    else
+                    {
+                        Image( painter = painterResource(id = R.drawable.data_pending),
+                            contentDescription = "Data Pending",
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                        )
+                    }
                 }
             }
         }
