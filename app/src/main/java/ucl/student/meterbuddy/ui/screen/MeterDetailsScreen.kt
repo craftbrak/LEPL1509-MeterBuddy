@@ -17,8 +17,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Fireplace
+import androidx.compose.material.icons.outlined.FlashOn
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +63,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
+import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
@@ -112,7 +120,41 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
     }
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun AppTopBar(nameMeter: String, navigator: Navigator, scope: CoroutineScope, snackbarHostState: SnackbarHostState) {
+    private fun AppTopBar(
+        nameMeter: String,
+        navigator: Navigator,
+        scope: CoroutineScope,
+        snackbarHostState: SnackbarHostState
+    ) {
+        val showDialog = remember { mutableStateOf(false) }
+
+        val openDialog = {
+            showDialog.value = true
+        }
+
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = { Text(text = "Meter Details") },
+                text = {
+                    Column {
+                        Text(text = "Name: ${meter.meterName}")
+                        Text(text = "Unit: ${meter.meterUnit}")
+                        Text(text = "Icon: ${meter.meterIcon}")
+                        Text(text = "Type: ${meter.meterType}")
+                        Text(text = "Cost: ${meter.meterCost}")
+                        Text(text = "Additive Meter: ${if (meter.additiveMeter) "Yes" else "No"}"
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { showDialog.value = false }) {
+                        Text("Close")
+                    }
+                }
+            )
+        }
+
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -120,25 +162,15 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
             ),
             title = { Text(text = nameMeter) },
             navigationIcon = {
-                IconButton(onClick = {navigator.pop()}) {
+                IconButton(onClick = { navigator.pop() }) {
                     Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                 }
             },
-//            actions = {
-//                IconButton(onClick = {
-//                    scope.launch {
-//                        val result = snackbarHostState.showSnackbar(
-//                            message = "Edit Not Implemented Yet",
-//                            actionLabel = "close"
-//                        )
-//                        if (result == SnackbarResult.ActionPerformed) {
-//                            Log.w("Snackbar", "Snackbar action performed")
-//                        }
-//                    }
-//                }) {
-//                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Delete Meter")
-//                }
-//            }
+            actions = {
+                IconButton(onClick = openDialog) {
+                    Icon(imageVector = Icons.Outlined.Info, contentDescription = "Meter Details")
+                }
+            }
         )
     }
 
