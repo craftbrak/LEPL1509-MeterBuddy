@@ -288,7 +288,7 @@ class RegisterScreen: Screen {
                     when(it){
                         is Resource.Error -> {
                             isLoading = false
-                            when(it.error){
+                            when(it.error) {
                                 AuthException.BAD_CREDENTIALS -> {
                                     Log.i("Bad Cred","bad cred")
 //                                    showToast(context = context, message = "Invalid email or password")
@@ -299,16 +299,28 @@ class RegisterScreen: Screen {
 //                                    showToast(context = context, message = "No network connection")
                                     errorFirebase = "No network connection"
                                 }
-                                AuthException.UNKNOWN_ERROR -> {
-                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
-//                                    showToast(context = context, message = "An unknown error occurred")
-                                    errorFirebase = "An unknown error occurred"
-                                }
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                                 AuthException.TO_MANY_ATTEMPT -> {
                                     Log.i("LoginScreen","To MAny attempts")
 //                                    showToast(context = context, message = "Too many attempt try again later")
                                     errorFirebase = "Too many attempt, try again later"
+                                }
+                                AuthException.EMAIL_ALREADY_TAKEN -> {
+                                    Log.i("EMAIL_ALREADY_TAKEN","EMAIL_ALREADY_TAKEN")
+                                    errorFirebase = "The email address is already in use by another account"
+                                }
+                                AuthException.EMAIL_BAD_FORMATTED -> {
+                                    Log.i("EMAIL_BAD_FORMATTED","EMAIL_BAD_FORMATTED")
+                                    errorFirebase = "The email address is badly formatted"
+                                }
+                                AuthException.PASSWORD_TO0_SHORT -> {
+                                    Log.i("PASSWORD_TO0_SHORT","PASSWORD_TO0_SHORT")
+                                    errorFirebase = "Password should be at least 6 characters"
+                                }
+                                AuthException.UNKNOWN_ERROR -> {
+                                    Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
+//                                    showToast(context = context, message = "An unknown error occurred")
+                                    errorFirebase = "An unknown error occurred"
                                 }
                             }
                         }

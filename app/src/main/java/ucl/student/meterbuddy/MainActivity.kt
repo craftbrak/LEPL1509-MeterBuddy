@@ -110,12 +110,16 @@ class MainActivity : ComponentActivity() {
                 mainPageScreenModel.state.value.currentUser.collect{
                     when(it){
                         is Resource.Error -> {
-                            when(it.error){
+                            when (it.error)
+                            {
                                 AuthException.BAD_CREDENTIALS -> Log.i("Bad Cred","bad cred")
                                 AuthException.NO_NETWORK -> Log.i("No Network","cool")
-                                AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                                 AuthException.TO_MANY_ATTEMPT -> Log.i("MainActivity","ToMAnyAttempt")
+                                AuthException.PASSWORD_TO0_SHORT -> Log.i("PASSWORD_TO0_SHORT", "PASSWORD_TO0_SHORT")
+                                AuthException.EMAIL_BAD_FORMATTED -> Log.i("EMAIL_BAD_FORMATTED", "EMAIL_BAD_FORMATTED")
+                                AuthException.EMAIL_ALREADY_TAKEN -> Log.i("EMAIL_ALREADY_TAKEN", "EMAIL_ALREADY_TAKEN")
+                                AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                             }
                             // Clear the back stack before navigating to the login screen
                             Log.w("MainActivity","auth error")
