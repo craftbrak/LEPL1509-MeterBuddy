@@ -5,10 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Fireplace
 import androidx.compose.material.icons.outlined.FlashOn
@@ -53,6 +58,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
@@ -63,10 +69,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
+import ucl.student.meterbuddy.data.model.entity.MeterReading
+import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterType
+import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.ui.component.MeterReadingCard
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
+import java.time.LocalDateTime
 
 data class MeterDetailsScreen(val meter: Meter): Screen {
 
@@ -175,6 +185,41 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
     }
 
     @Composable
+    private fun graphExample() {
+        val readings = listOf(  MeterReading(-1, -1, 10.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 18.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 29.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 32.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 35.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 46.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 51.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 67.0f, LocalDateTime.now(), ""),
+            MeterReading(-1, -1, 67.0f, LocalDateTime.now(), "")
+        )
+
+        val timeIntervalWeeks = 1L // One week
+        var currentDateTime = LocalDateTime.now()
+
+        readings.forEachIndexed { index, reading ->
+            reading.date = currentDateTime
+            currentDateTime = currentDateTime.plusWeeks(timeIntervalWeeks)
+        }
+
+        val meterType = MeterType.ELECTRICITY
+        val meterUnit = MeterUnit.KILO_WATT_HOUR
+
+        val graph = ChartLineModel.createChartLine(
+            readings = readings,
+            type = meterType,
+            meterUnit = meterUnit,
+        )
+        ChartLineModel.DisplayChartLine(graph = graph!!,
+            width = LocalConfiguration.current.screenWidthDp,
+            height = 300
+        )
+    }
+
+    @Composable
     private fun AddFirstReadingIndicator(meterScreenModel: MeterScreenModel, navigator: Navigator) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -198,31 +243,50 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
-                        text = "Capture and track your first reading to start monitoring your usage.",
+                        text = "Capture and track your first reading to start monitoring your usage. Your data will automatically generate a graph for visualization. Here's an example.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+                    graphExample()
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                                           .height(60.dp)
+                    ) {
+                        Text(
+                            text = "Click here",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowRightAlt,
+                            contentDescription = "Forward Arrow",
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        FloatingActionButton(
+                            onClick = {
+                                navigator.push(AddReadingScreen(meterScreenModel.meter.meterName) { value, date, note ->
+                                    meterScreenModel.addReading(value, date, note)
+                                })
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier
+                                .size(50.dp),
+                            shape = CircleShape,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Add,
+                                contentDescription = "Add Reading",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 }
-            }
-            FloatingActionButton(
-                onClick = {
-                    navigator.push(AddReadingScreen(meterScreenModel.meter.meterName) { value, date, note ->
-                        meterScreenModel.addReading(value, date, note)
-                    })
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier
-                    .size(56.dp)
-                    .align(Alignment.CenterHorizontally),
-                shape = CircleShape,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Add Reading",
-                    modifier = Modifier.size(24.dp)
-                )
             }
         }
     }
