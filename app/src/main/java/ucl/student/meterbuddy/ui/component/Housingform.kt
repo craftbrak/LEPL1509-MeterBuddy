@@ -87,7 +87,7 @@ fun HousingFrom(
                     housingSurface = it
                 }
                             },
-            label = { Text("Surface (M³)") },
+            label = { Text("Surface (m²)") },
             placeholder = { Text("350") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(
