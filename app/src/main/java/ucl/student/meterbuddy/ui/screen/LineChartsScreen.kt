@@ -3,6 +3,7 @@ package ucl.student.meterbuddy.ui.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -69,13 +71,13 @@ class LineChartsScreen: Tab {
             Column(modifier = Modifier.padding(innerPadding)) {
                 if (meters.isEmpty()) {
                     Text("You don't have a meter.")
-                } else {
-                    // TODO ( Make a swipeable slider for the graphs )
+                } else
+                {
                     Box(modifier = Modifier.fillMaxSize()){
                         HorizontalPager(
                             state = pagerState
 
-                        ){index ->
+                        ) {index ->
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -94,8 +96,6 @@ class LineChartsScreen: Tab {
 
                     }
                 }
-
-
             }
         }
     }
@@ -120,13 +120,17 @@ class LineChartsScreen: Tab {
                 }
 
                 if (readings.isNotEmpty()) {
-                    val graph = ChartLineModel.createChartLine(readings, type, MeterUnit.KILO_WATT_HOUR)
-                    if (graph.isNotNull()) { graphs.add(graph!!) }
+                    BoxWithConstraints {
+                        val maxWidth = maxWidth.value
+                        val graph = ChartLineModel.createChartLine(readings, type, MeterUnit.KILO_WATT_HOUR, maxWidth.dp)
+                        if (graph.isNotNull()) { graphs.add(graph!!) }
+                    }
                 }
             }
         }
         return graphs
     }
+
     public data class MeterTab(
         val graph: LineChartData,
         val totalCost: Float,

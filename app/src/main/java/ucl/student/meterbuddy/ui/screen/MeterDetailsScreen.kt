@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -208,15 +209,20 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         val meterType = MeterType.ELECTRICITY
         val meterUnit = MeterUnit.KILO_WATT_HOUR
 
-        val graph = ChartLineModel.createChartLine(
-            readings = readings,
-            type = meterType,
-            meterUnit = meterUnit,
-        )
-        ChartLineModel.DisplayChartLine(graph = graph!!,
-            width = LocalConfiguration.current.screenWidthDp,
-            height = 300
-        )
+        BoxWithConstraints {
+            val maxWidth = maxWidth.value
+            val graph = ChartLineModel.createChartLine(
+                readings = readings,
+                type = meterType,
+                meterUnit = meterUnit,
+                maxWidth = maxWidth.dp
+            )
+            ChartLineModel.DisplayChartLine(
+                graph = graph!!,
+                width = LocalConfiguration.current.screenWidthDp,
+                height = 300
+            )
+        }
     }
 
     @Composable
@@ -326,15 +332,19 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                 ) {
                     val readings = meterScreenModel.state.value.readings
                     if (readings.size >= 2) {
-                        val graph = ChartLineModel.createChartLine(
-                                        readings = readings,
-                                        type = meterScreenModel.meter.meterType,
-                                        meterUnit = meterScreenModel.meter.meterUnit,
-                                    )
-                        ChartLineModel.DisplayChartLine(graph = graph!!,
-                                                        width = LocalConfiguration.current.screenWidthDp,
-                                                        height = 300
-                        )
+                        BoxWithConstraints {
+                            val maxWidth = maxWidth.value
+                            val graph = ChartLineModel.createChartLine(
+                                readings = readings,
+                                type = meterScreenModel.meter.meterType,
+                                meterUnit = meterScreenModel.meter.meterUnit,
+                                maxWidth = maxWidth.dp
+                            )
+                            ChartLineModel.DisplayChartLine(graph = graph!!,
+                                width = LocalConfiguration.current.screenWidthDp,
+                                height = 300
+                            )
+                        }
                     } else { Image( painter = painterResource(id = R.drawable.data_pending),
                             contentDescription = "Data Pending",
                             modifier = Modifier

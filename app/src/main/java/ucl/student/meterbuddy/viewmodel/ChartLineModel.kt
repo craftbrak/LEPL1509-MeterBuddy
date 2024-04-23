@@ -1,15 +1,20 @@
 package ucl.student.meterbuddy.viewmodel
 
 import android.view.Gravity
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
 import kotlin.math.floor
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.widget.ConstraintLayout
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -61,15 +66,14 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    private fun createXAxis(values: List<Point>): AxisData {
-        val nbSteps = if(values.size > 2) values.size - 1 else 1
-        val maxWidth = 220
+    private fun createXAxis(values: List<Point>, maxWidth: Dp): AxisData {
+        val nbSteps = if (values.size > 2) values.size - 1 else 1
         val stepSize = maxWidth / nbSteps
         return AxisData.Builder()
             .steps(nbSteps)
-            .axisStepSize(20.dp)
-            .labelData { a ->
-                getXLabel(a,values)}
+            .axisStepSize(stepSize)
+            .labelData { i -> getXLabel(i, values, nbSteps) }
+            .labelAndAxisLinePadding(15.dp)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
@@ -79,14 +83,13 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
-        val nbSteps = if(values.size > 3) values.size - 1 else 2
+        val nbSteps = if (values.size > 3) values.size - 1 else 2
         val maxHeight = 200
         val stepSize = maxHeight / nbSteps
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize.dp)
-            .labelData {i -> getYLabel(i,values,nbSteps)
-            }
+            .labelData {i -> getYLabel(i, values, nbSteps) }
             .labelAndAxisLinePadding(15.dp)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
@@ -94,33 +97,35 @@ object ChartLineModel: ScreenModel {
             .axisLabelDescription { labelAxis }
             .build()
     }
-    private fun getXLabel(a : Int, values : List<Point>) : String{
-        val i = a/6 /* Trop bizarre mais contrairement au labelData de yAxis, i s'incrémente de 6 par 6 au lieu de 1. */
-        if(i < values.size){
+    private fun getXLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
+        val i = i / 6 /* Bizarre mais contrairement au labelData de yAxis, i s'incremente de 6 par 6 au lieu de 1. */
+        if (i < values.size)
+        {
             val dayOfYear = values[i].x.toInt()
             println("The day $dayOfYear of the year 2024 is ${LocalDate.ofYearDay(2024,dayOfYear)}")
             return LocalDate.ofYearDay(2024,dayOfYear).toString()
-        } else {
+        }
+        else
+        {
             val dayOfYear = values.last().x.toInt() + i*7
             return LocalDate.ofYearDay(2024,dayOfYear).toString()
         }
     }
-    private fun getYLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
-        if(values.size == 1){
-            if(i == 0){ return "0"}
-            if(i == 1){
-                return floor(values[0].y).toString()
-            }
-            else{
-                return floor(values[0].y * 2).toString()
-            }
-        }
-        else{
 
+    private fun getYLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
+        if (values.size == 1)
+        {
+            if (i == 0) { return "0"}
+            if (i == 1) { return floor(values[0].y).toString() }
+            else { return floor(values[0].y * 2).toString() }
+        }
+        else
+        {
             val yScale = values.maxBy { it.y }.y - values.minBy { it.y }.y
             return floor(values.minBy { it.y }.y +(i * (yScale / nbSteps))).toString()
         }
     }
+
     @Composable
     fun DisplayChartLine(graph: LineChartData, width: Int, height: Int) {
         LineChart(modifier = Modifier
@@ -131,10 +136,9 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    fun createChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit): LineChartData? {
+    fun createChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
         val values = this.getPointsFromMeterReadings(readings) ?: return null
-
-        val xData = this.createXAxis(values = values)
+        val xData = this.createXAxis(values = values, maxWidth = maxWidth)
         val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
         return LineChartData(
             linePlotData = LinePlotData(
