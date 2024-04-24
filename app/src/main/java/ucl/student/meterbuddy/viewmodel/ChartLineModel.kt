@@ -1,20 +1,15 @@
 package ucl.student.meterbuddy.viewmodel
 
-import android.view.Gravity
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
 import kotlin.math.floor
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.ConstraintLayout
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -33,8 +28,6 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import java.time.LocalDate
-
-//import java.time.LocalDate
 
 object ChartLineModel: ScreenModel {
 
@@ -72,7 +65,7 @@ object ChartLineModel: ScreenModel {
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize)
-            .labelData { i -> getXLabel(i, values, nbSteps) }
+            .labelData { a -> getXLabel(a, values, nbSteps) }
             .labelAndAxisLinePadding(15.dp)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
@@ -97,17 +90,20 @@ object ChartLineModel: ScreenModel {
             .axisLabelDescription { labelAxis }
             .build()
     }
-    private fun getXLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
-        val i = i / 6 /* Bizarre mais contrairement au labelData de yAxis, i s'incremente de 6 par 6 au lieu de 1. */
+
+    // TODO : XLabel renvoie toujours la même date
+    private fun getXLabel(a : Int, values : List<Point>, nbSteps : Int) : String {
+        val i = a / 6 /* Bizarre mais contrairement au labelData de yAxis, i s'incremente de 6 par 6 au lieu de 1. */
         if (i < values.size)
         {
             val dayOfYear = values[i].x.toInt()
-            println("The day $dayOfYear of the year 2024 is ${LocalDate.ofYearDay(2024,dayOfYear)}")
-            return LocalDate.ofYearDay(2024,dayOfYear).toString()
+            // TODO : Rendre possible les dates > l'année 2024
+            println("The day $dayOfYear of the year 2024 is ${LocalDate.ofYearDay(2024, dayOfYear)}")
+            return LocalDate.ofYearDay(2024, dayOfYear).toString()
         }
         else
         {
-            val dayOfYear = values.last().x.toInt() + i*7
+            val dayOfYear = values.last().x.toInt() + i * 7
             return LocalDate.ofYearDay(2024,dayOfYear).toString()
         }
     }
