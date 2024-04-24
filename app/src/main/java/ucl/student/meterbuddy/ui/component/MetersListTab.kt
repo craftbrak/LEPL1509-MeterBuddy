@@ -2,14 +2,17 @@ package ucl.student.meterbuddy.ui.component
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
@@ -54,6 +58,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getViewModel
@@ -103,6 +108,18 @@ object MetersListTab : Tab {
 }
 
 class MeterList : Screen {
+
+
+    @Composable
+    private fun AdderButton(mainPageScreenModel: MainPageScreenModel, showMeterFormDialog:  MutableState<Boolean>) {
+        if (mainPageScreenModel.state.value.meters.isNotEmpty()) {
+            ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
+                Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
+                Text("Add Meter")
+            }
+        }
+    }
+
     @Composable
     override fun Content() {
         val context = LocalContext.current
@@ -119,28 +136,22 @@ class MeterList : Screen {
             remember { mutableStateOf(Optional.empty()) }
         val editedHousing: MutableState<Housing?> = remember { mutableStateOf(null)}
         val showHousingDialog = remember{ mutableStateOf(false)}
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
-            floatingActionButton = {
-                ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
-                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add Meter")
-                    Text("Add Meter")
-                }
-            },
+            floatingActionButton = { AdderButton(mainPageScreenModel, showMeterFormDialog) },
             topBar = {
                 TopBar(
                     onDisconnectClick = { mainPageScreenModel.logout() },
                     onHoushingSelect = { housing -> mainPageScreenModel.selectHousing(housing) },
                     homes = mainPageScreenModel.state.value.housings,
                     selectedHome = mainPageScreenModel.state.value.selectedHousing,
-                    onAddHomeClick = {
-                        showHousingDialog.value = true
-                    },
+                    onAddHomeClick = { showHousingDialog.value = true },
                     onUpdateClick = {
                         showHousingDialog.value = true
-                        editedHousing.value = when(mainPageScreenModel.state.value.selectedHousing){
+                        editedHousing.value = when(mainPageScreenModel.state.value.selectedHousing) {
                             is Resource.Error -> null
                             is Resource.Loading -> null
                             is Resource.Success -> (mainPageScreenModel.state.value.selectedHousing as Resource.Success<Housing, DataException>).data
@@ -159,18 +170,7 @@ class MeterList : Screen {
                         .padding(it)
                 ) {
                     items(mainPageScreenModel.state.value.meters) { meter ->
-                        val readings =
-                            mainPageScreenModel.state.value.lastReading[meter.meterID]
-                        // val recentReadingValue = readings?.lastOrNull()?.value
-
-                        // val trendValue: Float = if ((readings?.size ?: 0) < 2) { 0.0f }
-                        // else {
-                        //     val oldReadingValue = readings?.get(readings.size - 2)?.value
-                        //  100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
-                        // }
-
-                        // Log.d("TREND", "$recentReadingValue")
-
+                        val readings = mainPageScreenModel.state.value.lastReading[meter.meterID]
                         val recentReadingValue = readings?.firstOrNull()?.value
 
                         val trendValue: Float = if ((readings?.size ?: 0) < 2) {
@@ -208,15 +208,9 @@ class MeterList : Screen {
                         )
                     }
                 }
-            } else {
-                Column (
-                    Modifier
-                        .padding(it)
-                        .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-                    Text(text = "Please get started by adding a meter", style = MaterialTheme.typography.headlineMedium)
-                }
-
             }
+            else { AddFirstMeterIndicator(it, showMeterFormDialog, showHousingDialog, editedHousing, mainPageScreenModel) }
+
             HousingDialog(enabled = showHousingDialog.value, onSubmit = { housing->
                 mainPageScreenModel.saveHousing(housing)
                 showHousingDialog.value = false
@@ -381,6 +375,78 @@ class MeterList : Screen {
             )
         }
     }
+
+    @Composable
+    private fun AddFirstMeterIndicator(it: PaddingValues, showMeterFormDialog: MutableState<Boolean>, showHousingDialog: MutableState<Boolean>, editedHousing:  MutableState<Housing?>, mainPageScreenModel: MainPageScreenModel) {
+        Column (
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Welcome to your new home!",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Here, you can create your own meters, add readings, view trends graphically, and much more!",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable(onClick = { showMeterFormDialog.value = true })
+            ) {
+                ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add first Meter")
+                    Text("Add your first Meter here!")
+                }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Row(
+                modifier = Modifier.clickable(onClick = {
+                    showHousingDialog.value = true
+                    editedHousing.value = when(mainPageScreenModel.state.value.selectedHousing) {
+                        is Resource.Error -> null
+                        is Resource.Loading -> null
+                        is Resource.Success -> (mainPageScreenModel.state.value.selectedHousing as Resource.Success<Housing, DataException>).data
+                    }
+                }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit your Home",
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Edit your home here",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.clickable(onClick = { showHousingDialog.value = true }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add a new home",
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Create a new home here",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable

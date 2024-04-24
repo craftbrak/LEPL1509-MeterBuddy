@@ -140,21 +140,21 @@ class LineChartsScreen: Tab {
     @Composable
     private fun getMetersInfo(meters : List<Meter>, graphs: List<LineChartData>) : List<MeterTab>{
         val list = ArrayList<MeterTab>()
-        var count : Int = 0
-        if(graphs.isEmpty()){
+        var count = 0
+        if (graphs.isEmpty()) {
             return list
         }
         println("Size of graph : ${graphs.size} Size of meters : ${meters.size}")
-        for(meter in meters){
+        for (meter in meters) {
             val meterScreenModel = getScreenModel<MeterScreenModel,MeterScreenModel.Factory>{
                 it.create(meter)
             }
             var readings : List<MeterReading> = meterScreenModel.state.value.readings
-            var totalEnergyConsumed : Float = 0f
-            for(reading in readings){
+            var totalEnergyConsumed = 0f
+            for (reading in readings) {
                 totalEnergyConsumed += reading.value
             }
-            if(count < graphs.size) {
+            if (count < graphs.size) {
                 val meterTab = MeterTab(
                     graph = graphs[count],
                     totalEnergyConsumed = totalEnergyConsumed,
