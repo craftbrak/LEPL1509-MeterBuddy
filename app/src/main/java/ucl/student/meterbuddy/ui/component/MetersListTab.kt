@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
@@ -136,7 +136,6 @@ class MeterList : Screen {
             remember { mutableStateOf(Optional.empty()) }
         val editedHousing: MutableState<Housing?> = remember { mutableStateOf(null)}
         val showHousingDialog = remember{ mutableStateOf(false)}
-
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -152,8 +151,7 @@ class MeterList : Screen {
                     onUpdateClick = {
                         showHousingDialog.value = true
                         editedHousing.value = when(mainPageScreenModel.state.value.selectedHousing) {
-                            is Resource.Error -> null
-                            is Resource.Loading -> null
+                            is Resource.Error,is Resource.Loading -> null
                             is Resource.Success -> (mainPageScreenModel.state.value.selectedHousing as Resource.Success<Housing, DataException>).data
                         }
                     }
@@ -188,24 +186,26 @@ class MeterList : Screen {
                             TrendIcon.Down
                         }
 
-                        MeterOverviewCard(
-                            onClick = { navigator?.push(MeterDetailsScreen(meter)) },
-                            onLongClick = {
-                                showBottomSheet.value = true
-                                selectedMeter.value = Optional.of(meter)
-                            },
-                            modifier = Modifier.padding(10.dp),
-                            meterName = meter.meterName,
-                            meterIcon = meter.meterIcon,
-                            lastReading = if (recentReadingValue.isNotNull()) {
-                                recentReadingValue.toString()
-                            } else null,
-                            readingUnit = meter.meterUnit.unit,
-                            trendIcon = trendIcon,
-                            trendValue = trendValue,
-                            monthlyCost = 20.0f,
-                            currencySymbol = "£" //TODO: USE values instead of hardcoded values
-                        )
+                        mainPageScreenModel.state.value.currentUserData?.userCurrency?.symbol?.let { it1 ->
+                            MeterOverviewCard(
+                                onClick = { navigator?.push(MeterDetailsScreen(meter)) },
+                                onLongClick = {
+                                    showBottomSheet.value = true
+                                    selectedMeter.value = Optional.of(meter)
+                                },
+                                modifier = Modifier.padding(10.dp),
+                                meterName = meter.meterName,
+                                meterIcon = meter.meterIcon,
+                                lastReading = if (recentReadingValue.isNotNull()) {
+                                    recentReadingValue.toString()
+                                } else null,
+                                readingUnit = meter.meterUnit.unit,
+                                trendIcon = trendIcon,
+                                trendValue = trendValue,
+                                monthlyCost = 20.0f,
+                                currencySymbol = it1
+                            )
+                        }
                     }
                 }
             }
@@ -214,14 +214,27 @@ class MeterList : Screen {
             HousingDialog(enabled = showHousingDialog.value, onSubmit = { housing->
                 mainPageScreenModel.saveHousing(housing)
                 showHousingDialog.value = false
-            }, onDismissRequest = { showHousingDialog.value = false },
+            }, onDismissRequest = { showHousingDialog.value = false; editedHousing.value = null},
                 initialData = editedHousing.value,
-                users = mainPageScreenModel.getUsers(),
+                users = mainPageScreenModel.state.value.users,
                 usersOfHousing = editedHousing.value?.let { it1 ->
-                    mainPageScreenModel.getHousingUsers(
-                        it1
-                    )
-                }?: emptyList()
+                    mainPageScreenModel.state.value.housingUsers
+                }?: emptyList(),
+                onUserDelete = { user ->
+                    if (mainPageScreenModel.state.value.housingUsers.size > 1) {
+                        mainPageScreenModel.deleteUserFromHousing(
+                            user,
+                            editedHousing.value!!
+                        )
+                    } },
+                onUserAdd = { user ->
+                    Log.wtf("HousingDialog", user.userName)
+                    if(user !in mainPageScreenModel.state.value.housingUsers){
+                        mainPageScreenModel.addUserToHousing(
+                            user,
+                            editedHousing.value!!
+                        )
+                    } }
                 )
             MeterFormDialog(
                 onDismissRequest = { showMeterFormDialog.value = false },

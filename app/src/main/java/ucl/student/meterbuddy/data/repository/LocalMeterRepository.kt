@@ -40,7 +40,7 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
-    override fun addHousing(housing: Housing) {
+    override fun addHousing(housing: Housing, user: User) {
         TODO("Not yet implemented")
     }
 
@@ -64,7 +64,7 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getUser(id: String): Resource<User, DataException> {
+    override suspend fun getUser(id: String): Resource<User, DataException> {
         TODO("Not yet implemented")
     }
 
@@ -80,7 +80,11 @@ class LocalMeterRepository(private val userDao: UserDao): MeterRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getHousingMember(housing: Housing): Resource<List<User>, DataException> {
+    override suspend fun getHousingMember(housing: Housing): Resource<List<User>, DataException> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUsersResource(): Flow<Resource<List<User>, DataException>> {
         TODO("Not yet implemented")
     }
 

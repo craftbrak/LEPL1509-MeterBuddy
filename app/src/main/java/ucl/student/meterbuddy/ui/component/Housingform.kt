@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -60,7 +58,8 @@ fun HousingFrom(
     initialData: Housing? = null,
     usersOfHousing:List<User> = emptyList(),
     users:List<User> = emptyList(),
-    onUserRemove:(User)->Unit = {}
+    onUserRemove:(User)->Unit = {},
+    onUserAdd:(User)->Unit = {}
 ) {
     var housingName by remember { mutableStateOf(initialData?.housingName ?: "") }
     var housingType by remember { mutableStateOf(initialData?.housingType ?: HousingType.House) }
@@ -142,7 +141,7 @@ fun HousingFrom(
                     .wrapContentHeight()
                     .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
                 usersOfHousing.forEach {
-                    InputChip(onClick = { /*TODO*/ }, selected = false
+                    InputChip(onClick = { onUserRemove(it) }, selected = false
                         , label = {
                         Text(text = it.userName)
                             Icon(imageVector = Icons.Filled.Close, contentDescription = Icons.Filled.Close.name)
@@ -179,16 +178,17 @@ fun HousingFrom(
                             },
                             singleLine = true
                         )
-                        LazyColumn(modifier = Modifier.heightIn(50.dp,500.dp)) {
-                            items(users.filter { u ->
+                        FlowRow(modifier = Modifier.heightIn(50.dp,500.dp)) {
+                            users.filter { u ->
                                 u.userName.contains(
                                     userSearch,
                                     ignoreCase = true
                                 )
-                            }) { user ->
+                            }.forEach{ user ->
+                                if (user !in usersOfHousing)
                                 FilterChip(
                                     selected = user in usersOfHousing,
-                                    onClick = { /*TODO*/ },
+                                    onClick = { onUserAdd(user) },
                                     label = {
                                         Text(text = user.userName)
                                     })

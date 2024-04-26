@@ -28,7 +28,9 @@ fun HousingDialog(
     onDismissRequest: ()->Unit,
     initialData: Housing? = null,
     users: List<User> = emptyList(),
-    usersOfHousing: List<User> = emptyList()
+    usersOfHousing: List<User> = emptyList(),
+    onUserDelete: (User) -> Unit,
+    onUserAdd: (User) -> Unit
 ) {
     if (enabled) {
         Dialog(onDismissRequest = onDismissRequest) {
@@ -47,7 +49,7 @@ fun HousingDialog(
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     Log.wtf("HousingDialog", initialData?.housingName)
-                    HousingFrom(modifier=Modifier.fillMaxWidth(),onSubmit = { housing -> onSubmit(housing) },initialData ,users= users, usersOfHousing = usersOfHousing)
+                    HousingFrom(modifier=Modifier.fillMaxWidth(),onSubmit = { housing -> onSubmit(housing) },initialData ,users= users, usersOfHousing = usersOfHousing, onUserRemove = onUserDelete, onUserAdd = onUserAdd)
                 }
 
             }
@@ -58,5 +60,5 @@ fun HousingDialog(
 @Preview(name = "HousingDialog")
 @Composable
 private fun PreviewHousingDialog() {
-    HousingDialog(enabled = true, onDismissRequest =  {}, onSubmit = {})
+    HousingDialog(enabled = true, onDismissRequest =  {}, onSubmit = {}, users = emptyList(), usersOfHousing = emptyList(), onUserDelete = {}, onUserAdd = {})
 }
