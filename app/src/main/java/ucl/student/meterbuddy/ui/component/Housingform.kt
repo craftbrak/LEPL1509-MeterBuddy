@@ -185,13 +185,11 @@ fun HousingFrom(
                                     ignoreCase = true
                                 )
                             }.forEach{ user ->
-                                if (user !in usersOfHousing)
-                                FilterChip(
-                                    selected = user in usersOfHousing,
-                                    onClick = { onUserAdd(user) },
-                                    label = {
-                                        Text(text = user.userName)
-                                    })
+                                if (user !in usersOfHousing) {
+                                    FilterChip(selected = user in usersOfHousing,
+                                        onClick = { onUserAdd(user) },
+                                        label = { Text(text = user.userName) })
+                                }
                             }
                         }
                         Button(onClick = { showUserSelect = false }) {
