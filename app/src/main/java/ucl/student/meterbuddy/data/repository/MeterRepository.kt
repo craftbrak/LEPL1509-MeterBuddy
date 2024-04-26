@@ -31,7 +31,7 @@ interface MeterRepository {
     fun filteredMetersByType(meters: List<Meter>, type: MeterType): List<Meter>
 
     fun getHousing(): Flow<Resource<List<Housing>, DataException>>
-    fun addHousing(housing: Housing)
+    fun addHousing(housing: Housing, user: User)
     fun updateHousing(housing: Housing)
     fun deleteHousing(housing: Housing)
 
@@ -39,5 +39,10 @@ interface MeterRepository {
     fun removeUserFromHousing(housing: Housing, user: User)
 
     fun getUsers(): Resource<List<User>, DataException>
+    suspend fun getUser(id: String): Resource<User, DataException>
     fun addUserData(user: User)
+    fun setHomeAndUser(housing : Housing, userId: String)
+    fun setHomeCollection(userId: String)
+    suspend fun getHousingMember(housing: Housing): Resource<List<User>, DataException>
+    fun getUsersResource(): Flow<Resource<List<User>, DataException>>
 }

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8f99b6c5e6251ed4b17b3bc837f069e4",
+    "identityHash": "43e063697d1fd4570802f9895fd52f60",
     "entities": [
       {
         "tableName": "Housing",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`housingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `housingName` TEXT NOT NULL, `housingType` TEXT NOT NULL, `housingSurface` INTEGER NOT NULL, `housingNbPersons` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`housingID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `housingName` TEXT NOT NULL, `housingType` TEXT NOT NULL, `housingSurface` REAL NOT NULL, `housingNbPersons` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "housingID",
@@ -29,7 +29,7 @@
           {
             "fieldPath": "housingSurface",
             "columnName": "housingSurface",
-            "affinity": "INTEGER",
+            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -223,7 +223,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8f99b6c5e6251ed4b17b3bc837f069e4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '43e063697d1fd4570802f9895fd52f60')"
     ]
   }
 }

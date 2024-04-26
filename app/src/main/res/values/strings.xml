@@ -16,4 +16,7 @@
     <string name="add_meter">Add a new meter</string>
     <string name="negative_cost">Cost cannot be negative, if you want to track a production please toggle the consumption off</string>
     <string name="title_activity_auth">AuthActivity</string>
+    <string name="add_housing">New Home</string>
+    <string name="home_selection">Home selection</string>
+    <string name="no_housings">Please add a housing to continue</string>
 </resources>

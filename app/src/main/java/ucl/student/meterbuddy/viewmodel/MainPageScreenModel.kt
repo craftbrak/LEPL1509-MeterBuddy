@@ -1,32 +1,17 @@
 package ucl.student.meterbuddy.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.hilt.ScreenModelFactory
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
-import ucl.student.meterbuddy.data.UserDatabase
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
@@ -36,97 +21,170 @@ import ucl.student.meterbuddy.data.model.enums.HousingType
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.data.repository.AuthRepository
-import ucl.student.meterbuddy.data.repository.LocalMeterRepository
 import ucl.student.meterbuddy.data.repository.MeterRepository
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.DataException
-import ucl.student.meterbuddy.data.utils.DataException.*
+import ucl.student.meterbuddy.data.utils.DataException.BAD_REQUEST
+import ucl.student.meterbuddy.data.utils.DataException.NO_DATA
+import ucl.student.meterbuddy.data.utils.DataException.NO_NETWORK
+import ucl.student.meterbuddy.data.utils.DataException.UNAUTHORIZED
+import ucl.student.meterbuddy.data.utils.DataException.UNKNONW_ERROR
 import ucl.student.meterbuddy.data.utils.Resource
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class MainPageScreenModel @Inject constructor(
     private val meterRepository: MeterRepository,
-    private val savedStateHandle: SavedStateHandle,
     private val authRepository: AuthRepository
 ) : ViewModel() {
-
+    private val tag = "MainPageScreenModel: "
     private val _state = mutableStateOf(MainPageState())
     val state: State<MainPageState> = _state
     val auth = Firebase.auth
 
     init {
-        updateState()
+        try {
+            updateState()
+        } catch (e: Throwable) {
+            e.message?.let { Log.e(tag + "update", it) }
+        }
     }
 
     private fun updateState() {
         viewModelScope.launch {
-            authRepository.getUser().collect {
-                _state.value.currentUser.emit(it)
-                when(it){
+            authRepository.getUser().collect { firebaseUserResource ->
+                _state.value.currentUser.emit(firebaseUserResource)
+                when (firebaseUserResource) {
                     is Resource.Error -> {
-                        Log.w("MainPageScreenModel", "No User")
+                        Log.w(tag, "No User")
                     }
+
                     is Resource.Loading -> {
-                        Log.d("MainPageScreenModel", "Loading")
+                        Log.d(tag, "Loading")
                     }
+
                     is Resource.Success -> {
-                        Log.d("MainPageScreenModel", "User: ${it.data.email}")
+                        Log.d(tag, "User: ${firebaseUserResource.data.email}")
+                        meterRepository.setHomeCollection(
+                            firebaseUserResource.data.uid.hashCode().toString()
+                        )
+                        viewModelScope.launch {
+                            val u = meterRepository.getUser(
+                                firebaseUserResource.data.uid.hashCode().toString()
+                            )
+                            _state.value = _state.value.copy(
+                                currentUserData = when (u) {
+                                    is Resource.Error, is Resource.Loading -> {
+                                        Log.e(tag + "User Data", "No custom user data retrieved")
+                                        null
+                                    }
+
+                                    is Resource.Success -> {
+                                        Log.d(tag + "User Data", u.data.toString())
+                                        u.data
+                                    }
+                                }
+                            )
+
+                        }
                         meterRepository.getHousing().collect { housingRessource ->
                             when (housingRessource) {
                                 is Resource.Error -> {
-                                    when(housingRessource.error){
+                                    _state.value = _state.value.copy(
+                                        housings = emptyList()
+                                    )
+                                    when (housingRessource.error) {
+
                                         NO_NETWORK -> TODO()
                                         BAD_REQUEST -> TODO()
                                         UNAUTHORIZED -> TODO()
                                         UNKNONW_ERROR -> TODO()
-                                        NO_DATA -> {
-                                            Log.d("Housing", "No Housing")
-                                            _state.value = state.value.copy(
-                                                selectedHousing = Resource.Error(NO_DATA)
+                                        NO_DATA -> { //TODO make onboarding process
+//                                            Log.d("Housing", "No Housing")
+//                                            _state.value = state.value.copy(
+//                                                selectedHousing = Resource.Error(NO_DATA)
+//                                            )
+                                            saveHousing(
+                                                Housing()
                                             )
-                                            state.value.currentUser.collect{
-                                                when(it){
-                                                    is Resource.Error -> {
-                                                        Log.w("MainPageScreenModel", "No User")
-                                                    }
-                                                    is Resource.Loading -> {
-                                                        Log.d("MainPageScreenModel", "Loading")
-                                                    }
-                                                    is Resource.Success -> {
-                                                        val defaultHousing = Housing(housingID = UUID.randomUUID().hashCode())
-                                                        meterRepository.addHousing(defaultHousing)
-                                                        meterRepository.addUserData(User(it.data.uid.hashCode(), it.data.email!!, Currency.EUR))
-                                                        meterRepository.addUserToHousing(defaultHousing, User(it.data.uid.hashCode(), it.data.email!!, Currency.EUR))
-                                                    }
-                                                }
-                                            }
+                                            Log.wtf(tag + "UpdateState", "No housings")
+                                            _state.value = state.value.copy(
+                                                selectedHousing = Resource.Error(NO_DATA),
+                                                housings = emptyList()
+                                            )
                                         }
                                     }
 
                                 }
 
                                 is Resource.Loading -> {
-
+                                    Log.wtf(tag + "UpdateState", "Loading housings")
+                                    _state.value = _state.value.copy(
+                                        housings = emptyList()
+                                    )
                                 }
 
                                 is Resource.Success -> {
+                                    _state.value = _state.value.copy(
+                                        housings = emptyList()
+                                    )
                                     if (housingRessource.data.isNotEmpty()) {
+                                        //TODO: store selected housing ID in localpref and if set use this housing by default
+                                        val selectedHousing = when (state.value.selectedHousing) {
+                                            is Resource.Error -> housingRessource.data.first()
+                                            is Resource.Loading -> housingRessource.data.first()
+                                            is Resource.Success -> (state.value.selectedHousing as Resource.Success<Housing, DataException>).data
+                                        }
+                                        val housingUsers = when (val users =
+                                            meterRepository.getHousingMember(selectedHousing)) {
+                                            is Resource.Error, is Resource.Loading -> emptyList()
+                                            is Resource.Success -> {
+                                                users.data
+                                            }
+                                        }
                                         _state.value = state.value.copy(
-                                            selectedHousing = Resource.Success(housingRessource.data.first()),
-                                            housings = housingRessource.data
+                                            selectedHousing = Resource.Success(selectedHousing),
+                                            housings = housingRessource.data,
+                                            housingUsers = housingUsers
                                         )
-                                        meterRepository.getMeterAndReadings(housingRessource.data.first()).collect {
-                                            _state.value = state.value.copy(
-                                                meters = it.keys.toList(),
-                                                lastReading = it.map { (meter, readings) ->
-                                                    meter.meterID to readings
-                                                }.toMap()
-                                            )
+                                        meterRepository.setHomeAndUser(
+                                            selectedHousing,
+                                            firebaseUserResource.data.uid.hashCode().toString()
+                                        )
+                                        viewModelScope.launch {
+                                            meterRepository.getUsersResource().collect {
+                                                when (it) {
+                                                    is Resource.Error -> {
+                                                        Log.e(tag + "GetUser", it.error.toString())
+                                                    }
+
+                                                    is Resource.Loading -> {
+
+                                                    }
+
+                                                    is Resource.Success -> {
+                                                        Log.d(tag + "GetUsers", it.data.toString())
+                                                        _state.value = _state.value.copy(
+                                                            users = it.data
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        viewModelScope.launch {
+                                            meterRepository.getMeterAndReadings(selectedHousing)
+                                                .collect {
+                                                    Log.wtf(tag + "Readings", it.toString())
+                                                    _state.value = state.value.copy(
+                                                        meters = it.keys.toList(),
+                                                        lastReading = it.map { (meter, readings) ->
+                                                            meter.meterID to readings
+                                                        }.toMap()
+                                                    )
+                                                }
                                         }
                                     } else {
-                                        Log.d("Housing", "No Housing")
+                                        Log.d(tag + "Housing", "No Housing")
                                         _state.value = state.value.copy(
                                             selectedHousing = Resource.Error(NO_DATA)
                                         )
@@ -140,20 +198,12 @@ class MainPageScreenModel @Inject constructor(
             }
 
         }
-//        viewModelScope.launch {
-//            meterRepository.getMeterAndReadings().collect { metersAndReadings ->
-////                Log.i("Meters and Readings", metersAndReadings.keys.toString())
-//                _state.value = state.value.copy(
-//                    meters = metersAndReadings.keys.toList(),
-//                    lastReading = metersAndReadings.map { (meter, readings) ->
-//                        meter.meterID to readings
-//                    }.toMap()
-//                )
-//            }
-//
-//
-//        }
+        viewModelScope.launch {
+            authRepository.getUser().collect {
+                _state.value.currentUser.emit(it)  //Don't ask me why this is duplicated but it work and it does not if removed
+            }
         }
+    }
 
 
     fun updateMeter(meter: Meter) {
@@ -163,9 +213,9 @@ class MainPageScreenModel @Inject constructor(
     }
 
     fun addMeter(metre: Meter) {
-        when(state.value.selectedHousing){
-            is Resource.Error -> TODO()
-            is Resource.Loading -> TODO()
+        when (state.value.selectedHousing) {
+            is Resource.Error -> {}
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 val meter = metre.copy(
                     housingID = (state.value.selectedHousing as Resource.Success<Housing, DataException>).data.housingID
@@ -224,23 +274,36 @@ class MainPageScreenModel @Inject constructor(
         return readingsConverted
     }
 
+    @Throws(Error::class)
     private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit): Float {
         if (meterUnit == MeterUnit.CENTIMETER) {
-            if (finalMeterUnit == MeterUnit.CUBIC_METER) {
-                return 1.3f
-            } else if (finalMeterUnit == MeterUnit.LITER) {
-                return 2.1f
-            } else {
-                Error("Bad Unit")
+            return when (finalMeterUnit) {
+                MeterUnit.CUBIC_METER -> {
+                    1.3f
+                }
+
+                MeterUnit.LITER -> {
+                    2.1f
+                }
+
+                else -> {
+                    throw Error("Bad Unit")
+                }
             }
 
         } else if (meterUnit == MeterUnit.CUBIC_METER) {
-            if (finalMeterUnit == MeterUnit.CUBIC_METER) {
-                return 3.32f
-            } else if (finalMeterUnit == MeterUnit.LITER) {
-                return 4.0f
-            } else {
-                Error("Bad Unit")
+            return when (finalMeterUnit) {
+                MeterUnit.CUBIC_METER -> {
+                    3.32f
+                }
+
+                MeterUnit.LITER -> {
+                    4.0f
+                }
+
+                else -> {
+                    throw Error("Bad Unit")
+                }
             }
         }
         return 1.0f
@@ -252,6 +315,15 @@ class MainPageScreenModel @Inject constructor(
 
     fun isMeterReadingAboveThreshold(meterReading: MeterReading, threshold: Double): Boolean {
         return meterReading.value > threshold
+    }
+
+    fun getUsers(): List<User> {
+        return when (val users = meterRepository.getUsers()) {
+            is Resource.Error, is Resource.Loading -> emptyList()
+            is Resource.Success -> {
+                users.data
+            }
+        }
     }
 
     fun deleteMeter(meter: Meter) {
@@ -282,12 +354,17 @@ class MainPageScreenModel @Inject constructor(
         }
     }
 
-    fun registerUser(email: String, password: String, username: String, selectedCurrency: Currency) {
+    fun registerUser(
+        email: String,
+        password: String,
+        username: String,
+        selectedCurrency: Currency
+    ) {
         viewModelScope.launch {
             authRepository.registerUser(email, password).collect {
                 when (it) {
                     is Resource.Error -> {
-                        Log.e("Main Page Screen Model Login Error", it.error.toString())
+                        Log.e(tag + "Login", it.error.toString())
                         _state.value.currentUser.emit(Resource.Error(it.error))
                     }
 
@@ -297,18 +374,18 @@ class MainPageScreenModel @Inject constructor(
 
                     is Resource.Success -> {
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
-                        val userData = User(it.data.user!!.uid.hashCode(), username, selectedCurrency)
+                        val userData =
+                            User(it.data.user!!.uid.hashCode(), username, selectedCurrency)
                         meterRepository.addUserData(userData)
                         val defaultHousing = Housing(
                             0,
                             "My Home",
                             HousingType.House,
-                            50,
+                            50f,
                             2
                         )
-                        meterRepository.addHousing(defaultHousing)
-                        meterRepository.addUserToHousing(defaultHousing, userData)
-                        Log.i("Register", "Logged in as ${it.data.user?.email}")
+                        meterRepository.addHousing(defaultHousing, userData)
+                        Log.i(tag + "Register", "Logged in as ${it.data.user?.email}")
                     }
                 }
             }
@@ -318,7 +395,39 @@ class MainPageScreenModel @Inject constructor(
 
     fun logout() {
         authRepository.logout()
-//        _state.value.currentUser.value = Resource.Error(AuthException.NO_CURRENT_USER)
+        viewModelScope.launch {
+            state.value.currentUser.emit(Resource.Error(AuthException.NO_CURRENT_USER))
+        }
+        Log.d(tag + "Logout", "Loggued out")
+    }
+
+    fun selectHousing(housing: Housing) {
+        _state.value = _state.value.copy(
+            selectedHousing = Resource.Success(housing),
+            meters = emptyList()
+        )
+        updateState()
+    }
+
+    fun saveHousing(housing: Housing) {
+        if (housing.housingID == 0) {
+            meterRepository.addHousing(housing, state.value.currentUserData!!)
+            updateState()
+        } else {
+            meterRepository.updateHousing(housing)
+            updateState()
+            selectHousing(housing)
+        }
+    }
+
+    fun deleteUserFromHousing(user: User, value: Housing) {
+        meterRepository.removeUserFromHousing(value, user)
+        updateState()
+    }
+
+    fun addUserToHousing(user: User, value: Housing) {
+        meterRepository.addUserToHousing(value, user)
+        updateState()
     }
 //    fun filterMeterByUnit(unit: Unit): MutableList<Meter> {
 //        return meters.filter { meter ->

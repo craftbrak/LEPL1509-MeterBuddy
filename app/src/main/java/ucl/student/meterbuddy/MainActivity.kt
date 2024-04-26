@@ -1,45 +1,49 @@
 package ucl.student.meterbuddy
 
+//import androidx.navigation.navigation
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-//import androidx.navigation.navigation
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
@@ -56,29 +60,12 @@ class MainActivity : ComponentActivity() {
     private val localScreenContext = compositionLocalOf<Context> { error("No Context provided") }
     private val mainPageScreenModel: MainPageScreenModel by viewModels()
 
-    //    private lateinit var analytics: FirebaseAnalytics
-    //TODO: Make a compose Navigation graph , nest current app in it ,
-    // set mainpageScreenModel.state.value.currentUser to bw a flow, listen to the flow and navigate based on it
-
+        private lateinit var analytics: FirebaseAnalytics
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        analytics = Firebase.analytics
         installSplashScreen().apply {}
-        val user = FirebaseAuth.getInstance().currentUser
-
-//        when(mainPageScreenModel.state.value.currentUser.value){
-//            is Resource.Error -> {
-//                val intent= Intent(this, AuthActivity::class.java)
-//                startActivity(intent)
-//            }
-//            is Resource.Loading -> {
-//                //TODO: Display Loading screen
-//
-//            }
-//            is Resource.Success -> {
-//
-//            }
-//        }
         setContent {
             val navController = rememberNavController()
             MeterBuddyTheme{
@@ -91,34 +78,51 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = "loading") {
                         composable("auth"){
-                            auth()
+                            Auth()
                         }
                         composable("loading"){
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Image(
+                                    painter = painterResource(id = R.drawable.meter_budy_logo),
+                                    contentDescription = "App Logo",
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
 
                         }
                         composable("home"){
-                            mainComp()
+                            MainComp()
                         }
                     }
 
                 }
-
-
             }
 
             LaunchedEffect(key1 = mainPageScreenModel.state.value.currentUser) {
                 mainPageScreenModel.state.value.currentUser.collect{
                     when(it){
                         is Resource.Error -> {
-                            when(it.error){
+                            when (it.error)
+                            {
                                 AuthException.BAD_CREDENTIALS -> Log.i("Bad Cred","bad cred")
                                 AuthException.NO_NETWORK -> Log.i("No Network","cool")
-                                AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                                 AuthException.NO_CURRENT_USER -> Log.i("No Current User","nobody connected")
                                 AuthException.TO_MANY_ATTEMPT -> Log.i("MainActivity","ToMAnyAttempt")
+                                AuthException.PASSWORD_TO0_SHORT -> Log.i("PASSWORD_TO0_SHORT", "PASSWORD_TO0_SHORT")
+                                AuthException.EMAIL_BAD_FORMATTED -> Log.i("EMAIL_BAD_FORMATTED", "EMAIL_BAD_FORMATTED")
+                                AuthException.EMAIL_ALREADY_TAKEN -> Log.i("EMAIL_ALREADY_TAKEN", "EMAIL_ALREADY_TAKEN")
+                                AuthException.UNKNOWN_ERROR -> Log.i("HAAAAAAAAAAAAAAAAAAa","merde")
                             }
                             // Clear the back stack before navigating to the login screen
-
+                            Log.w("MainActivity","auth error")
                             navController.navigate("auth"){
                                 popUpTo(navController.graph.id)
                             }
@@ -137,12 +141,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
-    private fun mainComp(){
+    private fun MainComp(){
         TabNavigator(tab = MetersListTab) {
             Scaffold(
                 content = {
-                    it != null
                     CurrentTab()
                 },
                 bottomBar = {
@@ -155,7 +159,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     @Composable
-    private fun auth(){
+    private fun Auth(){
         Navigator(screen = LoginScreen()) {
             SlideTransition(navigator = it)
         }

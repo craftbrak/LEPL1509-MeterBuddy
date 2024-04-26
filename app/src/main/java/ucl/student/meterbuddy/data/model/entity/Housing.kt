@@ -10,6 +10,6 @@ data class Housing (
     @PrimaryKey(autoGenerate = true) val housingID: Int = 0,
     val housingName: String = "My Home",
     val housingType: HousingType = HousingType.House,
-    val housingSurface: Int = 50,
+    val housingSurface: Float = 50f,
     val housingNbPersons: Int = 2
 )
