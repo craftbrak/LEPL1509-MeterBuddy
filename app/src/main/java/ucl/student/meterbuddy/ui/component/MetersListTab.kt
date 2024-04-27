@@ -208,7 +208,7 @@ class MeterList : Screen {
                                     meterIcon = meter.meterIcon,
                                     lastReading = if (recentReadingValue.isNotNull()) {
                                         recentReadingValue.toString()
-                                    } else null,
+                                    } else { null },
                                     readingUnit = meter.meterUnit.unit,
                                     trendIcon = trendIcon,
                                     trendValue = trendValue,
@@ -441,7 +441,7 @@ class MeterList : Screen {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
-                text = "Start your journey to effortless meter management. Add your first house with just a tap and begin tracking your energy usage like a pro. Let's make managing meters a breeze together!",
+                text = "Start your journey to effortless meter management.\nAdd your first house with just a tap and begin tracking your energy usage like a pro.\nLet's make managing meters a breeze together!",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 16.dp)
