@@ -232,13 +232,10 @@ class MainPageScreenModel @Inject constructor(
         return meterRepository.getMeterReadings(meter.meterID).last().last()
     }
 
+    @Composable
     fun filterMetersByType(type: MeterType): List<Meter> {
-        val meters = state.value.meters
-        return meters.filter { meter ->
-            meter.meterType == type
-        }.toList()
+        return meterRepository.getMeters().collectAsState(initial = emptyList()).value.filter { meter -> meter.meterType == type }
     }
-
     @Composable
     fun getMeterReadings(meter: Meter): List<MeterReading> {
         return meterRepository.getMeterReadings(meter.meterID)
@@ -287,6 +284,7 @@ class MainPageScreenModel @Inject constructor(
                 }
 
                 else -> {
+                    println("Ici salope")
                     throw Error("Bad Unit")
                 }
             }
@@ -302,6 +300,7 @@ class MainPageScreenModel @Inject constructor(
                 }
 
                 else -> {
+
                     throw Error("Bad Unit")
                 }
             }

@@ -57,7 +57,6 @@ class LineChartsScreen: Tab {
                 )
             }
         }
-
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
@@ -66,7 +65,6 @@ class LineChartsScreen: Tab {
         val meters = mainPageScreenModel.state.value.meters
         val graphs: List<LineChartData> = getListGraphs(mainPageScreenModel)
 
-        // TODO : Affiche qu'il n'y a aucun readings même quand y'en a assez
         if (graphs.isEmpty()) { Text("You need at least one meter with two readings.")  }
         else {
             val listMeterTab: List<MeterTab> = getMetersInfo(meters, graphs)
@@ -140,9 +138,8 @@ class LineChartsScreen: Tab {
 
             if (metersFiltered.isNotEmpty())
             {
-                val unitOfUser = type.meterUnits.last()
+                val unitOfUser = metersFiltered.last().meterUnit
                 val readings = mutableListOf<MeterReading>()
-
                 metersFiltered.forEach { meter ->
                     val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
                     readings += mainPageScreenModel.convertUnitReadings(
@@ -152,15 +149,21 @@ class LineChartsScreen: Tab {
                     )
                 }
 
+
                 if (readings.isNotEmpty()) {
+
                     BoxWithConstraints {
                         val maxWidth = maxWidth.value
                         val graph = ChartLineModel.createChartLine(readings, type, MeterUnit.KILO_WATT_HOUR, maxWidth.dp)
-                        if (graph.isNotNull()) { graphs.add(graph!!) }
+                        if (graph.isNotNull()) {
+                            graphs.add(graph!!)
+
+                        }
                     }
                 }
             }
         }
+
         return graphs
     }
 
