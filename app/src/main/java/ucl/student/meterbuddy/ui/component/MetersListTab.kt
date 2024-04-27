@@ -159,58 +159,60 @@ class MeterList : Screen {
             },
             bottomBar = { BottomAppBar {} }
         ) {
+            if (mainPageScreenModel.state.value.housings.isEmpty()) { AddFirstHousingIndicator(it, showMeterFormDialog, showHousingDialog, editedHousing, mainPageScreenModel) }
+            else {
 
-            // val scope = rememberCoroutineScope()
-            if (mainPageScreenModel.state.value.meters.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(it)
-                ) {
-                    items(mainPageScreenModel.state.value.meters) { meter ->
-                        val readings = mainPageScreenModel.state.value.lastReading[meter.meterID]
-                        val recentReadingValue = readings?.firstOrNull()?.value
+                // val scope = rememberCoroutineScope()
+                if (mainPageScreenModel.state.value.meters.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(it)
+                    ) {
+                        items(mainPageScreenModel.state.value.meters) { meter ->
+                            val readings = mainPageScreenModel.state.value.lastReading[meter.meterID]
+                            val recentReadingValue = readings?.firstOrNull()?.value
 
-                        val trendValue: Float = if ((readings?.size ?: 0) < 2) {
-                            0.0f
-                        } else {
-                            val oldReadingValue = readings?.get(1)?.value
-                            100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
-                        }
+                            val trendValue: Float = if ((readings?.size ?: 0) < 2) {
+                                0.0f
+                            } else {
+                                val oldReadingValue = readings?.get(1)?.value
+                                100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
+                            }
 
-                        val trendIcon: TrendIcon = if (trendValue == 0.0f) {
-                            TrendIcon.Flat
-                        } else if (trendValue > 0.0f) {
-                            TrendIcon.Up
-                        } else {
-                            TrendIcon.Down
-                        }
+                            val trendIcon: TrendIcon = if (trendValue == 0.0f) {
+                                TrendIcon.Flat
+                            } else if (trendValue > 0.0f) {
+                                TrendIcon.Up
+                            } else {
+                                TrendIcon.Down
+                            }
 
-                        mainPageScreenModel.state.value.currentUserData?.userCurrency?.symbol?.let { it1 ->
-                            MeterOverviewCard(
-                                onClick = { navigator?.push(MeterDetailsScreen(meter)) },
-                                onLongClick = {
-                                    showBottomSheet.value = true
-                                    selectedMeter.value = Optional.of(meter)
-                                },
-                                modifier = Modifier.padding(10.dp),
-                                meterName = meter.meterName,
-                                meterIcon = meter.meterIcon,
-                                lastReading = if (recentReadingValue.isNotNull()) {
-                                    recentReadingValue.toString()
-                                } else null,
-                                readingUnit = meter.meterUnit.unit,
-                                trendIcon = trendIcon,
-                                trendValue = trendValue,
-                                monthlyCost = 20.0f,
-                                currencySymbol = it1
-                            )
+                            mainPageScreenModel.state.value.currentUserData?.userCurrency?.symbol?.let { it1 ->
+                                MeterOverviewCard(
+                                    onClick = { navigator?.push(MeterDetailsScreen(meter)) },
+                                    onLongClick = {
+                                        showBottomSheet.value = true
+                                        selectedMeter.value = Optional.of(meter)
+                                    },
+                                    modifier = Modifier.padding(10.dp),
+                                    meterName = meter.meterName,
+                                    meterIcon = meter.meterIcon,
+                                    lastReading = if (recentReadingValue.isNotNull()) {
+                                        recentReadingValue.toString()
+                                    } else null,
+                                    readingUnit = meter.meterUnit.unit,
+                                    trendIcon = trendIcon,
+                                    trendValue = trendValue,
+                                    monthlyCost = 20.0f,
+                                    currencySymbol = it1
+                                )
+                            }
                         }
                     }
                 }
+                else { AddFirstMeterIndicator(it, showMeterFormDialog, showHousingDialog, editedHousing, mainPageScreenModel) }
             }
-            else { AddFirstMeterIndicator(it, showMeterFormDialog, showHousingDialog, editedHousing, mainPageScreenModel) }
-
             HousingDialog(enabled = showHousingDialog.value, onSubmit = { housing->
                 mainPageScreenModel.saveHousing(housing)
                 showHousingDialog.value = false
@@ -386,6 +388,39 @@ class MeterList : Screen {
                     showDeleteDialog.value = true
                 },
             )
+        }
+    }
+
+
+    @Composable
+    private fun AddFirstHousingIndicator(it: PaddingValues, showMeterFormDialog: MutableState<Boolean>, showHousingDialog: MutableState<Boolean>, editedHousing:  MutableState<Housing?>, mainPageScreenModel: MainPageScreenModel) {
+        Column (
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Welcome to MeterBuddy!",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Start your journey to effortless meter management. Add your first house with just a tap and begin tracking your energy usage like a pro. Let's make managing meters a breeze together!",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable(onClick = { showMeterFormDialog.value = true })
+            ) {
+                ExtendedFloatingActionButton(onClick = { showMeterFormDialog.value = true }) {
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add first House")
+                    Text("Add your first House just here!")
+                }
+            }
         }
     }
 
