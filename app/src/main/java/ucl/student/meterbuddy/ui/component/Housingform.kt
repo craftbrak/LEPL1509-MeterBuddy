@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import co.yml.charts.common.extensions.isNotNull
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.model.enums.HousingType
@@ -134,21 +135,26 @@ fun HousingFrom(
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
-        ElevatedCard {
-            FlowRow(
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                usersOfHousing.forEach {
-                    InputChip(onClick = { onUserRemove(it) }, selected = false
-                        , label = {
-                        Text(text = it.userName)
-                            Icon(imageVector = Icons.Filled.Close, contentDescription = Icons.Filled.Close.name)
+        if (initialData.isNotNull()){
+            ElevatedCard {
+                FlowRow(
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    usersOfHousing.forEach {
+                        InputChip(onClick = { onUserRemove(it) }, selected = false, label = {
+                            Text(text = it.userName)
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = Icons.Filled.Close.name
+                            )
                         })
-                }
-                FilledTonalButton(onClick = { showUserSelect = true }) {
-                    Text(text = "Add Member")
+                    }
+                    FilledTonalButton(onClick = { showUserSelect = true }) {
+                        Text(text = "Add Member")
+                    }
                 }
             }
         }
