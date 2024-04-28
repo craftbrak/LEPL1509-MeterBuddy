@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -114,7 +116,10 @@ class LoginScreen : Screen {
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 isError = emptyEmail || emailFormatError && email.isNotEmpty() || errorFirebase.isNotEmpty(),
-                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) }
+                placeholder = { Text("example@example.com", color = MaterialTheme.colorScheme.outline) },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                )
             )
             if (emptyEmail) {
                 Text(
@@ -152,7 +157,10 @@ class LoginScreen : Screen {
                         Icon(imageVector = imageVector, contentDescription = description)
                     }
                 },
-                isError = emptyPassword || errorFirebase.isNotEmpty()
+                isError = emptyPassword || errorFirebase.isNotEmpty(),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                )
             )
             if (emptyPassword) {
                 Text(
