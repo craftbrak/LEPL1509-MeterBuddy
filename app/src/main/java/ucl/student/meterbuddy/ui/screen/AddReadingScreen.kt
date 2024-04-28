@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
+import co.yml.charts.common.extensions.isNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
@@ -220,12 +221,17 @@ data class AddReadingScreen(
         formatter: DateTimeFormatter
     ) {
         OutlinedButton(onClick = { showDialog.value = true }) {
-            Text(
-                text = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
-                    ZoneId.systemDefault()
-                ).format(formatter)
-            )
+            val selectedDateMillis = datePickerState.selectedDateMillis
+            if (selectedDateMillis.isNotNull()) {
+                Text(
+                    text = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
+                        ZoneId.systemDefault()
+                    ).format(formatter)
+                )
+            } else {
+                Text(text = "Select a date")
+            }
             Spacer(modifier = Modifier.height(5.dp))
             Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Edit")
         }

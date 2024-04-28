@@ -30,6 +30,7 @@ import ucl.student.meterbuddy.data.utils.DataException.NO_NETWORK
 import ucl.student.meterbuddy.data.utils.DataException.UNAUTHORIZED
 import ucl.student.meterbuddy.data.utils.DataException.UNKNONW_ERROR
 import ucl.student.meterbuddy.data.utils.Resource
+import java.lang.NullPointerException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -409,14 +410,17 @@ class MainPageScreenModel @Inject constructor(
     }
 
     fun saveHousing(housing: Housing) {
-        if (housing.housingID == 0) {
-            meterRepository.addHousing(housing, state.value.currentUserData!!)
-            updateState()
-        } else {
-            meterRepository.updateHousing(housing)
-            updateState()
-            selectHousing(housing)
-        }
+        // Try-Catch when the user is new and the housing is therefore 'null'
+        try {
+            if (housing.housingID == 0) {
+                meterRepository.addHousing(housing, state.value.currentUserData!!)
+                updateState()
+            } else {
+                meterRepository.updateHousing(housing)
+                updateState()
+                selectHousing(housing)
+            }
+        } catch(e: NullPointerException) { }
     }
 
     fun deleteUserFromHousing(user: User, value: Housing) {

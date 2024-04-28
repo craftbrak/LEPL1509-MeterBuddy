@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Meter Buddy</string>
-    <string name="no_reading">Please add a reading to this meter</string>
+    <string name="no_reading">Add a reading to this meter!</string>
     <string name="meter_menu">"Meter Menu"</string>
     <string name="home_tab">Meters</string>
     <string name="delete_meter_validation_text">Deleting this meter will also delete all it\'s reading. This action cannot be reverted</string>
@@ -18,5 +18,5 @@
     <string name="title_activity_auth">AuthActivity</string>
     <string name="add_housing">New Home</string>
     <string name="home_selection">Home selection</string>
-    <string name="no_housings">Please add a housing to continue</string>
+    <string name="no_housings">No Home</string>
 </resources>
