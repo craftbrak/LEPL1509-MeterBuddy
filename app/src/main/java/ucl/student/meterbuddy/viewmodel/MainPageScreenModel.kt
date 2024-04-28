@@ -236,8 +236,10 @@ class MainPageScreenModel @Inject constructor(
 
     @Composable
     fun filterMetersByType(type: MeterType): List<Meter> {
-        return meterRepository.getMeters().collectAsState(initial = emptyList()).value.filter { meter -> meter.meterType == type }
+        return meterRepository.getMeters()
+            .collectAsState(initial = emptyList()).value.filter { meter -> meter.meterType == type }
     }
+
     @Composable
     fun getMeterReadings(meter: Meter): List<MeterReading> {
         return meterRepository.getMeterReadings(meter.meterID)

@@ -319,6 +319,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                     if (readings.size >= 2) {
                         BoxWithConstraints {
                             val maxWidth = maxWidth.value
+                            println("Max width : $maxWidth")
                             val graph = ChartLineModel.createChartLine(
                                 readings = readings,
                                 type = meterScreenModel.meter.meterType,

@@ -2,19 +2,27 @@ package ucl.student.meterbuddy.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,18 +81,23 @@ class LineChartsScreen: Tab {
             val pagerState = rememberPagerState(pageCount = { listMeterTab.size })
 
             Scaffold { innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding)) {
-                    Text("Total Energy Consumption",fontWeight= FontWeight.Bold)
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        LazyColumn(
+                Column(modifier = Modifier
+                    .padding(innerPadding)
+                    .size(1000.dp)
+                    .verticalScroll(rememberScrollState())) {
+                        Text("Total Energy Consumption", fontWeight = FontWeight.Bold,)
+                        Box() {
+                            Column(
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                repeat(listMeterTab.size)  { item ->
+                                    HorizontalDivider(Modifier.padding(20.dp))
+                                    GraphBox(param = listMeterTab[item])
 
-                        ) {
-                            items(listMeterTab) { item ->
-                                GraphBox(param = item)
+                                }
                             }
                         }
                     }
-                }
             }
         }
     }
@@ -99,17 +112,25 @@ class LineChartsScreen: Tab {
 
                 Text(text="${param.title}", fontWeight = FontWeight.Bold)
                 ChartLineModel.DisplayChartLine(graph = param.graph, width = LocalConfiguration.current.screenWidthDp - 40, height = 300 )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Text(text = "Total Energy Consumed :")
-                    Text(text = "${param.totalEnergyConsumed}")
-                }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Text(text = "Total Cost :")
-                    Text(text = "${param.totalCost}")
+                Column(
+                    horizontalAlignment = Alignment.Start,
+
+
+                )
+                {
+                    Row(
+                        horizontalArrangement = Arrangement.Absolute.Left
+                    ) {
+                        Text(text = "Total Energy Consumed :")
+                        Text(text = "${param.totalEnergyConsumed}")
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Absolute.Left
+
+                    ) {
+                        Text(text = "Total Cost :")
+                        Text(text = "${param.totalCost}")
+                    }
                 }
             }
         }
