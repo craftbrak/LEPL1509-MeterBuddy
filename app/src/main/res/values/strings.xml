@@ -4,6 +4,7 @@
     <string name="meter_menu">"Meter Menu"</string>
     <string name="home_tab">Meters</string>
     <string name="delete_meter_validation_text">Deleting this meter will also delete all it\'s reading. This action cannot be reverted</string>
+    <string name="delete_house_validation_text">Deleting this house will also delete all it\'s meter and readings. This action cannot be reverted</string>
     <string name="delete_meter_validation_title">Are You Sure ?</string>
     <string name="stat_tab">Stats\n</string>
     <string name="edit_reading">Edit Reading of</string>
