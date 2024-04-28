@@ -132,6 +132,7 @@ class MeterList : Screen {
         val navigator = LocalNavigator.current
         val showBottomSheet = remember { mutableStateOf(false) }
         val showDeleteDialog = remember { mutableStateOf(false) }
+        val showDeleteHouseDialog = remember { mutableStateOf(false)}
         val selectedMeter: MutableState<Optional<Meter>> =
             remember { mutableStateOf(Optional.empty()) }
         val editedHousing: MutableState<Housing?> = remember { mutableStateOf(null)}
@@ -247,6 +248,9 @@ class MeterList : Screen {
                                 user,
                                 editedHousing.value!!
                             )
+                        } else {
+                            //popup de dialogue pour supprimer la maison
+                            showDeleteHouseDialog.value = true
                         }
                     },
                     onUserAdd = { user ->
@@ -255,6 +259,7 @@ class MeterList : Screen {
                             mainPageScreenModel.addUserToHousing(
                                 user,
                                 editedHousing.value!!
+                                //TODO: fix crash when add user on new home
                             )
                         }
                     }
@@ -333,6 +338,47 @@ class MeterList : Screen {
                         dismissButton = {
                             Button(onClick = {
                                 showDeleteDialog.value = false
+                            }) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
+
+                if(showDeleteHouseDialog.value) {
+                    AlertDialog(onDismissRequest = { showDeleteHouseDialog.value = false },
+                        confirmButton = {
+                            Button(onClick = {
+                                showDeleteHouseDialog.value = false
+                                showHousingDialog.value = false
+                                if (mainPageScreenModel.state.value.housingUsers.size == 1) {
+                                    editedHousing.value?.let { it1 ->
+                                        mainPageScreenModel.deleteHousing(
+                                            it1, mainPageScreenModel.state.value.housingUsers.get(0))
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Error in delete prosses",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }) {
+                                Text("Delete")
+                            }
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.delete_house_validation_text),
+                            )
+                        },
+                        title = { Text(text = stringResource(id = R.string.delete_meter_validation_title)) },
+                        icon = {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                        },
+                        dismissButton = {
+                            Button(onClick = {
+                                showDeleteHouseDialog.value = false
                             }) {
                                 Text("Cancel")
                             }

@@ -156,7 +156,7 @@ fun HousingFrom(
             Dialog(onDismissRequest = { showUserSelect = false }) {
                 Card (Modifier.padding(15.dp)) {
                     Column (modifier= Modifier.padding(15.dp),horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-                        Text("Add Member T  o $housingName")
+                        Text("Add Member To $housingName")
                         OutlinedTextField(
                             userSearch,
                             { userSearch = it },

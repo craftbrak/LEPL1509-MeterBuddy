@@ -336,6 +336,8 @@ class MainPageScreenModel @Inject constructor(
         viewModelScope.launch {
             meterRepository.removeUserFromHousing(housing, user)
             meterRepository.deleteHousing(housing)
+            selectHousing(state.value.housings.filter { h -> h != housing }.get(0))
+            updateState()
         }
     }
     fun loginUser(email: String, password: String) {
