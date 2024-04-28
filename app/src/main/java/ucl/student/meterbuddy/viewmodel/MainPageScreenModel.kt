@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -331,7 +332,12 @@ class MainPageScreenModel @Inject constructor(
             meterRepository.deleteMeter(meter)
         }
     }
-
+    fun deleteHousing(housing: Housing, user:User){
+        viewModelScope.launch {
+            meterRepository.removeUserFromHousing(housing, user)
+            meterRepository.deleteHousing(housing)
+        }
+    }
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             authRepository.loginUser(email, password).collect {
