@@ -1,5 +1,21 @@
 package ucl.student.meterbuddy
 
+/*
+Bugs TODO :
+- Ajout d'un utilisateur ou delete d'un utilisateur (NullPointerException), j'imagine que c'est à cause d'une ancienne adresse supprimée
+- Pour les ajouts d'utilisateurs, ça met les adresses mail et parfois les noms d'utilisateurs ? Mettre le pseudo + un # avec un numéro unique, ça serait bien
+- Delete les maisons ? Pour l'instant, je peux add qqn et me degager mais ça créer des bugs de fou => Creation de pleins de nvlle maisons,..
+- A la création d'un nouveau compte, ça créer tjr automatiquement une maison.
+- Bug visuel : "Bangalow", le "w" se met en-dessous chez moi et donc la case est trop grande par rapport aux autres
+- Quand je change de maison ou autres, le temps de chargements, plusieurs écrans apparaisent (les mauvais) pendant un très court instant.
+- Graphs:
+    - on a la possibilité de mettre que du 2024
+    - bien caser le graphs dans la width du tél
+    - Faire en sorte que les abcisses, on sait les lire (mettre en diagonale ou quoi les labels)
+    - Mettre des titres aux axes (pas réussis)
+- La page de graphs complète est buggé et rien marche
+ */
+
 //import androidx.navigation.navigation
 import android.annotation.SuppressLint
 import android.content.Context
