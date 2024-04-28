@@ -57,11 +57,17 @@ object ChartLineModel: ScreenModel {
         }
         return values.sortedBy { it.y }.sortedBy { it.x }
     }
+    private fun getScale(values: List<Point>, maxWidth: Dp) : Dp {
+        val sorted = values.sortedBy { it.x }
+        val first = sorted.first()
+        val last = sorted.last()
+        return (maxWidth / (last.x - first.x))
 
+    }
     @Composable
     private fun createXAxis(values: List<Point>, maxWidth: Dp): AxisData {
         val nbSteps = if (values.size > 2) values.size - 1 else 1
-        val stepSize = (maxWidth / nbSteps)
+        val stepSize = getScale(values,maxWidth)
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize)

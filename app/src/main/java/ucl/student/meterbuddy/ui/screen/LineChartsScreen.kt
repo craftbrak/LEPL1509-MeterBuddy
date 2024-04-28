@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
@@ -74,33 +76,11 @@ class LineChartsScreen: Tab {
                 Column(modifier = Modifier.padding(innerPadding)) {
                     Text("Total Energy Consumption",fontWeight= FontWeight.Bold)
                     Box(modifier = Modifier.fillMaxSize()) {
-                        HorizontalPager(
-                            state = pagerState,
-                            contentPadding = PaddingValues(horizontal = 32.dp),
-                            pageSpacing = 16.dp
-                        ) {index ->
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ){
+                        LazyColumn(
 
-                                if (listMeterTab.isNotEmpty()){
-
-                                    Text(text="${listMeterTab[index].title} ${listMeterTab.size}", fontWeight = FontWeight.Bold)
-                                    graphModel.DisplayChartLine(graph = listMeterTab[index].graph, width = LocalConfiguration.current.screenWidthDp, height = 300 )
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ){
-                                        Text(text = "Total Energy Consumed :")
-                                        Text(text = "${listMeterTab[index].totalEnergyConsumed}")
-                                    }
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ){
-                                        Text(text = "Total Cost :")
-                                        Text(text = "${listMeterTab[index].totalCost}")
-                                    }
-                                }
+                        ) {
+                            items(listMeterTab) { item ->
+                                GraphBox(param = item)
                             }
                         }
                     }
@@ -108,7 +88,32 @@ class LineChartsScreen: Tab {
             }
         }
     }
+    @Composable
+    fun GraphBox(param : MeterTab){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
 
+            if (param != null){
+
+                Text(text="${param.title}", fontWeight = FontWeight.Bold)
+                ChartLineModel.DisplayChartLine(graph = param.graph, width = LocalConfiguration.current.screenWidthDp - 40, height = 300 )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(text = "Total Energy Consumed :")
+                    Text(text = "${param.totalEnergyConsumed}")
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(text = "Total Cost :")
+                    Text(text = "${param.totalCost}")
+                }
+            }
+        }
+    }
     @Composable
     fun TextBox(s: String) {
         Box(
