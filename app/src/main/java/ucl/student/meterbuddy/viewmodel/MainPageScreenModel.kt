@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -233,13 +234,10 @@ class MainPageScreenModel @Inject constructor(
         return meterRepository.getMeterReadings(meter.meterID).last().last()
     }
 
+    @Composable
     fun filterMetersByType(type: MeterType): List<Meter> {
-        val meters = state.value.meters
-        return meters.filter { meter ->
-            meter.meterType == type
-        }.toList()
+        return meterRepository.getMeters().collectAsState(initial = emptyList()).value.filter { meter -> meter.meterType == type }
     }
-
     @Composable
     fun getMeterReadings(meter: Meter): List<MeterReading> {
         return meterRepository.getMeterReadings(meter.meterID)
@@ -288,6 +286,7 @@ class MainPageScreenModel @Inject constructor(
                 }
 
                 else -> {
+                    println("Ici salope")
                     throw Error("Bad Unit")
                 }
             }
@@ -303,6 +302,7 @@ class MainPageScreenModel @Inject constructor(
                 }
 
                 else -> {
+
                     throw Error("Bad Unit")
                 }
             }
@@ -332,7 +332,12 @@ class MainPageScreenModel @Inject constructor(
             meterRepository.deleteMeter(meter)
         }
     }
-
+    fun deleteHousing(housing: Housing, user:User){
+        viewModelScope.launch {
+            meterRepository.removeUserFromHousing(housing, user)
+            meterRepository.deleteHousing(housing)
+        }
+    }
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             authRepository.loginUser(email, password).collect {

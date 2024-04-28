@@ -4,8 +4,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,21 +22,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import co.yml.charts.common.extensions.isNotNull
 import co.yml.charts.ui.linechart.model.LineChartData
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
-import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
@@ -57,7 +57,6 @@ class LineChartsScreen: Tab {
                 )
             }
         }
-
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
@@ -66,31 +65,40 @@ class LineChartsScreen: Tab {
         val meters = mainPageScreenModel.state.value.meters
         val graphs: List<LineChartData> = getListGraphs(mainPageScreenModel)
 
-        // TODO : Affiche qu'il n'y a aucun readings même quand y'en a assez
         if (graphs.isEmpty()) { Text("You need at least one meter with two readings.")  }
         else {
             val listMeterTab: List<MeterTab> = getMetersInfo(meters, graphs)
-            val pagerState = rememberPagerState(pageCount = { graphs.size })
-            TextBox()
+            val pagerState = rememberPagerState(pageCount = { listMeterTab.size })
+
             Scaffold { innerPadding ->
                 Column(modifier = Modifier.padding(innerPadding)) {
-
+                    Text("Total Energy Consumption",fontWeight= FontWeight.Bold)
                     Box(modifier = Modifier.fillMaxSize()) {
                         HorizontalPager(
-                            state = pagerState
-
+                            state = pagerState,
+                            contentPadding = PaddingValues(horizontal = 32.dp),
+                            pageSpacing = 16.dp
                         ) {index ->
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ){
+
                                 if (listMeterTab.isNotEmpty()){
-                                    graphModel.DisplayChartLine(graph = listMeterTab[index].graph, width = 200, height = 300 )
+
+                                    Text(text="${listMeterTab[index].title} ${listMeterTab.size}", fontWeight = FontWeight.Bold)
+                                    graphModel.DisplayChartLine(graph = listMeterTab[index].graph, width = LocalConfiguration.current.screenWidthDp, height = 300 )
                                     Row(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ){
                                         Text(text = "Total Energy Consumed :")
                                         Text(text = "${listMeterTab[index].totalEnergyConsumed}")
+                                    }
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ){
+                                        Text(text = "Total Cost :")
+                                        Text(text = "${listMeterTab[index].totalCost}")
                                     }
                                 }
                             }
@@ -102,7 +110,7 @@ class LineChartsScreen: Tab {
     }
 
     @Composable
-    fun TextBox() {
+    fun TextBox(s: String) {
         Box(
             modifier = Modifier
                 .padding(16.dp)
@@ -140,9 +148,8 @@ class LineChartsScreen: Tab {
 
             if (metersFiltered.isNotEmpty())
             {
-                val unitOfUser = type.meterUnits.last()
+                val unitOfUser = metersFiltered.last().meterUnit
                 val readings = mutableListOf<MeterReading>()
-
                 metersFiltered.forEach { meter ->
                     val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
                     readings += mainPageScreenModel.convertUnitReadings(
@@ -151,22 +158,26 @@ class LineChartsScreen: Tab {
                         unitOfUser
                     )
                 }
-
                 if (readings.isNotEmpty()) {
-                    BoxWithConstraints {
-                        val maxWidth = maxWidth.value
-                        val graph = ChartLineModel.createChartLine(readings, type, MeterUnit.KILO_WATT_HOUR, maxWidth.dp)
-                        if (graph.isNotNull()) { graphs.add(graph!!) }
-                    }
+
+                    val graph = ChartLineModel.createChartLine(
+                        readings = readings,
+                        type = type,
+                        meterUnit = unitOfUser,
+                        maxWidth = (LocalConfiguration.current.screenWidthDp - 50).dp,
+                    )
+                    graphs.add(graph!!)
                 }
             }
         }
+        println(graphs)
         return graphs
     }
 
     public data class MeterTab(
         val graph: LineChartData,
-        val totalCost: Float,
+        val title : String,
+        val totalCost: Double,
         val totalEnergyConsumed: Float
     )
 
@@ -177,7 +188,7 @@ class LineChartsScreen: Tab {
         if (graphs.isEmpty()) {
             return list
         }
-        println("Size of graph : ${graphs.size} Size of meters : ${meters.size}")
+
         for (meter in meters) {
             val meterScreenModel = getScreenModel<MeterScreenModel,MeterScreenModel.Factory>{
                 it.create(meter)
@@ -190,8 +201,9 @@ class LineChartsScreen: Tab {
             if (count < graphs.size) {
                 val meterTab = MeterTab(
                     graph = graphs[count],
+                    title = meter.meterType.type,
                     totalEnergyConsumed = totalEnergyConsumed,
-                    totalCost = 0f
+                    totalCost = totalEnergyConsumed.toDouble() * meter.meterCost
                 )
                 count += 1
                 list.add(meterTab)
