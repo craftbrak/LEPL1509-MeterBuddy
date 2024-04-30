@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.screen
 
+import android.os.Parcelable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +55,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Meter
 import ucl.student.meterbuddy.data.model.entity.MeterReading
@@ -64,7 +66,8 @@ import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
 import java.time.LocalDateTime
 
-data class MeterDetailsScreen(val meter: Meter): Screen {
+@Parcelize
+data class MeterDetailsScreen(val meter: Meter) : Screen, Parcelable {
 
     @Composable
     override fun Content() {
