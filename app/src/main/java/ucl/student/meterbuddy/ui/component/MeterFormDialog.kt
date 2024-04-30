@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -267,7 +268,7 @@ fun MeterUnitOptions(
     FlowColumn(
         Modifier
             .padding(4.dp)
-            .height(100.dp), Arrangement.SpaceBetween
+            .heightIn(5.dp, 150.dp), Arrangement.SpaceBetween
     ) {
         selectedType.meterUnits.forEach { unit ->
             Row(
