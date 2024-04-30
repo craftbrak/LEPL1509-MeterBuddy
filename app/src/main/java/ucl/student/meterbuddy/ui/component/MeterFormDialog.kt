@@ -15,10 +15,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,7 +46,7 @@ import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import kotlin.enums.EnumEntries
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MeterFormDialog(
     modifier: Modifier = Modifier,
@@ -99,10 +103,32 @@ fun MeterFormDialog(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Consumption", modifier = Modifier.weight(1f))
-                        SwitchButton(isAdditive) { newBoolean -> isAdditive = newBoolean }
+
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
+                                selected = isAdditive,
+                                onClick = { isAdditive = true },
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = 0,
+                                    count = 2
+                                )
+                            ) {
+                                Text("Consumption", modifier = Modifier.weight(1f))
+                            }
+                            SegmentedButton(
+                                selected = !isAdditive,
+                                onClick = { isAdditive = false },
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = 1,
+                                    count = 2
+                                )
+                            ) {
+                                Text(text = "Production")
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -135,7 +161,7 @@ fun MeterFormDialog(
 fun TypeSelectorButton(
     type: MeterType,
     selectedType: MeterType,
-    onTypeSelected: (MeterType) -> kotlin.Unit
+    onTypeSelected: (MeterType) -> Unit
 ) {
     IconToggleButton(
         modifier = Modifier.padding(3.dp),
@@ -158,7 +184,7 @@ fun UnitSelectorButton(unit: MeterUnit, selectedUnit: MeterUnit) {
 }
 
 @Composable
-fun SwitchButton(defaultValue: Boolean, onBooleanChange: (Boolean) -> kotlin.Unit) {
+fun SwitchButton(defaultValue: Boolean, onBooleanChange: (Boolean) -> Unit) {
     Switch(
         checked = defaultValue,
         onCheckedChange = { newValue -> onBooleanChange(newValue) },
@@ -171,7 +197,7 @@ Texts
  *****/
 
 @Composable
-fun MeterTextField(name: String, onNameChange: (String) -> kotlin.Unit) {
+fun MeterTextField(name: String, onNameChange: (String) -> Unit) {
     var nameMeter by remember { mutableStateOf(name) }
     TextField(
         value = nameMeter,
@@ -185,7 +211,7 @@ fun MeterTextField(name: String, onNameChange: (String) -> kotlin.Unit) {
 }
 
 @Composable
-fun MeterCostTextField(cost: String, onNameChange: (String) -> kotlin.Unit) {
+fun MeterCostTextField(cost: String, onNameChange: (String) -> Unit) {
     TextField(
         value = cost,
         onValueChange = { newName ->
@@ -213,7 +239,7 @@ Options
 fun MeterTypeOptions(
     meterTypes: EnumEntries<MeterType>,
     selectedType: MeterType,
-    onTypeSelected: (MeterType) -> kotlin.Unit
+    onTypeSelected: (MeterType) -> Unit
 ) {
     FlowRow(Modifier.padding(10.dp), Arrangement.SpaceEvenly) {
         meterTypes.forEach { type ->
