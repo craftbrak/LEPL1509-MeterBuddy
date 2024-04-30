@@ -43,7 +43,8 @@ fun MeterOverviewCard(
     readingUnit: String,
     trendIcon: TrendIcon,
     trendValue: Float,
-    monthlyCost: Float,
+    monthlyCost: Double,
+    monthlyCostIcon: Int,
     currencySymbol: String
 ) {
     ElevatedCard(modifier = modifier, onClick = onClick) {
@@ -66,9 +67,11 @@ fun MeterOverviewCard(
             if (lastReading !=null){
                 Row(modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Spacer(Modifier.width(10.dp))
-                    Text(text = monthlyCost.toString())
-                    Spacer(Modifier.width(8.dp))
+                    Image( painter = painterResource(id = monthlyCostIcon), contentDescription = "Trend Icon")
+                    Spacer(Modifier.width(3.dp))
+                    val formattedmonthlyCostValue = String.format("%.2f", monthlyCost)
+                    Text(text = formattedmonthlyCostValue)
+                    Spacer(Modifier.width(4.dp))
                     Text(text = currencySymbol)
                     Spacer(Modifier.weight(1f))
                     Image( painter = painterResource(id = trendIcon.icon), contentDescription = "Trend Icon")
@@ -94,7 +97,8 @@ fun MeterOverviewCardPreview() {
         readingUnit = MeterUnit.CUBIC_METER.unit,
         trendIcon = TrendIcon.Down,
         trendValue = 23.303904f,
-        monthlyCost = 213f,
+        monthlyCost = 213.5,
+        monthlyCostIcon = R.drawable.additive_icon,
         currencySymbol = "$"
     )
 }
