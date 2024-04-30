@@ -19,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.enums.MeterIcon
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
-import ucl.student.meterbuddy.data.model.enums.TrendIcon
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -41,7 +42,7 @@ fun MeterOverviewCard(
     meterIcon: MeterIcon,
     lastReading: String?,
     readingUnit: String,
-    trendIcon: TrendIcon,
+    trendIcon: Int,
     trendValue: Float,
     monthlyCost: Double,
     monthlyCostIcon: Int,
@@ -67,14 +68,14 @@ fun MeterOverviewCard(
             if (lastReading !=null){
                 Row(modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Image( painter = painterResource(id = monthlyCostIcon), contentDescription = "Trend Icon")
+                    Image( painter = painterResource(id = monthlyCostIcon), contentDescription = "Trend Icon", colorFilter = ColorFilter.tint(Color.DarkGray))
                     Spacer(Modifier.width(3.dp))
                     val formattedmonthlyCostValue = String.format("%.2f", monthlyCost)
                     Text(text = formattedmonthlyCostValue)
                     Spacer(Modifier.width(4.dp))
                     Text(text = currencySymbol)
                     Spacer(Modifier.weight(1f))
-                    Image( painter = painterResource(id = trendIcon.icon), contentDescription = "Trend Icon")
+                    Image( painter = painterResource(id = trendIcon), contentDescription = "Trend Icon")
                     ElevatedSuggestionChip(modifier = Modifier.clickable(enabled = false) {}, onClick = { /*TODO*/ },label = {
                         val formattedTrendValue = String.format("%.2f", trendValue)
                         Text(text = "$formattedTrendValue %")
@@ -95,7 +96,7 @@ fun MeterOverviewCardPreview() {
         meterIcon = MeterIcon.Electricity,
         lastReading = 192384.0f.toString(),
         readingUnit = MeterUnit.CUBIC_METER.unit,
-        trendIcon = TrendIcon.Down,
+        trendIcon = R.drawable.trend_up_red_icon,
         trendValue = 23.303904f,
         monthlyCost = 213.5,
         monthlyCostIcon = R.drawable.additive_icon,

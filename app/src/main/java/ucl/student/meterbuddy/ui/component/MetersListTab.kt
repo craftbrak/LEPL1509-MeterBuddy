@@ -1,6 +1,5 @@
 package ucl.student.meterbuddy.ui.component
 
-import android.graphics.drawable.Icon
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -72,7 +71,6 @@ import co.yml.charts.common.extensions.isNotNull
 import ucl.student.meterbuddy.R
 import ucl.student.meterbuddy.data.model.entity.Housing
 import ucl.student.meterbuddy.data.model.entity.Meter
-import ucl.student.meterbuddy.data.model.enums.TrendIcon
 import ucl.student.meterbuddy.data.utils.DataException
 import ucl.student.meterbuddy.data.utils.Resource
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
@@ -215,22 +213,22 @@ class MeterList : Screen {
                                 costTrend = abs((recentReadingValue - oldReadingValue)) * meter.meterCost
                             }
 
-                            val trendIcon: TrendIcon
+                            val trendIcon: Int
                             if (meter.additiveMeter) {
                                 trendIcon = if (trendValue == 0.0f) {
-                                    TrendIcon.Flat
+                                    R.drawable.flat_icon
                                 } else if (trendValue > 0.0f) {
-                                    TrendIcon.Up // NEED TO SWITCH COLOR
+                                    R.drawable.trend_up_red_icon
                                 } else {
-                                    TrendIcon.Down // NEED TO SWITCH COLOR
+                                    R.drawable.trend_down_green_icon
                                 }
                             } else {
                                 trendIcon = if (trendValue == 0.0f) {
-                                    TrendIcon.Flat
+                                    R.drawable.flat_icon
                                 } else if (trendValue > 0.0f) {
-                                    TrendIcon.Up
+                                    R.drawable.trend_up_green_icon
                                 } else {
-                                    TrendIcon.Down
+                                    R.drawable.trend_down_red_icon
                                 }
                             }
 
