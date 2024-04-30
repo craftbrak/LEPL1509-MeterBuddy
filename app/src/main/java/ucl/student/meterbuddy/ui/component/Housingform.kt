@@ -27,10 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -121,19 +122,33 @@ fun HousingFrom(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        MultiChoiceSegmentedButtonRow {
-            HousingType.entries.forEachIndexed{index, houseType ->
-                SegmentedButton(checked = housingType == houseType , onCheckedChange = { housingType = houseType } , shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = HousingType.entries.size
-                ) ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(imageVector = ImageVector.vectorResource(id = houseType.icon), contentDescription = houseType.name)
-                        Text(text = houseType.type, style = MaterialTheme.typography.labelSmall)
+        Row(modifier = Modifier.fillMaxWidth()) {
+            SingleChoiceSegmentedButtonRow {
+                HousingType.entries.forEachIndexed { index, houseType ->
+                    SegmentedButton(
+                        selected = housingType == houseType,
+                        onClick = { housingType = houseType },
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = HousingType.entries.size
+                        )) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = houseType.icon),
+                                contentDescription = houseType.name
+                            )
+                            Text(
+                                text = houseType.type,
+                                style = MaterialTheme.typography.labelSmall,
+                                overflow = TextOverflow.Ellipsis,
+                                softWrap = false
+                            )
+                        }
                     }
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(20.dp))
         if (initialData.isNotNull()){
             ElevatedCard {

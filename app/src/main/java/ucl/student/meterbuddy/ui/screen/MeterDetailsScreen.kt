@@ -16,8 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -78,7 +78,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = { AppTopBar(meter.meterName, navigator, scope, snackbarHostState) },
+            topBar = { AppTopBar(meter.meterName, navigator) },
             floatingActionButton = { AdderButton(meterScreenModel, navigator) },
             bottomBar = { BottomAppBar { } }
         ) { innerPadding ->
@@ -101,7 +101,24 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                             onclick =
                             {
                                 navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, reading.date, reading.value,reading.note, true) { value, date, note ->
-                                    meterScreenModel.updateReading(reading.readingID, value, date, note)
+                                    try {
+
+                                        meterScreenModel.state.value.readings.first { readi -> readi.date == date }
+                                        return@AddReadingScreen false
+
+                                    } catch (e: NoSuchElementException) {
+                                        meterScreenModel.updateReading(
+                                            reading.readingID,
+                                            value,
+                                            date,
+                                            note
+                                        )
+
+                                    }
+                                    return@AddReadingScreen true
+
+
+
                                 })
                             },
                             value = reading.value,
@@ -119,8 +136,6 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
     private fun AppTopBar(
         nameMeter: String,
         navigator: Navigator,
-        scope: CoroutineScope,
-        snackbarHostState: SnackbarHostState
     ) {
         val showDialog = remember { mutableStateOf(false) }
 
@@ -244,8 +259,9 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                                           .height(60.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
                     ) {
                         Text(
                             text = "Click here",
@@ -254,7 +270,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                             textAlign = TextAlign.Center
                         )
                         Icon(
-                            imageVector = Icons.Default.ArrowRightAlt,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt,
                             contentDescription = "Forward Arrow",
                             modifier = Modifier.size(40.dp),
                             tint = MaterialTheme.colorScheme.secondary
@@ -262,7 +278,16 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                         FloatingActionButton(
                             onClick = {
                                 navigator.push(AddReadingScreen(meterScreenModel.meter.meterName) { value, date, note ->
-                                    meterScreenModel.addReading(value, date, note)
+                                    try {
+
+                                        meterScreenModel.state.value.readings.first { readi -> readi.date == date }
+                                        return@AddReadingScreen false
+
+                                    } catch (e: NoSuchElementException) {
+                                        meterScreenModel.addReading(value, date, note)
+
+                                    }
+                                    return@AddReadingScreen true
                                 })
                             },
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -292,7 +317,16 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
             ) {
                 IconButton(onClick = {
                     navigator.push(AddReadingScreen(meterScreenModel.meter.meterName) { value, date, note ->
-                        meterScreenModel.addReading(value, date, note)
+                        try {
+
+                            meterScreenModel.state.value.readings.first { readi -> readi.date == date }
+                            return@AddReadingScreen false
+
+                        } catch (e: NoSuchElementException) {
+                            meterScreenModel.addReading(value, date, note)
+
+                        }
+                        return@AddReadingScreen true
                     })
                 }, modifier = Modifier) {
                     Icon(imageVector = Icons.Outlined.Add, contentDescription = "Sort")
