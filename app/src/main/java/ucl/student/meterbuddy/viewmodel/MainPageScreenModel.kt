@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,6 @@ import ucl.student.meterbuddy.data.utils.DataException.NO_NETWORK
 import ucl.student.meterbuddy.data.utils.DataException.UNAUTHORIZED
 import ucl.student.meterbuddy.data.utils.DataException.UNKNONW_ERROR
 import ucl.student.meterbuddy.data.utils.Resource
-import java.lang.NullPointerException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -242,8 +240,7 @@ class MainPageScreenModel @Inject constructor(
 
     @Composable
     fun getMeterReadings(meter: Meter): List<MeterReading> {
-        return meterRepository.getMeterReadings(meter.meterID)
-            .collectAsState(initial = emptyList()).value
+        return state.value.lastReading[meter.meterID] ?: emptyList()
     }
 
     @Composable
