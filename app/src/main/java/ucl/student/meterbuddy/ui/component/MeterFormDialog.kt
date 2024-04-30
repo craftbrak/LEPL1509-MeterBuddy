@@ -87,7 +87,9 @@ fun MeterFormDialog(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text("Meter Type")
-                    MeterTypeOptions(meterTypes, selectedType) { newType -> selectedType = newType }
+                    MeterTypeOptions(meterTypes, selectedType) { newType ->
+                        selectedType = newType; selectedUnit = selectedType.meterUnits.first()
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
