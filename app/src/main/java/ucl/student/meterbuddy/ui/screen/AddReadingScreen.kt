@@ -1,61 +1,61 @@
 package ucl.student.meterbuddy.ui.screen
 
 import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import java.time.Instant
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.yml.charts.common.extensions.isNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.R
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -67,7 +67,7 @@ data class AddReadingScreen(
     val lastValue: Float? = null,
     val lastNote: String? = null,
     val edit: Boolean = false,
-    val onSubmit: (value: Float, date: LocalDateTime, note: String?) -> Unit
+    val onSubmit: (value: Float, date: LocalDateTime, note: String?) -> Boolean
 ) : Screen {
     /*************
     Main function
@@ -89,6 +89,9 @@ data class AddReadingScreen(
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli()
         )
+        val showSameDateError = remember {
+            mutableStateOf(false)
+        }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -112,8 +115,13 @@ data class AddReadingScreen(
                     DisplayDateDialog(showDialog, datePickerState)
                 }
 
-                EditDateButton(showDialog, datePickerState, formatter)
-
+                EditDateButton(showDialog, datePickerState, formatter, showSameDateError)
+                if (showSameDateError.value) {
+                    Text(
+                        text = "There already is a reading for this date",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
                 OutlinedTextField(
                     value = if (reading != "null") { reading } else { "" },
                     onValueChange = { reading = it },
@@ -137,7 +145,8 @@ data class AddReadingScreen(
                     hostState,
                     scope,
                     datePickerState,
-                    navigator
+                    navigator,
+                    showSameDateError
                 )
             }
         }
@@ -218,9 +227,10 @@ data class AddReadingScreen(
     fun EditDateButton(
         showDialog: MutableState<Boolean>,
         datePickerState: DatePickerState,
-        formatter: DateTimeFormatter
+        formatter: DateTimeFormatter,
+        showSameDateError: MutableState<Boolean>
     ) {
-        OutlinedButton(onClick = { showDialog.value = true }) {
+        OutlinedButton(onClick = { showDialog.value = true; showSameDateError.value = false }) {
             val selectedDateMillis = datePickerState.selectedDateMillis
             if (selectedDateMillis.isNotNull()) {
                 Text(
@@ -245,16 +255,22 @@ data class AddReadingScreen(
         snackBarHostState: SnackbarHostState,
         scope: CoroutineScope,
         datePickerState: DatePickerState,
-        navigator: Navigator
+        navigator: Navigator,
+        showSameDateError: MutableState<Boolean>
     ) {
         ElevatedButton(onClick = {
             try {
-                onSubmit(
+                if (onSubmit(
                     reading.toFloat(), LocalDateTime.ofInstant(
                         Instant.ofEpochMilli(datePickerState.selectedDateMillis!!),
                         ZoneId.systemDefault()
                     ), note
-                ); navigator.pop()
+                    )
+                ) {
+                    navigator.pop()
+                } else {
+                    showSameDateError.value = true
+                }
             } catch (e: NumberFormatException) {
                 scope.launch {
                     val result = snackBarHostState.showSnackbar(
