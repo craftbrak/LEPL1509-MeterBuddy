@@ -106,7 +106,7 @@ data class MeterDetailsScreen(val meter: Meter) : Screen, Parcelable {
                                 navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, reading.date, reading.value,reading.note, true) { value, date, note ->
                                     try {
 
-                                        meterScreenModel.state.value.readings.first { readi -> readi.date == date }
+                                        meterScreenModel.state.value.readings.first { readi -> readi.date == date && readi.readingID != reading.readingID }
                                         return@AddReadingScreen false
 
                                     } catch (e: NoSuchElementException) {
