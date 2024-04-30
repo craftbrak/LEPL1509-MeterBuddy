@@ -68,7 +68,7 @@ class LineChartsScreen: Tab {
         val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         val listMeterTab: MutableList<MeterTab> = mutableListOf()
         for (type in MeterType.entries) {
-            val metersFiltered : List<Meter> = mainPageScreenModel.filterMetersByType(type = type)
+            val metersFiltered : List<Meter> = mainPageScreenModel.filterMetersByType(type)
             if (metersFiltered.isNotEmpty())
             {
                 val unitOfUser = metersFiltered.last().meterUnit
@@ -80,15 +80,16 @@ class LineChartsScreen: Tab {
                     readings += mainPageScreenModel.convertUnitReadings(
                         readingsNotFiltered,
                         meter.meterUnit,
-                        unitOfUser
+                        unitOfUser,
+                        meter.meterType
                     )
                     totalEnergyConsumed = 0.0f
                     for (reading in readings) { totalEnergyConsumed += reading.value }
                     totalCost = totalEnergyConsumed.toDouble() * meter.meterCost
                 }
 
-                if (readings.size >= 2) {
-
+                if (readings.size >= 2)
+                {
                     val graph = ChartLineModel.createChartLine(
                         readings = readings,
                         type = type,
