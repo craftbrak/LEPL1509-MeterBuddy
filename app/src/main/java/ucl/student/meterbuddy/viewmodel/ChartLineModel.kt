@@ -82,6 +82,9 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
+        val longestLabelLength = values.maxByOrNull { it.x }?.x.toString().length
+        val padding = (longestLabelLength * 6).dp
+
         val nbSteps = if (values.size > 3) values.size - 1 else 2
         val maxHeight = 200
         val stepSize = maxHeight / nbSteps
@@ -89,7 +92,7 @@ object ChartLineModel: ScreenModel {
             .steps(nbSteps)
             .axisStepSize(stepSize.dp)
             .labelData {i -> getYLabel(i, values, nbSteps) }
-            .labelAndAxisLinePadding(15.dp)
+            .labelAndAxisLinePadding(padding)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
@@ -116,9 +119,9 @@ object ChartLineModel: ScreenModel {
     private fun getYLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
         if (values.size == 1)
         {
-            if (i == 0) { return "0"}
-            if (i == 1) { return floor(values[0].y).toString() }
-            else { return floor(values[0].y * 2).toString() }
+            if (i == 0)      { return "0"}
+            else if (i == 1) { return floor(values[0].y).toString() }
+            else             { return floor(values[0].y * 2).toString() }
         }
         else
         {
@@ -137,34 +140,85 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    fun createChartLine(readings: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
+    fun createLine(values: List<Point>, typeValues: String): Line {
+        if (typeValues == "consumption")
+        {
+            return Line(
+                dataPoints = values,
+                LineStyle(
+                    color = Color.Red,
+                    lineType = LineType.SmoothCurve(isDotted = false)
+                ),
+                IntersectionPoint(color = Color.Red),
+                SelectionHighlightPoint(color = Color.Red),
+
+                ShadowUnderLine(
+                    alpha = 0.5f,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Red.copy(alpha = 0.5f),
+                            Color.Transparent
+                        )
+                    )
+                ),
+                SelectionHighlightPopUp()
+            )
+        }
+        else if (typeValues == "production")
+        {
+            return Line(
+                dataPoints = values,
+                LineStyle(
+                    color = Color.Green,
+                    lineType = LineType.SmoothCurve(isDotted = false)
+                ),
+                IntersectionPoint(color = Color.Green),
+                SelectionHighlightPoint(color = Color.Green),
+
+                ShadowUnderLine(
+                    alpha = 0.5f,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Green.copy(alpha = 0.5f),
+                            Color.Transparent
+                        )
+                    )
+                ),
+                SelectionHighlightPopUp()
+            )
+        }
+        else { return Line(values) } // Never reach
+    }
+
+    @Composable
+    fun createChartLineIndividual(readings: List<MeterReading>, typeValues: String, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
         val values = this.getPointsFromMeterReadings(readings) ?: return null
+        val xData = this.createXAxis(values = values, maxWidth = maxWidth)
+        val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
+        return LineChartData(
+            linePlotData = LinePlotData(lines = listOf(createLine(values, typeValues))),
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            xAxisData = xData,
+            yAxisData = yData,
+            gridLines = GridLines(color = MaterialTheme.colorScheme.outline)
+        )
+    }
+
+    @Composable
+    fun createChartLine(readingsConsumption: List<MeterReading>, readingsProduction: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
+        if (readingsConsumption.isEmpty()) { return createChartLineIndividual(readingsProduction, "production", type, meterUnit, maxWidth) }
+        if (readingsProduction.isEmpty())  { return createChartLineIndividual(readingsConsumption, "consumption", type, meterUnit, maxWidth) }
+        val valuesConsumption = this.getPointsFromMeterReadings(readingsConsumption)?.toMutableList() ?: return null
+        val valuesProduction  = this.getPointsFromMeterReadings(readingsProduction)?.toMutableList() ?: return null
+        val values = valuesConsumption + valuesProduction
         val xData = this.createXAxis(values = values, maxWidth = maxWidth)
         val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
         return LineChartData(
             linePlotData = LinePlotData(
                 lines = listOf(
-                    Line(
-                        dataPoints = values,
-                        LineStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            lineType = LineType.SmoothCurve(isDotted = false)
-                        ),
-                        IntersectionPoint(color = MaterialTheme.colorScheme.tertiary),
-                        SelectionHighlightPoint(color = MaterialTheme.colorScheme.primary),
-
-                        ShadowUnderLine(
-                            alpha = 0.5f,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.inversePrimary,
-                                     Color.Transparent
-                                )
-                            )
-                        ),
-                        SelectionHighlightPopUp()
-                    )
-                ),
+                    createLine(values = valuesConsumption, typeValues = "consumption"),
+                    createLine(values = valuesProduction, typeValues = "production")
+                )
             ),
             backgroundColor = MaterialTheme.colorScheme.surface,
             xAxisData = xData,

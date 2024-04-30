@@ -72,50 +72,85 @@ class LineChartsScreen: Tab {
             val metersFiltered : List<Meter> = mainPageScreenModel.filterMetersByType(type)
             if (metersFiltered.isNotEmpty())
             {
-                val readings = mutableListOf<MeterReading>()
+                var readings_production = mutableListOf<MeterReading>()
+                var readings_consumption = mutableListOf<MeterReading>()
                 val unitOfUser = metersFiltered.last().meterUnit
                 var totalEnergyConsumed = 0.0f
                 var totalEnergyProduced = 0.0f
                 var totalCostProduced = 0.0
                 var totalCostConsumed = 0.0
-                var idxFirstReadings = 0
+                var idxFirstReadings_production = 0
+                var idxFirstReadings_consumption = 0
                 metersFiltered.forEach { meter ->
                     val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
-                    println(meter)
-                    println(readingsNotFiltered)
-                    readings += mainPageScreenModel.convertUnitReadings(
-                        readingsNotFiltered,
-                        meter.meterUnit,
-                        unitOfUser,
-                        meter.meterType
-                    )
 
-                    if (readings.size > idxFirstReadings)
-                    {
-                        if (meter.additiveMeter)
+                    if (meter.additiveMeter) {
+                        readings_consumption += mainPageScreenModel.convertUnitReadings(
+                            readingsNotFiltered,
+                            meter.meterUnit,
+                            unitOfUser,
+                            meter.meterType
+                        )
+
+                        if (readings_consumption.size > idxFirstReadings_consumption)
                         {
-                            val currentEnergyConsumed = readings[idxFirstReadings].value
+                            val currentEnergyConsumed = readings_consumption[idxFirstReadings_consumption].value
                             totalEnergyConsumed += currentEnergyConsumed
                             totalCostConsumed += currentEnergyConsumed.toDouble() * meter.meterCost
                         }
-                        else
+
+                        idxFirstReadings_consumption = readings_consumption.size
+                    }
+                    else
+                    {
+                        readings_production += mainPageScreenModel.convertUnitReadings(
+                            readingsNotFiltered,
+                            meter.meterUnit,
+                            unitOfUser,
+                            meter.meterType
+                        )
+
+                        if (readings_production.size > idxFirstReadings_production)
                         {
-                            val currentEnergyProduced = readings[idxFirstReadings].value
+                            val currentEnergyProduced = readings_production[idxFirstReadings_production].value
                             totalEnergyProduced += currentEnergyProduced
                             totalCostProduced += currentEnergyProduced.toDouble() * meter.meterCost
                         }
-                        idxFirstReadings = readings.size
+
+                        idxFirstReadings_production = readings_production.size
                     }
                 }
 
-                if (readings.size >= 2)
+                if (readings_consumption.size >= 2 || readings_production.size >= 2)
                 {
-                    val graph = ChartLineModel.createChartLine(
-                        readings = readings,
-                        type = type,
-                        meterUnit = unitOfUser,
-                        maxWidth = (LocalConfiguration.current.screenWidthDp - 50).dp,
-                    )
+                    val graph: LineChartData?
+                    if (readings_consumption.size < 2) {
+                        graph = ChartLineModel.createChartLine(
+                            readingsConsumption = emptyList(),
+                            readingsProduction = readings_production,
+                            type = type,
+                            meterUnit = unitOfUser,
+                            maxWidth = (LocalConfiguration.current.screenWidthDp - 50).dp,
+                        )
+                    }
+                    else if (readings_production.size < 2) {
+                        graph = ChartLineModel.createChartLine(
+                            readingsConsumption = readings_consumption,
+                            readingsProduction = emptyList(),
+                            type = type,
+                            meterUnit = unitOfUser,
+                            maxWidth = (LocalConfiguration.current.screenWidthDp - 50).dp,
+                        )
+                    }
+                    else {
+                        graph = ChartLineModel.createChartLine(
+                            readingsConsumption = readings_consumption,
+                            readingsProduction = readings_production,
+                            type = type,
+                            meterUnit = unitOfUser,
+                            maxWidth = (LocalConfiguration.current.screenWidthDp - 50).dp,
+                        )
+                    }
 
                     val title: String
                     if (type == MeterType.ELECTRICITY)    { title = "Electricity" }

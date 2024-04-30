@@ -53,6 +53,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.yml.charts.ui.linechart.model.LineChartData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -214,12 +215,26 @@ data class MeterDetailsScreen(val meter: Meter) : Screen, Parcelable {
 
         BoxWithConstraints {
             val maxWidth = maxWidth.value
-            val graph = ChartLineModel.createChartLine(
-                readings = readings,
-                type = meterType,
-                meterUnit = meterUnit,
-                maxWidth = maxWidth.dp
-            )
+            val graph: LineChartData?
+            if (meter.additiveMeter)
+            {
+                graph = ChartLineModel.createChartLine(
+                    readingsConsumption = readings,
+                    readingsProduction = emptyList(),
+                    type = meterType,
+                    meterUnit = meterUnit,
+                    maxWidth = maxWidth.dp
+                )
+            } else
+            {
+                graph = ChartLineModel.createChartLine(
+                    readingsConsumption = emptyList(),
+                    readingsProduction = readings,
+                    type = meterType,
+                    meterUnit = meterUnit,
+                    maxWidth = maxWidth.dp
+                )
+            }
             ChartLineModel.DisplayChartLine(
                 graph = graph!!,
                 width = LocalConfiguration.current.screenWidthDp,
@@ -356,13 +371,27 @@ data class MeterDetailsScreen(val meter: Meter) : Screen, Parcelable {
                     if (readings.size >= 2) {
                         BoxWithConstraints {
                             val maxWidth = maxWidth.value
-                            println("Max width : $maxWidth")
-                            val graph = ChartLineModel.createChartLine(
-                                readings = readings,
-                                type = meterScreenModel.meter.meterType,
-                                meterUnit = meterScreenModel.meter.meterUnit,
-                                maxWidth = maxWidth.dp
-                            )
+                            val graph: LineChartData?
+                            if (meter.additiveMeter)
+                            {
+                                graph = ChartLineModel.createChartLine(
+                                    readingsConsumption = readings,
+                                    readingsProduction = emptyList(),
+                                    type = meterScreenModel.meter.meterType,
+                                    meterUnit = meterScreenModel.meter.meterUnit,
+                                    maxWidth = maxWidth.dp
+                                )
+                            } else
+                            {
+                                graph = ChartLineModel.createChartLine(
+                                    readingsConsumption = emptyList(),
+                                    readingsProduction = readings,
+                                    type = meterScreenModel.meter.meterType,
+                                    meterUnit = meterScreenModel.meter.meterUnit,
+                                    maxWidth = maxWidth.dp
+                                )
+                            }
+
                             ChartLineModel.DisplayChartLine(graph = graph!!,
                                 width = LocalConfiguration.current.screenWidthDp,
                                 height = 300
