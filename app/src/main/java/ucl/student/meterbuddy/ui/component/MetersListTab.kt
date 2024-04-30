@@ -1,5 +1,6 @@
 package ucl.student.meterbuddy.ui.component
 
+import android.graphics.drawable.Icon
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -77,6 +78,7 @@ import ucl.student.meterbuddy.data.utils.Resource
 import ucl.student.meterbuddy.ui.screen.MeterDetailsScreen
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
 import java.util.Optional
+import kotlin.math.abs
 
 object MetersListTab : Tab {
     private fun readResolve(): Any = MetersListTab
@@ -182,14 +184,30 @@ class MeterList : Screen {
                                 mainPageScreenModel.state.value.lastReading[meter.meterID]
                             val recentReadingValue = readings?.firstOrNull()?.value
 
-                            val trendValue: Float = if ((readings?.size ?: 0) < 2) {
-                                0.0f
+                            val costTrend: Double
+                            val trendValue: Float
+                            val costIcon: Int
+
+                            if ((readings?.size ?: 0) < 2) {
+                                costTrend = 0.0
+                                trendValue = 0.0f
+                                if (meter.additiveMeter) {
+                                    costIcon = R.drawable.non_additive_icon_24
+                                } else {
+                                    costIcon = R.drawable.additive_icon
+                                }
                             } else {
                                 val oldReadingValue = readings?.get(1)?.value
-                                100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
+                                trendValue = 100 * ((recentReadingValue!! / oldReadingValue!!) - 1)
+                                if ((recentReadingValue / oldReadingValue) > 0.0) {
+                                    costIcon = R.drawable.additive_icon
+                                } else {
+                                    costIcon = R.drawable.non_additive_icon_24
+                                }
+                                costTrend = abs((recentReadingValue / oldReadingValue)) * meter.meterCost
                             }
 
-                            var trendIcon: TrendIcon
+                            val trendIcon: TrendIcon
                             if (meter.additiveMeter) {
                                 trendIcon = if (trendValue == 0.0f) {
                                     TrendIcon.Flat
@@ -224,7 +242,8 @@ class MeterList : Screen {
                                     readingUnit = meter.meterUnit.unit,
                                     trendIcon = trendIcon,
                                     trendValue = trendValue,
-                                    monthlyCost = 20.0f,
+                                    monthlyCost = costTrend,
+                                    monthlyCostIcon = costIcon,
                                     currencySymbol = it1
                                 )
                             }
