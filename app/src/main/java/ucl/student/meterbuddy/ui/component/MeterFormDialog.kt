@@ -81,7 +81,11 @@ fun MeterFormDialog(
                         .padding(horizontal = 16.dp, vertical = 20.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "${if (edit)  stringResource(id = R.string.edit_meter) + " " + meterName else stringResource(id = R.string.add_meter)}", style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        text = if (edit) stringResource(id = R.string.edit_meter) + " " + meterName else stringResource(
+                            id = R.string.add_meter
+                        ), style = MaterialTheme.typography.headlineSmall
+                    )
                     MeterTextField(meterName) { newName -> meterName = newName }
 
                     Spacer(modifier = Modifier.height(16.dp))
