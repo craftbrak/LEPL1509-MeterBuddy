@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -72,8 +71,6 @@ class LineChartsScreen: Tab {
         if (graphs.isEmpty()) { Text("You need at least one meter with two readings.")  }
         else {
             val listMeterTab: List<MeterTab> = getMetersInfo(meters, graphs)
-
-
             Scaffold { innerPadding ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "Total Energy Consumption", fontWeight = FontWeight.Bold)
