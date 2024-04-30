@@ -180,7 +180,7 @@ class LineChartsScreen: Tab {
                     )
                 }
 
-                if (readings.isNotEmpty()) {
+                if (readings.size >= 2) {
                     println(readings.size)
                     val graph = ChartLineModel.createChartLine(
                         readings = readings,
