@@ -69,7 +69,8 @@ class LineChartsScreen: Tab {
         val mainPageScreenModel: MainPageScreenModel = getViewModel<MainPageScreenModel>()
         val listMeterTab: MutableList<MeterTab> = mutableListOf()
         for (type in MeterType.entries) {
-            val metersFiltered : List<Meter> = mainPageScreenModel.filterMetersByType(type)
+            val metersFiltered: List<Meter> =
+                mainPageScreenModel.state.value.meters.filter { m -> m.meterType == type }
             if (metersFiltered.isNotEmpty())
             {
                 var readings_production = mutableListOf<MeterReading>()
@@ -82,7 +83,9 @@ class LineChartsScreen: Tab {
                 var idxFirstReadings_production = 0
                 var idxFirstReadings_consumption = 0
                 metersFiltered.forEach { meter ->
-                    val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                    val readingsNotFiltered =
+                        mainPageScreenModel.state.value.lastReading[meter.meterID]
+                            ?: emptyList()
 
                     if (meter.additiveMeter) {
                         readings_consumption += mainPageScreenModel.convertUnitReadings(
