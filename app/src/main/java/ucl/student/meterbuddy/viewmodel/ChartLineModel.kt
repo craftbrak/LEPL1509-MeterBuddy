@@ -97,7 +97,6 @@ object ChartLineModel: ScreenModel {
             .build()
     }
 
-    // TODO : XLabel renvoie toujours la même date
     private fun getXLabel(a : Int, values : List<Point>, nbSteps : Int) : String {
         val i = a / 6 /* Bizarre mais contrairement au labelData de yAxis, i s'incremente de 6 par 6 au lieu de 1. */
         if (i < values.size)

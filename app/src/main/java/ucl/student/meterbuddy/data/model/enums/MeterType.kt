@@ -1,8 +1,5 @@
 package ucl.student.meterbuddy.data.model.enums
 
-import kotlin.enums.enumEntries
-
-
 enum class MeterType (val type: String, val meterUnits: List<MeterUnit>, val icon: MeterIcon) {
     ELECTRICITY("Electricity", listOf(MeterUnit.KILO_WATT_HOUR), MeterIcon.Electricity),
     GAS("Gas", listOf(MeterUnit.KILO_WATT_HOUR, MeterUnit.CUBIC_METER, MeterUnit.LITER), MeterIcon.Gas),

@@ -118,7 +118,7 @@ data class AddReadingScreen(
                 EditDateButton(showDialog, datePickerState, formatter, showSameDateError)
                 if (showSameDateError.value) {
                     Text(
-                        text = "There already is a reading for this date",
+                        text = "A reading for this date already exists",
                         color = MaterialTheme.colorScheme.error
                     )
                 }
