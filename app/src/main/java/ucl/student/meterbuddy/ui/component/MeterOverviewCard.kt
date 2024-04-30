@@ -59,6 +59,7 @@ fun MeterOverviewCard(
                 Icon(imageVector = ImageVector.vectorResource(meterIcon.icon), contentDescription = "Meter Icon")
                 Spacer(Modifier.width(8.dp))
                 Text(text = meterName)
+                Spacer(Modifier.width(4.dp))
                 Spacer(Modifier.weight(1f))
                 Text(text = lastReading ?: stringResource(R.string.no_reading))
                 Spacer(Modifier.width(8.dp))
