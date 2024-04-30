@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Info
@@ -77,7 +78,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = { AppTopBar(meter.meterName, navigator, scope, snackbarHostState) },
+            topBar = { AppTopBar(meter.meterName, navigator) },
             floatingActionButton = { AdderButton(meterScreenModel, navigator) },
             bottomBar = { BottomAppBar { } }
         ) { innerPadding ->
@@ -101,7 +102,7 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
                             {
                                 navigator.push(AddReadingScreen(meterScreenModel.meter.meterName, reading.date, reading.value,reading.note, true) { value, date, note ->
                                     try {
-                                        
+
                                         meterScreenModel.state.value.readings.first { readi -> readi.date == date }
                                         return@AddReadingScreen false
 
@@ -135,8 +136,6 @@ data class MeterDetailsScreen(val meter: Meter): Screen {
     private fun AppTopBar(
         nameMeter: String,
         navigator: Navigator,
-        scope: CoroutineScope,
-        snackbarHostState: SnackbarHostState
     ) {
         val showDialog = remember { mutableStateOf(false) }
 
