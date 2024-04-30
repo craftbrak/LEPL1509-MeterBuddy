@@ -189,12 +189,23 @@ class MeterList : Screen {
                                 100 * ((recentReadingValue!! / oldReadingValue!!) - 1) // In percent
                             }
 
-                            val trendIcon: TrendIcon = if (trendValue == 0.0f) {
-                                TrendIcon.Flat
-                            } else if (trendValue > 0.0f) {
-                                TrendIcon.Up
+                            var trendIcon: TrendIcon
+                            if (meter.additiveMeter) {
+                                trendIcon = if (trendValue == 0.0f) {
+                                    TrendIcon.Flat
+                                } else if (trendValue > 0.0f) {
+                                    TrendIcon.Down
+                                } else {
+                                    TrendIcon.Up
+                                }
                             } else {
-                                TrendIcon.Down
+                                trendIcon = if (trendValue == 0.0f) {
+                                    TrendIcon.Flat
+                                } else if (trendValue > 0.0f) {
+                                    TrendIcon.Up
+                                } else {
+                                    TrendIcon.Down
+                                }
                             }
 
                             mainPageScreenModel.state.value.currentUserData?.userCurrency?.symbol?.let { it1 ->
