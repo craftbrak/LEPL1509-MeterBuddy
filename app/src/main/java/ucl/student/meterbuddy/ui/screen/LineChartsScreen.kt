@@ -80,8 +80,7 @@ class LineChartsScreen: Tab {
                 var totalCostConsumed = 0.0
                 var idxFirstReadings = 0
                 metersFiltered.forEach { meter ->
-                    val readingsNotFiltered = mainPageScreenModel.state.value.lastReading[meter.meterID] ?: emptyList()
-                    // val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                    val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
                     println(meter)
                     println(readingsNotFiltered)
                     readings += mainPageScreenModel.convertUnitReadings(
@@ -91,19 +90,22 @@ class LineChartsScreen: Tab {
                         meter.meterType
                     )
 
-                    if (meter.additiveMeter)
+                    if (readings.size > idxFirstReadings)
                     {
-                        val currentEnergyConsumed = readings[idxFirstReadings].value
-                        totalEnergyConsumed += currentEnergyConsumed
-                        totalCostConsumed += currentEnergyConsumed.toDouble() * meter.meterCost
+                        if (meter.additiveMeter)
+                        {
+                            val currentEnergyConsumed = readings[idxFirstReadings].value
+                            totalEnergyConsumed += currentEnergyConsumed
+                            totalCostConsumed += currentEnergyConsumed.toDouble() * meter.meterCost
+                        }
+                        else
+                        {
+                            val currentEnergyProduced = readings[idxFirstReadings].value
+                            totalEnergyProduced += currentEnergyProduced
+                            totalCostProduced += currentEnergyProduced.toDouble() * meter.meterCost
+                        }
+                        idxFirstReadings = readings.size
                     }
-                    else
-                    {
-                        val currentEnergyProduced = readings[idxFirstReadings].value
-                        totalEnergyProduced += currentEnergyProduced
-                        totalCostProduced += currentEnergyProduced.toDouble() * meter.meterCost
-                    }
-                    idxFirstReadings = readings.size
                 }
 
                 if (readings.size >= 2)
@@ -122,13 +124,6 @@ class LineChartsScreen: Tab {
                     else if (type == MeterType.WATER)     { title = "Water" }
                     else if (type == MeterType.CAR)       { title = "Car" }
                     else                                  { title = "Other" }
-
-                    if (type == MeterType.ELECTRICITY) {
-                        println(totalCostConsumed)
-                        println(totalCostProduced)
-                        println(totalEnergyConsumed)
-                        println(totalEnergyProduced)
-                    }
 
                     listMeterTab += MeterTab(
                         graph = graph!!,
