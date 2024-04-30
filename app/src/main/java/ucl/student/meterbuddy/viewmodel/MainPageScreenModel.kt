@@ -275,6 +275,7 @@ class MainPageScreenModel @Inject constructor(
 
     @Throws(Error::class)
     private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit, typeMeter: MeterType): Float {
+        println(typeMeter)
         if (typeMeter == MeterType.WATER || typeMeter == MeterType.HOT_WATER)
         {
             if (meterUnit == MeterUnit.CUBIC_METER)

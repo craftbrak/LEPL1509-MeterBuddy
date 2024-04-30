@@ -89,9 +89,7 @@ data class AddReadingScreen(
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = lastDate.toInstant(ZoneOffset.UTC)?.toEpochMilli()
         )
-        val showSameDateError = remember {
-            mutableStateOf(false)
-        }
+        val showSameDateError = remember { mutableStateOf(false) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),

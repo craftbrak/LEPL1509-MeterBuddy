@@ -36,6 +36,7 @@ import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import ucl.student.meterbuddy.viewmodel.ChartLineModel
 import ucl.student.meterbuddy.viewmodel.MainPageScreenModel
+import kotlin.math.abs
 
 class LineChartsScreen: Tab {
 
@@ -44,8 +45,8 @@ class LineChartsScreen: Tab {
         val title: String,
         val unit: MeterUnit,
         val unitCost: String,
-        val totalCost: String,
-        val totalEnergyConsumed: String
+        val deltaTotalCost: Double,
+        val deltaTotalEnergy: Float
     )
 
     override val options: TabOptions
@@ -74,18 +75,31 @@ class LineChartsScreen: Tab {
                 val unitOfUser = metersFiltered.last().meterUnit
                 val readings = mutableListOf<MeterReading>()
                 var totalEnergyConsumed = 0.0f
-                var totalCost = 0.0
+                var totalEnergyProduced = 0.0f
+                var totalCostProduced = 0.0
+                var totalCostConsumed = 0.0
                 metersFiltered.forEach { meter ->
-                    val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                    val readingsNotFiltered = mainPageScreenModel.state.value.lastReading[meter.meterID] ?: emptyList()
+                    // val readingsNotFiltered = mainPageScreenModel.getMeterReadings(meter)
+                    println(meter)
+                    println(readingsNotFiltered)
                     readings += mainPageScreenModel.convertUnitReadings(
                         readingsNotFiltered,
                         meter.meterUnit,
                         unitOfUser,
                         meter.meterType
                     )
-                    totalEnergyConsumed = 0.0f
-                    for (reading in readings) { totalEnergyConsumed += reading.value }
-                    totalCost = totalEnergyConsumed.toDouble() * meter.meterCost
+
+                    if (meter.additiveMeter)
+                    {
+                        totalEnergyConsumed += readings.last().value
+                        totalCostConsumed += totalEnergyConsumed.toDouble() * meter.meterCost
+                    }
+                    else
+                    {
+                        totalEnergyProduced += readings.last().value
+                        totalCostProduced += totalEnergyProduced.toDouble() * meter.meterCost
+                    }
                 }
 
                 if (readings.size >= 2)
@@ -110,8 +124,8 @@ class LineChartsScreen: Tab {
                         title = title,
                         unit = unitOfUser,
                         unitCost = mainPageScreenModel.state.value.currentUserData?.userCurrency?.symbol!!,
-                        totalCost = String.format("%.2f", totalCost),
-                        totalEnergyConsumed = String.format("%.2f", totalEnergyConsumed)
+                        deltaTotalCost = totalCostConsumed - totalCostProduced,
+                        deltaTotalEnergy = totalEnergyConsumed - totalEnergyProduced
                     )
                 }
             }
@@ -160,16 +174,30 @@ class LineChartsScreen: Tab {
                 Row(
                     horizontalArrangement = Arrangement.Absolute.Left
                 ) {
-                    Text(text = "Total Energy Consumed : ")
-                    Text(text = param.totalEnergyConsumed)
+                    val energy: Float
+                    if (param.deltaTotalEnergy > 0.0f) {
+                        Text(text = "Total Energy Consumed : ")
+                        energy = param.deltaTotalEnergy
+                    } else {
+                        Text(text = "Total Energy Produced : ")
+                        energy = abs(param.deltaTotalEnergy)
+                    }
+                    Text(text = String.format("%.2f", energy))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = param.unit.symbol)
                 }
                 Row(
                     horizontalArrangement = Arrangement.Absolute.Left
                 ) {
-                    Text(text = "Total Cost : ")
-                    Text(text = param.totalCost)
+                    val costEnergy: Double
+                    if (param.deltaTotalCost > 0.0) {
+                        Text(text = "Total Cost of Consumption : ")
+                        costEnergy = param.deltaTotalCost
+                    } else {
+                        Text(text = "Total Cost of Production : ")
+                        costEnergy = abs(param.deltaTotalCost)
+                    }
+                    Text(text = String.format("%.2f", costEnergy))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = param.unitCost)
                 }
