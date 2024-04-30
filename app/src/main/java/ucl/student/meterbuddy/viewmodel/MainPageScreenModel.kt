@@ -276,97 +276,94 @@ class MainPageScreenModel @Inject constructor(
     @Throws(Error::class)
     private fun getFactorUnitConversion(meterUnit: MeterUnit, finalMeterUnit: MeterUnit, typeMeter: MeterType): Float {
         println(typeMeter)
-        if (typeMeter == MeterType.WATER || typeMeter == MeterType.HOT_WATER)
-        {
-            if (meterUnit == MeterUnit.CUBIC_METER)
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.CUBIC_METER -> { 1.0f }
-                    MeterUnit.LITER -> { 1000.0f }
-                    else -> { throw Error("Bad Unit") }
+        return when (typeMeter) {
+            MeterType.WATER, MeterType.HOT_WATER -> {
+                when (meterUnit) {
+                    MeterUnit.CUBIC_METER -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.CUBIC_METER -> 1.0f
+                            MeterUnit.LITER -> 1000.0f
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+
+                    else -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.CUBIC_METER -> 0.001f
+                            MeterUnit.LITER -> 1.0f
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
                 }
             }
-            else
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.CUBIC_METER -> { 0.001f }
-                    MeterUnit.LITER -> { 1.0f }
-                    else -> { throw Error("Bad Unit") }
+
+            MeterType.CAR -> {
+                val factor_kWh_per_km = 0.15f
+                val factor_kWh_per_liter = 10.0f
+                when (meterUnit) {
+                    MeterUnit.KILO_WATT_HOUR -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> 1.0f
+                            MeterUnit.KILO_METER -> 1 / factor_kWh_per_km
+                            MeterUnit.LITER -> 1 / factor_kWh_per_liter
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+
+                    MeterUnit.KILO_METER -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> factor_kWh_per_km
+                            MeterUnit.KILO_METER -> 1.0f
+                            MeterUnit.LITER -> factor_kWh_per_km / factor_kWh_per_liter
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+
+                    else -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> factor_kWh_per_liter
+                            MeterUnit.KILO_METER -> factor_kWh_per_liter / factor_kWh_per_km
+                            MeterUnit.LITER -> 1.0f
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
                 }
             }
+
+            MeterType.GAS -> {
+                val factor_kWh_per_cubic_meter = 8.9f
+                when (meterUnit) {
+                    MeterUnit.KILO_WATT_HOUR -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> 1.0f
+                            MeterUnit.CUBIC_METER -> factor_kWh_per_cubic_meter
+                            MeterUnit.LITER -> factor_kWh_per_cubic_meter / 1000
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+
+                    MeterUnit.CUBIC_METER -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> 1 / factor_kWh_per_cubic_meter
+                            MeterUnit.CUBIC_METER -> 1.0f
+                            MeterUnit.LITER -> 1000.0f
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+
+                    else -> {
+                        when (finalMeterUnit) {
+                            MeterUnit.KILO_WATT_HOUR -> 1000 / factor_kWh_per_cubic_meter
+                            MeterUnit.CUBIC_METER -> 0.001f
+                            MeterUnit.LITER -> 1.0f
+                            else -> throw Error("Bad Unit")
+                        }
+                    }
+                }
+            }
+
+            else -> 1.0f // Trop complexe
         }
-        else if (typeMeter == MeterType.CAR)
-        {
-            val factor_kWh_per_km = 0.15f
-            val factor_kWh_per_liter = 10.0f
-            if (meterUnit == MeterUnit.KILO_WATT_HOUR)
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { 1.0f }
-                    MeterUnit.KILO_METER -> { 1 / factor_kWh_per_km }
-                    MeterUnit.LITER -> { 1 / factor_kWh_per_liter }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-            else if (meterUnit == MeterUnit.KILO_METER)
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { factor_kWh_per_km }
-                    MeterUnit.KILO_METER -> { 1.0f }
-                    MeterUnit.LITER -> { factor_kWh_per_km / factor_kWh_per_liter }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-            else
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { factor_kWh_per_liter }
-                    MeterUnit.KILO_METER -> { factor_kWh_per_liter / factor_kWh_per_km }
-                    MeterUnit.LITER -> { 1.0f }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-        }
-        else if (typeMeter == MeterType.GAS)
-        {
-            val factor_kWh_per_cubic_meter = 8.9f
-            if (meterUnit == MeterUnit.KILO_WATT_HOUR)
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { 1.0f }
-                    MeterUnit.CUBIC_METER -> { factor_kWh_per_cubic_meter }
-                    MeterUnit.LITER -> { factor_kWh_per_cubic_meter / 1000 }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-            else if (meterUnit == MeterUnit.CUBIC_METER)
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { 1 / factor_kWh_per_cubic_meter }
-                    MeterUnit.CUBIC_METER -> { 1.0f }
-                    MeterUnit.LITER -> { 1000.0f }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-            else
-            {
-                return when (finalMeterUnit)
-                {
-                    MeterUnit.KILO_WATT_HOUR -> { 1000 / factor_kWh_per_cubic_meter }
-                    MeterUnit.CUBIC_METER -> { 0.001f }
-                    MeterUnit.LITER -> { 1.0f }
-                    else -> { throw Error("Bad Unit") }
-                }
-            }
-        }
-        else { return 1.0f } // Trop complexe
     }
 
     fun getMeterDetails(meter: Meter): String {
