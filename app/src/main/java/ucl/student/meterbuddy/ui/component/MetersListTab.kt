@@ -199,12 +199,20 @@ class MeterList : Screen {
                             } else {
                                 val oldReadingValue = readings?.get(1)?.value
                                 trendValue = 100 * ((recentReadingValue!! / oldReadingValue!!) - 1)
-                                if ((recentReadingValue / oldReadingValue) > 0.0) {
-                                    costIcon = R.drawable.additive_icon
+                                if ((recentReadingValue - oldReadingValue) > 0.0) {
+                                    if (meter.additiveMeter) {
+                                        costIcon = R.drawable.non_additive_icon_24
+                                    } else {
+                                        costIcon = R.drawable.additive_icon
+                                    }
                                 } else {
-                                    costIcon = R.drawable.non_additive_icon_24
+                                    if (meter.additiveMeter) {
+                                        costIcon = R.drawable.additive_icon
+                                    } else {
+                                        costIcon = R.drawable.non_additive_icon_24
+                                    }
                                 }
-                                costTrend = abs((recentReadingValue / oldReadingValue)) * meter.meterCost
+                                costTrend = abs((recentReadingValue - oldReadingValue)) * meter.meterCost
                             }
 
                             val trendIcon: TrendIcon
@@ -212,9 +220,9 @@ class MeterList : Screen {
                                 trendIcon = if (trendValue == 0.0f) {
                                     TrendIcon.Flat
                                 } else if (trendValue > 0.0f) {
-                                    TrendIcon.Down
+                                    TrendIcon.Up // NEED TO SWITCH COLOR
                                 } else {
-                                    TrendIcon.Up
+                                    TrendIcon.Down // NEED TO SWITCH COLOR
                                 }
                             } else {
                                 trendIcon = if (trendValue == 0.0f) {
