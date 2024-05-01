@@ -213,6 +213,7 @@ class MeterList : Screen {
                                 costTrend = abs((recentReadingValue - oldReadingValue)) * meter.meterCost
                             }
 
+<<<<<<< Updated upstream
                             val trendIcon: Int
                             if (meter.additiveMeter) {
                                 trendIcon = if (trendValue == 0.0f) {
@@ -229,6 +230,24 @@ class MeterList : Screen {
                                     R.drawable.trend_up_green_icon
                                 } else {
                                     R.drawable.trend_down_red_icon
+=======
+                            var trendIcon: TrendIcon
+                            if (meter.additiveMeter) {
+                                trendIcon = if (trendValue == 0.0f) {
+                                    TrendIcon.Flat
+                                } else if (trendValue > 0.0f) {
+                                    TrendIcon.Up
+                                } else {
+                                    TrendIcon.Down
+                                }
+                            } else {
+                                trendIcon = if (trendValue == 0.0f) {
+                                    TrendIcon.Flat
+                                } else if (trendValue > 0.0f) {
+                                    TrendIcon.Down
+                                } else {
+                                    TrendIcon.Up
+>>>>>>> Stashed changes
                                 }
                             }
 

@@ -206,7 +206,7 @@ fun HousingFrom(
                                     ignoreCase = true
                                 )
                             }.forEach{ user ->
-                                if (user !in usersOfHousing) {
+                                if (user !in usersOfHousing && userSearch.isNotBlank()) {
                                     FilterChip(selected = user in usersOfHousing,
                                         onClick = { onUserAdd(user) },
                                         label = { Text(text = user.userName) })
