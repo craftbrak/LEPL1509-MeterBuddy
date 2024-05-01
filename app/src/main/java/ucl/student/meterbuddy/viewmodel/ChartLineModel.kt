@@ -3,13 +3,9 @@ package ucl.student.meterbuddy.viewmodel
 import android.graphics.Paint
 import android.graphics.RectF
 import android.text.TextPaint
-import androidx.compose.foundation.layout.Row
-import kotlin.math.floor
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -17,9 +13,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
@@ -27,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
-import co.yml.charts.common.extensions.getTextBackgroundRect
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
 import co.yml.charts.ui.linechart.model.GridLines
@@ -44,16 +36,12 @@ import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import kotlin.math.ceil
-import kotlin.math.log10
-import kotlin.math.pow
+import kotlin.math.floor
 
 object ChartLineModel: ScreenModel {
 
     @Composable
-    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): List<Point>? {
+    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): List<Point> {
 
         if (meterReadings.isEmpty()) {
             val values = mutableListOf<Point>()
@@ -78,12 +66,12 @@ object ChartLineModel: ScreenModel {
         }
         return values.sortedBy { it.y }.sortedBy { it.x }
     }
-
     private fun getScale(values: List<Point>, maxWidth: Dp) : Dp {
         val sorted = values.sortedBy { it.x }
         val first = sorted.first()
         val last = sorted.last()
         return (maxWidth / (last.x - first.x))
+
     }
 
     @Composable
@@ -137,7 +125,7 @@ object ChartLineModel: ScreenModel {
             println(values.last().x.toInt())
             println(i * 7)
             println(values.last().x.toInt() + i * 7)
-            val dayOfYear = values.last().x.toInt() + i * 7
+            val dayOfYear = (values.last().x.toInt() + i * 7) % 366
             return LocalDate.ofYearDay(2024, dayOfYear).toString()
         }
     }

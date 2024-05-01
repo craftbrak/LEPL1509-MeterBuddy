@@ -295,6 +295,6 @@ fun MeterUnitOptions(
 @Composable
 private fun MeterFormDialogPreview() {
     MeterFormDialog(Modifier, {}, { name, unit, icon, type, cost, additive ->
-        println("Name: $name, Unit: $unit, Icon: $icon, Type: $type, Cost: $cost, Additive: $additive")
+//        println("Name: $name, Unit: $unit, Icon: $icon, Type: $type, Cost: $cost, Additive: $additive")
     }, true, "My Electricity Meter", "1.5")
 }
