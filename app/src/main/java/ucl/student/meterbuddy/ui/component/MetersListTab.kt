@@ -250,7 +250,8 @@ class MeterList : Screen {
                                     trendValue = trendValue,
                                     monthlyCost = costTrend,
                                     monthlyCostIcon = costIcon,
-                                    currencySymbol = it1
+                                    currencySymbol = it1,
+                                    consumption = meter.additiveMeter
                                 )
                             }
                         }
