@@ -3,7 +3,24 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="app">
+<<<<<<< Updated upstream
         <State />
+=======
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="R58R14L11HR" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-30T08:37:43.656100Z" />
+        </State>
+>>>>>>> Stashed changes
       </entry>
     </value>
   </component>
