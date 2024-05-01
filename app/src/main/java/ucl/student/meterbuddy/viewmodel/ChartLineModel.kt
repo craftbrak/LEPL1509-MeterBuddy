@@ -1,15 +1,21 @@
 package ucl.student.meterbuddy.viewmodel
 
+import androidx.compose.foundation.layout.Row
 import kotlin.math.floor
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -64,6 +70,7 @@ object ChartLineModel: ScreenModel {
         return (maxWidth / (last.x - first.x))
 
     }
+
     @Composable
     private fun createXAxis(values: List<Point>, maxWidth: Dp): AxisData {
         val nbSteps = if (values.size > 2) values.size - 1 else 1
@@ -71,12 +78,13 @@ object ChartLineModel: ScreenModel {
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize)
+            .axisLabelAngle(5f)
             .labelData { a -> getXLabel(a, values, nbSteps) }
             .labelAndAxisLinePadding(15.dp)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
             .axisLabelColor(MaterialTheme.colorScheme.tertiary)
-            .axisLabelDescription { "Time (dayOfYear) []" }
+            .axisLabelDescription { "Time []" }
             .build()
     }
 
