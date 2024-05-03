@@ -3,6 +3,7 @@ package ucl.student.meterbuddy.viewmodel
 import android.graphics.Paint
 import android.graphics.RectF
 import android.text.TextPaint
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -32,58 +33,89 @@ import co.yml.charts.ui.linechart.model.LineType
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import ucl.student.meterbuddy.data.model.TypeConverters
 import ucl.student.meterbuddy.data.model.entity.MeterReading
 import ucl.student.meterbuddy.data.model.enums.MeterType
 import ucl.student.meterbuddy.data.model.enums.MeterUnit
-import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import kotlin.math.floor
 
 object ChartLineModel: ScreenModel {
-
+    val converter = TypeConverters()
     @Composable
-    private fun getPointsFromMeterReadings(meterReadings: List<MeterReading>): List<Point> {
-
+    private fun getPointsFromMeterReadings(
+        meterReadings: List<MeterReading>,
+        maxWidth: Dp
+    ): List<Point> {
         if (meterReadings.isEmpty()) {
-            val values = mutableListOf<Point>()
-            values.add(Point(0f,0f))
-            return values
+            return listOf(Point(0f, 0f))
         }
-
-        val meterReadingsSorted = meterReadings.sortedBy { it.date.dayOfYear }
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val meterReadingsSorted = meterReadings.sortedBy { it.date }
 
         val values = mutableListOf<Point>()
-        val xValues = mutableSetOf<Float>()
-        meterReadingsSorted.forEach {reading ->
-            val x = reading.date.dayOfYear.toFloat()
-            var y = reading.value
-
-            if (x in xValues) {
-                y += values.last().y
-                values.removeLast()
-            } else { xValues.add(x) }
-
-            values.add(Point(x, y))
+        val scale = getScale(meterReadingsSorted, maxWidth)
+        meterReadingsSorted.forEachIndexed { index, reading ->
+            // Normalize the X position based on the index and the size of the dataset
+            val x = (scale.value * index)
+            val y = reading.value
+            values.add(Point(x, y, description = "$y, date: ${reading.date.format(formatter)}"))
         }
+
         return values.sortedBy { it.y }.sortedBy { it.x }
     }
-    private fun getScale(values: List<Point>, maxWidth: Dp) : Dp {
-        val sorted = values.sortedBy { it.x }
-        val first = sorted.first()
-        val last = sorted.last()
-        return (maxWidth / (last.x - first.x))
 
+    fun determineUnit(startDate: LocalDateTime, endDate: LocalDateTime, maxWidth: Int): ChronoUnit {
+        val daysDelta = ChronoUnit.DAYS.between(startDate, endDate)
+        if (daysDelta > maxWidth / 2) {
+            val weeksDelta = ChronoUnit.WEEKS.between(startDate, endDate)
+            if (weeksDelta > maxWidth / 2) {
+                return ChronoUnit.MONTHS
+            } else {
+                return ChronoUnit.WEEKS
+            }
+        } else {
+            return ChronoUnit.DAYS
+        }
+    }
+
+    fun calculateDelta(startDate: LocalDateTime, endDate: LocalDateTime, unit: ChronoUnit): Long {
+        return unit.between(startDate, endDate)
+    }
+
+    private fun getScale(values: List<MeterReading>, maxWidth: Dp): Dp {
+        val sorted = values.sortedBy { it.date }
+        val unit = determineUnit(sorted.first().date, sorted.last().date, maxWidth.value.toInt())
+        val delta = calculateDelta(sorted.first().date, sorted.last().date, unit)
+        Log.d("ChartLineModel", "Delta = $delta")
+        Log.d(
+            "ChartLineModel",
+            "Proposed scale = ${(maxWidth.value.toInt() / (values.size)).dp / 4}"
+        )
+//        if (values.size == 2){
+//            return ((maxWidth.value.toInt()) / (values.size*9)).dp
+//        }
+//        if (values.size == 3){
+//            return ((maxWidth.value.toInt()) / (values.size*8)).dp
+//        }
+//
+//        return ((maxWidth.value.toInt()) / (values.size* values.size)).dp
+        return 8.dp
     }
 
     @Composable
-    private fun createXAxis(values: List<Point>, maxWidth: Dp): AxisData {
+    private fun createXAxis(values: List<MeterReading>, maxWidth: Dp): AxisData {
         val nbSteps = if (values.size > 2) values.size - 1 else 1
         // val nbSteps = if (values.size > 3) values.size - 1 else 2
-        val stepSize = getScale(values,maxWidth)
+        val stepSize = getScale(values, maxWidth - 200.dp)
+        val sortedReadings = values.sortedBy { it.date }
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize)
-            .axisLabelAngle(8f)
-            .labelData { a -> getXLabel(a, values, nbSteps) }
+            .axisLabelAngle(10f)
+            .labelData { a -> getXLabel(a, sortedReadings, nbSteps, stepSize) }
             .labelAndAxisLinePadding(15.dp)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
@@ -93,16 +125,17 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    private fun createYAxis(values: List<Point>, labelAxis: String): AxisData {
-        val longestLabelLength = values.maxByOrNull { it.x }?.x.toString().length
+    private fun createYAxis(values: List<MeterReading>, labelAxis: String): AxisData {
+        val longestLabelLength = values.maxByOrNull { it.value }?.value.toString().length
         val padding = (longestLabelLength * 6).dp
-        val nbSteps = 6
+        val nbSteps = values.size
         val maxHeight = 200
         val stepSize = maxHeight / nbSteps
+
         return AxisData.Builder()
             .steps(nbSteps)
             .axisStepSize(stepSize.dp)
-            .labelData {i -> getYLabel(i, values, nbSteps) }
+            .labelData { i -> getYLabel(i, values, nbSteps) }
             .labelAndAxisLinePadding(padding)
             .backgroundColor(Color.Transparent)
             .axisLineColor(MaterialTheme.colorScheme.tertiary)
@@ -111,36 +144,34 @@ object ChartLineModel: ScreenModel {
             .build()
     }
 
-    private fun getXLabel(a : Int, values : List<Point>, nbSteps : Int) : String {
-        val i = a / 6 /* Bizarre mais contrairement au labelData de yAxis, i s'incremente de 6 par 6 au lieu de 1. */
+    private fun getXLabel(a: Int, values: List<MeterReading>, nbSteps: Int, scale: Dp): String {
+        val i = a / scale.value.toInt()  // Normalize the X position based on the axis step size
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         if (i < values.size)
         {
-            val dayOfYear = values[i].x.toInt()
-            // TODO : Rendre possible les dates > l'année 2024
-            println("The day $dayOfYear of the year 2024 is ${LocalDate.ofYearDay(2024, dayOfYear)}")
-            return LocalDate.ofYearDay(2024, dayOfYear).toString()
+            val formattedDate = values[i].date.format(formatter)
+            return formattedDate.toString()
         }
         else
         {
-            println(values.last().x.toInt())
-            println(i * 7)
-            println(values.last().x.toInt() + i * 7)
-            val dayOfYear = (values.last().x.toInt() + i * 7) % 366
-            return LocalDate.ofYearDay(2024, dayOfYear).toString()
+            val formattedDate = values.last().date.format(formatter)
+            return formattedDate
         }
     }
 
-    private fun getYLabel(i : Int, values : List<Point>, nbSteps : Int) : String {
+    private fun getYLabel(i: Int, values: List<MeterReading>, nbSteps: Int): String {
         if (values.size == 1)
         {
-            if (i == 0)      { return "0"}
-            else if (i == 1) { return floor(values[0].y).toString() }
-            else             { return floor(values[0].y * 2).toString() }
+            if (i == 0)      { return "0"} else if (i == 1) {
+                return floor(values[0].value).toString()
+            } else {
+                return floor(values[0].value * 2).toString()
+            }
         }
         else
         {
-            val yScale = values.maxBy { it.y }.y - values.minBy { it.y }.y
-            return floor(values.minBy { it.y }.y +(i * (yScale / nbSteps))).toString()
+            val yScale = values.maxBy { it.value }.value - values.minBy { it.value }.value
+            return floor(values.minBy { it.value }.value + (i * (yScale / nbSteps))).toString()
         }
     }
 
@@ -183,7 +214,7 @@ object ChartLineModel: ScreenModel {
                     paddingBetweenPopUpAndPoint = 20.dp,
                     draw = { selectedOffset, identifiedPoint ->
                         // ${LocalDate.ofYearDay(2024, identifiedPoint.x.toInt())}
-                        val popUpText = "x: YYYY/DD/MM, y: ${identifiedPoint.y}"
+                        val popUpText = identifiedPoint.description
                         val paint = TextPaint().apply {
                             textSize = 14.sp.toPx()
                             color = Color.Black.toArgb()
@@ -286,9 +317,10 @@ object ChartLineModel: ScreenModel {
 
     @Composable
     fun createChartLineIndividual(readings: List<MeterReading>, typeValues: String, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
-        val values = this.getPointsFromMeterReadings(readings) ?: return null
-        val xData = this.createXAxis(values = values, maxWidth = maxWidth)
-        val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
+        val values = this.getPointsFromMeterReadings(readings, maxWidth)
+        val xData = this.createXAxis(values = readings, maxWidth = maxWidth - 50.dp)
+        val yData =
+            this.createYAxis(values = readings, labelAxis = "$type Consumption [ $meterUnit ]")
         return LineChartData(
             linePlotData = LinePlotData(lines = listOf(createLine(values, typeValues))),
             backgroundColor = MaterialTheme.colorScheme.surface,
@@ -302,9 +334,15 @@ object ChartLineModel: ScreenModel {
     fun createChartLine(readingsConsumption: List<MeterReading>, readingsProduction: List<MeterReading>, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
         if (readingsConsumption.isEmpty()) { return createChartLineIndividual(readingsProduction, "production", type, meterUnit, maxWidth) }
         if (readingsProduction.isEmpty())  { return createChartLineIndividual(readingsConsumption, "consumption", type, meterUnit, maxWidth) }
-        val valuesConsumption = this.getPointsFromMeterReadings(readingsConsumption)?.toMutableList() ?: return null
-        val valuesProduction  = this.getPointsFromMeterReadings(readingsProduction)?.toMutableList() ?: return null
-        val values = valuesConsumption + valuesProduction
+        val valuesConsumption = this.getPointsFromMeterReadings(
+            readingsConsumption,
+            maxWidth
+        ).toMutableList()
+        val valuesProduction = this.getPointsFromMeterReadings(
+            readingsProduction,
+            maxWidth
+        ).toMutableList()
+        val values = readingsConsumption + readingsProduction
         val xData = this.createXAxis(values = values, maxWidth = maxWidth)
         val yData = this.createYAxis(values = values, labelAxis = "$type Consumption [ $meterUnit ]")
         return LineChartData(

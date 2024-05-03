@@ -303,7 +303,11 @@ class LineChartsScreen: Tab {
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Text(text="Type : ${param.title}", fontWeight = FontWeight.Bold)
-            ChartLineModel.DisplayChartLine(graph = param.graph, width = LocalConfiguration.current.screenWidthDp - 40, height = 300 )
+            ChartLineModel.DisplayChartLine(
+                graph = param.graph,
+                width = LocalConfiguration.current.screenWidthDp,
+                height = 300
+            )
             Column(
                 horizontalAlignment = Alignment.Start,
                 )
