@@ -129,7 +129,7 @@ fun HousingFrom(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             SingleChoiceSegmentedButtonRow {
                 HousingType.entries.forEachIndexed { index, houseType ->
                     SegmentedButton(
