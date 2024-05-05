@@ -205,6 +205,7 @@ class FireBaseMeterRepository @Inject constructor(private val db: FirebaseFirest
     }
 
     override fun addUserData(user: User) {
+        Log.d("AddUser", "Adding user custom data")
         db.collection("users").document(user.userID.toString()).set(user)
     }
 

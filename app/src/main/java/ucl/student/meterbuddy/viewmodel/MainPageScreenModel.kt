@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Housing
@@ -424,7 +425,7 @@ class MainPageScreenModel @Inject constructor(
         username: String,
         selectedCurrency: Currency
     ) {
-        viewModelScope.launch {
+        GlobalScope.launch {
             authRepository.registerUser(email, password).collect {
                 when (it) {
                     is Resource.Error -> {
@@ -437,7 +438,6 @@ class MainPageScreenModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _state.value.currentUser.emit(Resource.Success(it.data.user!!))
                         val userData =
                             User(it.data.user!!.uid.hashCode(), username, selectedCurrency)
                         meterRepository.addUserData(userData)
@@ -450,6 +450,7 @@ class MainPageScreenModel @Inject constructor(
                         )
                         meterRepository.addHousing(defaultHousing, userData)
                         Log.i(tag + "Register", "Logged in as ${it.data.user?.email}")
+                        _state.value.currentUser.emit(Resource.Success(it.data.user!!))
                     }
                 }
             }

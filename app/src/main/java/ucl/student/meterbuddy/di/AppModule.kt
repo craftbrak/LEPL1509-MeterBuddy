@@ -13,6 +13,7 @@ import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import ucl.student.meterbuddy.data.repository.AuthRepository
+import ucl.student.meterbuddy.data.repository.FireBaseMeterRepository
 import ucl.student.meterbuddy.data.repository.FirebaseAuthRepository
 import ucl.student.meterbuddy.viewmodel.MainPageState
 import ucl.student.meterbuddy.viewmodel.MeterScreenModel
@@ -42,8 +43,11 @@ object AppModuleStatic {
 
     @Provides
     @Singleton
-    fun providesFirebaseAuthRepository(fb: FirebaseAuth): AuthRepository {
-        return FirebaseAuthRepository(fb)
+    fun providesFirebaseAuthRepository(
+        fb: FirebaseAuth,
+        fireBaseMeterRepository: FireBaseMeterRepository
+    ): AuthRepository {
+        return FirebaseAuthRepository(fb, fireBaseMeterRepository)
     }
 
     @Provides

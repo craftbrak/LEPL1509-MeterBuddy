@@ -10,13 +10,15 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import ucl.student.meterbuddy.data.model.entity.User
 import ucl.student.meterbuddy.data.utils.AuthException
 import ucl.student.meterbuddy.data.utils.Resource
 import java.util.Optional
 import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseMeterRepository: MeterRepository
 ) : AuthRepository {
     override fun currentUser(): Optional<FirebaseUser> {
         return if (firebaseAuth.currentUser != null) Optional.of(firebaseAuth.currentUser!!)
@@ -31,6 +33,7 @@ class FirebaseAuthRepository @Inject constructor(
             emit(Resource.Loading<AuthResult, AuthException>(true))
             val res = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             emit(Resource.Success<AuthResult, AuthException>(res))
+            Log.i("AuthRepo", "Login")
         }.catch { throwable ->
             throwable.message?.let { Log.e("AuthRepo", it) }
             when (throwable.message) {
@@ -48,12 +51,22 @@ class FirebaseAuthRepository @Inject constructor(
 
     override fun registerUser(
         email: String,
-        password: String
+        password: String,
+        user: User
     ): Flow<Resource<AuthResult, AuthException>> {
         return flow {
-            emit(Resource.Loading<AuthResult, AuthException>(true))
-            val res = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            emit(Resource.Success(res))
+            emit(Resource.Loading<AuthResult, AuthException>(false))
+            val res = firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("AuthRepo", "User created")
+//                    firebaseMeterRepository.addUserData(user.copy(userID = task.result?.user?.uid.hashCode()))
+                    }
+                }.await()
+            // call add user data and add housing
+//            Log.i("AuthRepo", "User created")
+//            firebaseMeterRepository.addUserData(user.copy(userID = res.user?.uid.hashCode()))
+            emit(Resource.Success<AuthResult, AuthException>(res))
         }.catch {
             when (it.message) {
                 ("Invalid Credentials") -> emit(Resource.Error(AuthException.BAD_CREDENTIALS))
@@ -63,6 +76,9 @@ class FirebaseAuthRepository @Inject constructor(
                 ("The given password is invalid. [ Password should be at least 6 characters ]") -> emit(Resource.Error(AuthException.PASSWORD_TO0_SHORT))
                 ("The email address is already in use by another account.") -> emit(Resource.Error(AuthException.EMAIL_ALREADY_TAKEN))
                 ("The email address is badly formatted.") -> emit(Resource.Error(AuthException.EMAIL_BAD_FORMATTED))
+                ("Initial task failed for action RecaptchaAction(action=signUpPassword)with exception - The email address is already in use by another account.") -> emit(
+                    Resource.Error(AuthException.EMAIL_ALREADY_TAKEN)
+                )
                 else -> emit(Resource.Error(AuthException.UNKNOWN_ERROR))
             }
         }
