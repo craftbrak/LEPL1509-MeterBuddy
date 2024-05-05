@@ -102,7 +102,7 @@ object ChartLineModel: ScreenModel {
 //        }
 //
 //        return ((maxWidth.value.toInt()) / (values.size* values.size)).dp
-        return 8.dp
+        return 10.dp
     }
 
     @Composable
@@ -316,7 +316,7 @@ object ChartLineModel: ScreenModel {
     }
 
     @Composable
-    fun createChartLineIndividual(readings: List<MeterReading>, typeValues: String, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData? {
+    fun createChartLineIndividual(readings: List<MeterReading>, typeValues: String, type: MeterType, meterUnit: MeterUnit, maxWidth: Dp): LineChartData {
         val values = this.getPointsFromMeterReadings(readings, maxWidth)
         val xData = this.createXAxis(values = readings, maxWidth = maxWidth - 50.dp)
         val yData =
