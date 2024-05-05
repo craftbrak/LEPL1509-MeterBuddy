@@ -460,6 +460,14 @@ class MainPageScreenModel @Inject constructor(
     }
 
     fun logout() {
+        _state.value = _state.value.copy(
+            currentUserData = null,
+            housings = emptyList(),
+            selectedHousing = Resource.Loading(),
+            meters = emptyList(),
+            lastReading = emptyMap(),
+            users = emptyList()
+        )
         authRepository.logout()
         viewModelScope.launch {
             state.value.currentUser.emit(Resource.Error(AuthException.NO_CURRENT_USER))
