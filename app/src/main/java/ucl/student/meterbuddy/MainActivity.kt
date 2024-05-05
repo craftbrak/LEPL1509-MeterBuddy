@@ -144,8 +144,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         is Resource.Loading -> {
-                            navController.navigate("loading")
-                            Log.i("Loading please wait", "wait")
+//                            navController.navigate("loading")
+//                            Log.i("Loading please wait", "wait")
                         }
                         is Resource.Success -> {
                             navController.navigate("home"){

@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import ucl.student.meterbuddy.data.model.entity.Housing
@@ -199,11 +198,11 @@ class MainPageScreenModel @Inject constructor(
             }
 
         }
-        viewModelScope.launch {
-            authRepository.getUser().collect {
-                _state.value.currentUser.emit(it)  //Don't ask me why this is duplicated but it work and it does not if removed
-            }
-        }
+//        viewModelScope.launch {
+//            authRepository.getUser().collect {
+//                _state.value.currentUser.emit(it)  //Don't ask me why this is duplicated but it work and it does not if removed
+//            }
+//        }
     }
 
 
@@ -413,6 +412,7 @@ class MainPageScreenModel @Inject constructor(
                     is Resource.Success -> {
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
                         Log.i("Login", "Logged in as ${it.data.user?.email}")
+                        updateState()
                     }
                 }
             }
@@ -425,7 +425,7 @@ class MainPageScreenModel @Inject constructor(
         username: String,
         selectedCurrency: Currency
     ) {
-        GlobalScope.launch {
+        viewModelScope.launch {
             authRepository.registerUser(email, password).collect {
                 when (it) {
                     is Resource.Error -> {
@@ -451,6 +451,7 @@ class MainPageScreenModel @Inject constructor(
                         meterRepository.addHousing(defaultHousing, userData)
                         Log.i(tag + "Register", "Logged in as ${it.data.user?.email}")
                         _state.value.currentUser.emit(Resource.Success(it.data.user!!))
+                        updateState()
                     }
                 }
             }
